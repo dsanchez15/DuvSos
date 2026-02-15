@@ -33,7 +33,7 @@ export default function DashboardContent() {
         fetchHabits();
     }, []);
 
-    const handleToggleCompletion = async (id: string, completed: boolean) => {
+    const handleToggleCompletion = async (id: number, completed: boolean) => {
         const date = getTodayDateString();
         try {
             if (completed) {

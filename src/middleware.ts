@@ -9,13 +9,18 @@ export async function middleware(request: NextRequest) {
     const session = request.cookies.get('session')?.value
 
     // Verify session
-    let userId: string | null = null
+    let userId: number | null = null
     if (session) {
         try {
             const { payload } = await jwtVerify(session, key, {
                 algorithms: ['HS256'],
             })
-            userId = payload.userId as string
+            // Parse userId from JWT (stored as string) to number
+            const userIdFromJwt = parseInt(payload.userId as string, 10)
+            // Validate that it's a valid number (not NaN from old UUID sessions)
+            if (!isNaN(userIdFromJwt) && userIdFromJwt > 0) {
+                userId = userIdFromJwt
+            }
         } catch (error) {
             // Invalid token
         }
@@ -43,7 +48,7 @@ export async function middleware(request: NextRequest) {
     // Add userId header for API routes to use easily (optional, but helpful)
     const response = NextResponse.next()
     if (userId) {
-        response.headers.set('x-user-id', userId)
+        response.headers.set('x-user-id', userId.toString())
     }
 
     return response

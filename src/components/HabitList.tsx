@@ -47,7 +47,7 @@ export default function HabitList() {
     }
   }
 
-  const handleUpdateHabit = async (id: string, data: HabitFormData) => {
+  const handleUpdateHabit = async (id: number, data: HabitFormData) => {
     try {
       const response = await fetch(`/api/habits/${id}`, {
         method: 'PUT',
@@ -63,7 +63,7 @@ export default function HabitList() {
     }
   }
 
-  const handleDeleteHabit = async (id: string) => {
+  const handleDeleteHabit = async (id: number) => {
     try {
       const response = await fetch(`/api/habits/${id}`, {
         method: 'DELETE',
@@ -76,7 +76,7 @@ export default function HabitList() {
     }
   }
 
-  const handleToggleCompletion = async (id: string, date: string, completed: boolean) => {
+  const handleToggleCompletion = async (id: number, date: string, completed: boolean) => {
     try {
       if (completed) {
         const response = await fetch(`/api/habits/${id}/completions`, {

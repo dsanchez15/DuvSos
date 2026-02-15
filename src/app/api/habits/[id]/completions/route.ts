@@ -10,16 +10,27 @@ interface RouteParams {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const { id } = await params
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
+
+    const { id: idStr } = await params
+    const id = parseInt(idStr, 10)
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: 'Invalid habit ID' },
+        { status: 400 }
+      )
+    }
+
     const body = await request.json()
     const { date } = body
 
@@ -39,11 +50,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Handle date correctly (local time vs UTC)
-    // If date is provided as YYYY-MM-DD, parsing it with new Date() assumes UTC
-    // We want to store it as local date (00:00:00 local time)
     let completionDate: Date
     if (date) {
-      // Append time to force local time parsing
       completionDate = new Date(`${date}T00:00:00`)
     } else {
       completionDate = new Date()
@@ -70,16 +78,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const { id } = await params
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
+
+    const { id: idStr } = await params
+    const id = parseInt(idStr, 10)
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: 'Invalid habit ID' },
+        { status: 400 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const dateParam = searchParams.get('date')
 

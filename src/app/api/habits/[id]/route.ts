@@ -10,16 +10,27 @@ interface RouteParams {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const { id } = await params
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
+
+    const { id: idStr } = await params
+    const id = parseInt(idStr, 10)
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: 'Invalid habit ID' },
+        { status: 400 }
+      )
+    }
+
     const body = await request.json()
     const { title, description, color } = body
 
@@ -68,16 +79,26 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const { id } = await params
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
+
+    const { id: idStr } = await params
+    const id = parseInt(idStr, 10)
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: 'Invalid habit ID' },
+        { status: 400 }
+      )
+    }
 
     // Check ownership
     const existingHabit = await prisma.habit.findUnique({

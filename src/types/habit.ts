@@ -1,10 +1,10 @@
 export interface Completion {
-    id: string
+    id: number
     date: string
 }
 
 export interface Habit {
-    id: string
+    id: number
     title: string
     description?: string | null
     color: string
@@ -14,6 +14,6 @@ export interface Habit {
 
 export interface HabitFormData {
     title: string
-    description: string
+    description?: string | null
     color: string
 }

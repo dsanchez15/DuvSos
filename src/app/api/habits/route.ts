@@ -7,14 +7,17 @@ import { headers } from 'next/headers'
 export async function GET() {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
+
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
 
     const habits = await prisma.habit.findMany({
       where: {
@@ -25,7 +28,7 @@ export async function GET() {
           orderBy: {
             date: 'desc',
           },
-          take: 30, // Optimize: limit to last 30 completions
+          take: 30,
         },
       },
       orderBy: {
@@ -45,14 +48,17 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const headersList = await headers()
-    const userId = headersList.get('x-user-id')
+    const userIdHeader = headersList.get('x-user-id')
 
-    if (!userId) {
+    if (!userIdHeader) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
+
+    // Middleware guarantees this is a valid number
+    const userId = parseInt(userIdHeader, 10)
 
     const body = await request.json()
     const { title, description, color } = body

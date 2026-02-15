@@ -14,11 +14,12 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
     return bcrypt.compare(password, hash)
 }
 
-export async function createSession(userId: string) {
+export async function createSession(userId: number) {
     const expiresCount = 24 * 60 * 60 * 1000 // 1 day
     const expires = new Date(Date.now() + expiresCount)
 
-    const token = await new SignJWT({ userId })
+    // Store userId as string in JWT (JWT claims are typically strings)
+    const token = await new SignJWT({ userId: userId.toString() })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
         .setExpirationTime('24h')
@@ -53,12 +54,19 @@ export async function getSession() {
 
 export async function getCurrentUser() {
     const session = await getSession()
-    if (!session || typeof session.userId !== 'string') return null
+    if (!session || !session.userId) return null
+
+    // Parse userId from string to number
+    const userId = parseInt(session.userId as string, 10)
+    if (isNaN(userId)) {
+        console.warn('getCurrentUser: Invalid userId format:', session.userId)
+        return null
+    }
 
     try {
-        console.log('getCurrentUser: fetching user for id:', session.userId);
+        console.log('getCurrentUser: fetching user for id:', userId)
         const user = await prisma.user.findUnique({
-            where: { id: session.userId },
+            where: { id: userId },
             select: {
                 id: true,
                 email: true,
@@ -67,10 +75,10 @@ export async function getCurrentUser() {
                 tagline: true,
             },
         })
-        if (!user) console.warn('getCurrentUser: User not found in DB for id:', session.userId);
+        if (!user) console.warn('getCurrentUser: User not found in DB for id:', userId)
         return user
     } catch (error) {
-        console.error('getCurrentUser: Database error during fetch:', error);
+        console.error('getCurrentUser: Database error during fetch:', error)
         return null
     }
 }

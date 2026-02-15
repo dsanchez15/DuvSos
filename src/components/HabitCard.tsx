@@ -7,9 +7,9 @@ import { calculateStreak, getTodayDateString, getLast7Days, isCompletedOnDate } 
 
 interface HabitCardProps {
   habit: Habit
-  onUpdate: (id: string, data: HabitFormData) => void
-  onDelete: (id: string) => void
-  onToggleCompletion: (id: string, date: string, completed: boolean) => void
+  onUpdate: (id: number, data: HabitFormData) => void
+  onDelete: (id: number) => void
+  onToggleCompletion: (id: number, date: string, completed: boolean) => void
 }
 
 export default function HabitCard({
