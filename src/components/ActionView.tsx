@@ -96,22 +96,23 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
           {xpPopups.map((popup) => (
             <div
               key={popup.id}
-              className="xp-popup bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-primary/20 p-4"
+              className="xp-popup rounded-xl shadow-lg border p-4"
+              style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
             >
               {popup.leveledUp && (
                 <div className="text-center mb-2">
                   <span className="text-2xl">🎉</span>
                   <p className="level-up-text text-lg font-bold text-primary">¡Subiste de nivel!</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Nivel {popup.newLevel} - {getLevelName(popup.newLevel)}</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Nivel {popup.newLevel} - {getLevelName(popup.newLevel)}</p>
                 </div>
               )}
               {popup.milestone && (
-                <p className="milestone-text text-sm text-amber-600 dark:text-amber-400 font-medium text-center">
+                <p className="milestone-text text-sm font-medium text-center" style={{ color: 'var(--color-warning)' }}>
                   🏆 {popup.milestone}
                 </p>
               )}
               {!popup.leveledUp && !popup.milestone && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
+                <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
                   +{popup.xp} XP
                 </p>
               )}
@@ -122,8 +123,8 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Acción Diaria</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Acción Diaria</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>
             {completedCount}/{habitsWithMetrics.length} completados hoy
           </p>
         </div>
@@ -132,19 +133,20 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
 
       {/* Summary */}
       {habitsWithMetrics.length > 0 && (
-        <div className="dashboard-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <div className="habit-progress-track h-3 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div className="habit-progress-track h-3 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-input)' }}>
                 <div
-                  className="habit-progress-fill h-full bg-green-500 rounded-full transition-all duration-500"
+                  className="habit-progress-fill h-full rounded-full transition-all duration-500"
                   style={{
+                    backgroundColor: 'var(--color-success)',
                     width: `${habitsWithMetrics.length > 0 ? (completedCount / habitsWithMetrics.length) * 100 : 0}%`,
                   }}
                 />
               </div>
             </div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
               {Math.round((completedCount / Math.max(1, habitsWithMetrics.length)) * 100)}%
             </span>
           </div>
@@ -152,9 +154,9 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
       )}
 
       {habitsWithMetrics.length === 0 ? (
-        <div className="empty-state text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-          <p className="text-slate-500 dark:text-slate-400 text-lg">No hay hábitos activos para hoy</p>
-          <p className="text-slate-400 dark:text-slate-500 mt-1">Crea hábitos en la vista de planificación</p>
+        <div className="empty-state text-center py-16 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>No hay hábitos activos para hoy</p>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Crea hábitos en la vista de planificación</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -167,10 +169,10 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
             return (
               <div
                 key={habit.id}
-                className={`action-row bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border-l-4 transition-all hover:shadow-md ${
+                className={`action-row rounded-xl p-4 shadow-sm border-l-4 transition-all hover:shadow-md ${
                   isCompleted ? 'action-row-completed opacity-75' : ''
                 }`}
-                style={{ borderLeftColor: habit.color }}
+                style={{ background: 'var(--color-bg-surface)', borderLeftColor: habit.color }}
               >
                 <div className="flex items-center gap-4">
                   <button
@@ -178,9 +180,13 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
                     disabled={completingId === habit.id}
                     className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
                       isCompleted
-                        ? 'toggle-btn-completed bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400'
-                        : 'toggle-btn-pending bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600'
+                        ? 'toggle-btn-completed'
+                        : 'toggle-btn-pending action-toggle-btn-pending'
                     }`}
+                    style={isCompleted
+                      ? { background: 'color-mix(in srgb, var(--color-success) 15%, transparent)', color: 'var(--color-success)' }
+                      : { background: 'var(--color-bg-input)', color: 'var(--color-text-muted)' }
+                    }
                   >
                     {completingId === habit.id ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current" />
@@ -196,14 +202,14 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
                   </button>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-semibold truncate ${isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>
+                    <h3 className={`font-semibold truncate ${isCompleted ? 'line-through' : ''}`} style={{ color: isCompleted ? 'var(--color-text-muted)' : 'var(--color-text-primary)' }}>
                       {habit.title}
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                       {habit.metrics.completionsThisPeriod} de {habit.goalValue} {periodLabel}
                       {periodRange && ` (${periodRange})`}
                     </p>
-                    <div className="mt-2 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-input)' }}>
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -231,8 +237,8 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
 
       {/* End of day summary */}
       {habitsWithMetrics.length > 0 && (
-        <div className="day-summary dashboard-card bg-gradient-to-r from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 rounded-xl p-4 border border-primary/20">
-          <p className="text-sm text-slate-700 dark:text-slate-300">
+        <div className="day-summary dashboard-card rounded-xl p-4 border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'var(--color-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             {completedCount === habitsWithMetrics.length
               ? '🎉 Excelente! Completaste todos tus hábitos hoy.'
               : completedCount === 0

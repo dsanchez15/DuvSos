@@ -41,49 +41,54 @@ export default function HabitCard({
     }
   }
 
-  const stateActions: { label: string; state: HabitState; class: string }[] = []
+  const stateActions: { label: string; state: HabitState; colorToken: string; hoverClass: string }[] = []
   if (habit.state === 'Active') {
     stateActions.push(
-      { label: 'Pausar', state: 'Paused', class: 'text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20' },
-      { label: 'Archivar', state: 'Archived', class: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50' }
+      { label: 'Pausar', state: 'Paused', colorToken: 'var(--color-warning)', hoverClass: 'habit-state-btn-warning' },
+      { label: 'Archivar', state: 'Archived', colorToken: 'var(--color-text-secondary)', hoverClass: 'habit-state-btn-muted' }
     )
   } else if (habit.state === 'Paused') {
     stateActions.push(
-      { label: 'Activar', state: 'Active', class: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20' },
-      { label: 'Archivar', state: 'Archived', class: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50' }
+      { label: 'Activar', state: 'Active', colorToken: 'var(--color-success)', hoverClass: 'habit-state-btn-success' },
+      { label: 'Archivar', state: 'Archived', colorToken: 'var(--color-text-secondary)', hoverClass: 'habit-state-btn-muted' }
     )
   } else if (habit.state === 'Archived') {
     stateActions.push(
-      { label: 'Reactivar', state: 'Active', class: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20' }
+      { label: 'Reactivar', state: 'Active', colorToken: 'var(--color-success)', hoverClass: 'habit-state-btn-success' }
     )
   }
 
   return (
-    <div className="dashboard-card bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border-l-4 transition-all hover:shadow-lg" style={{ borderLeftColor: habit.color }}>
+    <div className="dashboard-card rounded-xl p-6 border-l-4 transition-all" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-md)', borderLeftColor: habit.color }}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{habit.title}</h3>
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-              habit.state === 'Active'
-                ? 'badge-active bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
-                : habit.state === 'Paused'
-                ? 'badge-paused bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400'
-                : 'badge-archived bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-            }`}>
+            <h3 className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{habit.title}</h3>
+            <span
+              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                habit.state === 'Active' ? 'badge-active' : habit.state === 'Paused' ? 'badge-paused' : 'badge-archived'
+              }`}
+              style={
+                habit.state === 'Active'
+                  ? { background: 'color-mix(in srgb, var(--color-success) 15%, transparent)', color: 'var(--color-success)' }
+                  : habit.state === 'Paused'
+                  ? { background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)', color: 'var(--color-warning)' }
+                  : { background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-muted)' }
+              }
+            >
               {habit.state === 'Active' ? 'Activo' : habit.state === 'Paused' ? 'Pausado' : 'Archivado'}
             </span>
             {habit.category && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-muted)' }}>
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: habit.category.color }} />
                 {habit.category.name}
               </span>
             )}
           </div>
           {habit.description && (
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{habit.description}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>{habit.description}</p>
           )}
-          <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
             <span>Meta: {habit.goalType === 'Daily' ? 'Diaria' : habit.goalType === 'Weekly' ? 'Semanal' : habit.goalType === 'Monthly' ? 'Mensual' : 'Ratio'} ({habit.goalValue}{habit.goalType === 'Ratio' ? '%' : 'x'})</span>
             {habit.isPermanent ? (
               <span>Permanente</span>
@@ -100,7 +105,8 @@ export default function HabitCard({
           {onEdit && (
             <button
               onClick={onEdit}
-              className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+              className="p-2 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+              style={{ color: 'var(--color-text-muted)' }}
               title="Editar"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +116,8 @@ export default function HabitCard({
           )}
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            className="p-2 habit-delete-btn rounded-lg transition-colors"
+            style={{ color: 'var(--color-text-muted)' }}
             title="Eliminar"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,9 +133,13 @@ export default function HabitCard({
           <button
             onClick={() => onToggleCompletion(habit.id, today, !isCompletedToday)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${isCompletedToday
-                ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/30'
-                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                ? 'habit-completion-done'
+                : 'habit-completion-pending'
               }`}
+            style={isCompletedToday
+              ? { background: 'color-mix(in srgb, var(--color-success) 15%, transparent)', color: 'var(--color-success)' }
+              : { background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }
+            }
           >
             {isCompletedToday ? (
               <>
@@ -163,7 +174,8 @@ export default function HabitCard({
             key={action.state}
             onClick={() => handleStateChange(action.state)}
             disabled={stateLoading}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${action.class}`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${action.hoverClass}`}
+            style={{ color: action.colorToken }}
           >
             {stateLoading ? '...' : action.label}
           </button>
@@ -172,7 +184,7 @@ export default function HabitCard({
 
       {/* Last 7 days */}
       <div className="flex items-center gap-1">
-        <span className="text-xs text-slate-500 dark:text-slate-400 mr-2">Últimos 7 días:</span>
+        <span className="text-xs mr-2" style={{ color: 'var(--color-text-muted)' }}>Últimos 7 días:</span>
         {last7Days.map((date) => {
           const isCompleted = isCompletedOnDate(habit.completions, date)
           const dayName = new Date(date).toLocaleDateString('es', { weekday: 'narrow' })
@@ -180,9 +192,13 @@ export default function HabitCard({
             <div
               key={date}
               className={`day-cell w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium ${isCompleted
-                  ? 'day-cell-completed bg-green-500 text-white'
-                  : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'
+                  ? 'day-cell-completed'
+                  : ''
                 }`}
+              style={isCompleted
+                ? { background: 'var(--color-success)', color: 'var(--color-text-inverse)' }
+                : { background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-muted)' }
+              }
               title={new Date(date).toLocaleDateString('es')}
             >
               {dayName}
@@ -193,7 +209,7 @@ export default function HabitCard({
 
       {/* Blockers */}
       {habit.blockers && habit.blockers.length > 0 && (
-        <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
           <span className="font-medium">Requisitos:</span>{' '}
           {habit.blockers.map((b) => b.blockerHabit?.title).join(', ')}
         </div>
@@ -201,15 +217,16 @@ export default function HabitCard({
 
       {showDeleteConfirm && (
         <div className="delete-modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="delete-modal bg-white dark:bg-slate-800 rounded-xl p-6 max-w-sm w-full">
-            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">¿Eliminar hábito?</h4>
-            <p className="text-slate-600 dark:text-slate-400 mb-4">
+          <div className="delete-modal rounded-xl p-6 max-w-sm w-full" style={{ background: 'var(--color-bg-surface)' }}>
+            <h4 className="text-lg font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>¿Eliminar hábito?</h4>
+            <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               Esta acción no se puede deshacer. Se eliminará el hábito &quot;{habit.title}&quot; y todo su historial.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="btn-outline flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-medium"
+                className="btn-outline flex-1 px-4 py-2 rounded-lg habit-cancel-btn transition-colors font-medium"
+                style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
               >
                 Cancelar
               </button>
@@ -218,7 +235,8 @@ export default function HabitCard({
                   onDelete(habit.id)
                   setShowDeleteConfirm(false)
                 }}
-                className="btn-danger flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                className="btn-danger flex-1 px-4 py-2 rounded-lg transition-colors font-medium"
+                style={{ background: 'var(--color-danger)', color: 'var(--color-text-inverse)' }}
               >
                 Eliminar
               </button>

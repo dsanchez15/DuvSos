@@ -1,28 +1,34 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Checklist, ChecklistCategory, ChecklistFilter, ChecklistItem, ChecklistTab, Priority } from '@/types/checklist'
 
-const priorityConfig: Record<Priority, { icon: string; class: string }> = {
-  high: { icon: 'arrow_upward', class: 'text-red-500' },
-  normal: { icon: 'remove', class: 'text-slate-400' },
-  low: { icon: 'arrow_downward', class: 'text-blue-400' },
+const priorityConfig: Record<Priority, { icon: string; color: string }> = {
+  high: { icon: 'arrow_upward', color: 'var(--color-danger)' },
+  normal: { icon: 'remove', color: 'var(--color-text-muted)' },
+  low: { icon: 'arrow_downward', color: 'var(--color-info)' },
 }
 
-export function getStatus(c: Checklist): { label: string; class: string } {
-  if (c.lifecycleState === 'Completed') return { label: 'Completed', class: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }
-  if (c.lifecycleState === 'Archived') return { label: 'Archived', class: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }
-  if (!c.startDate && !c.endDate) return { label: 'No dates', class: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' }
+export function getStatus(c: Checklist): { label: string; style: React.CSSProperties } {
+  const successStyle: React.CSSProperties = { background: 'color-mix(in srgb, var(--color-success) 15%, transparent)', color: 'var(--color-success)' }
+  const mutedStyle: React.CSSProperties = { background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }
+  const dangerStyle: React.CSSProperties = { background: 'color-mix(in srgb, var(--color-danger) 15%, transparent)', color: 'var(--color-danger)' }
+  const warningStyle: React.CSSProperties = { background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)', color: 'var(--color-warning)' }
+  const infoStyle: React.CSSProperties = { background: 'color-mix(in srgb, var(--color-info) 15%, transparent)', color: 'var(--color-info)' }
+
+  if (c.lifecycleState === 'Completed') return { label: 'Completed', style: successStyle }
+  if (c.lifecycleState === 'Archived') return { label: 'Archived', style: mutedStyle }
+  if (!c.startDate && !c.endDate) return { label: 'No dates', style: mutedStyle }
   const now = new Date()
   const end = c.endDate ? new Date(c.endDate) : null
   const start = c.startDate ? new Date(c.startDate) : null
-  if (end && end < now) return { label: 'Expired', class: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }
+  if (end && end < now) return { label: 'Expired', style: dangerStyle }
   if (end) {
     const days = Math.ceil((end.getTime() - now.getTime()) / 86400000)
-    if (days <= 3) return { label: `${days}d left`, class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }
+    if (days <= 3) return { label: `${days}d left`, style: warningStyle }
   }
-  if (start && start > now) return { label: 'Upcoming', class: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
-  return { label: 'Active', class: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }
+  if (start && start > now) return { label: 'Upcoming', style: infoStyle }
+  return { label: 'Active', style: successStyle }
 }
 
 function getProgress(c: Checklist) {
@@ -93,11 +99,12 @@ function UndoToast({ message, onUndo, onClose }: { message: string; onUndo: () =
   useEffect(() => { const t = setTimeout(onClose, 5000); return () => clearTimeout(t) }, [onClose])
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-slide-in">
-      <div className="checklist-undo-toast flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-        <span className="material-symbols-outlined text-lg text-amber-500">delete</span>
-        <span className="text-sm font-medium text-slate-900 dark:text-white">{message}</span>
+      <div className="checklist-undo-toast flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border"
+        style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+        <span className="material-symbols-outlined text-lg" style={{ color: 'var(--color-warning)' }}>delete</span>
+        <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{message}</span>
         <button onClick={onUndo} className="px-3 py-1 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg">Undo</button>
-        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+        <button onClick={onClose} className="checklist-close-btn" style={{ color: 'var(--color-text-muted)' }}>
           <span className="material-symbols-outlined text-sm">close</span>
         </button>
       </div>
@@ -113,30 +120,32 @@ function MiniDashboard({ checklist }: { checklist: Checklist }) {
   const prioConfig = priorityConfig[priority]
 
   return (
-    <div className="checklist-mini-dashboard mb-3 px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+    <div className="checklist-mini-dashboard mb-3 px-4 py-2 rounded-lg border"
+      style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {checklist.endDate && (
-            <span className="text-xs text-slate-600 dark:text-slate-400">
+            <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
               <span className="material-symbols-outlined text-xs align-middle mr-1">event</span>
               {new Date(checklist.endDate).toLocaleDateString()}
             </span>
           )}
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${prioConfig.class} bg-white dark:bg-slate-800 border border-current`}>
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-current"
+            style={{ color: prioConfig.color, background: 'var(--color-bg-surface)' }}>
             {priority} priority
           </span>
         </div>
         {effort > 0 && (
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
             Est. effort: {Math.floor(effort / 60)}h {effort % 60}m
           </span>
         )}
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-surface-hover)' }}>
           <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: checklist.color }} />
         </div>
-        <span className="text-xs font-medium text-slate-600 dark:text-slate-400 w-8 text-right">{progress}%</span>
+        <span className="text-xs font-medium w-8 text-right" style={{ color: 'var(--color-text-secondary)' }}>{progress}%</span>
       </div>
     </div>
   )
@@ -162,15 +171,18 @@ function InlineItemInput({ onAdd, checklistItems }: { onAdd: (title: string, pri
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 mt-3">
       <input ref={inputRef} type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Add item..."
-        className="checklist-inline-input flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-slate-400" />
+        className="checklist-inline-input flex-1 px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
+        style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }} />
       <select value={priority} onChange={e => setPriority(e.target.value as Priority)}
-        className="checklist-inline-select px-2 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary">
+        className="checklist-inline-select px-2 py-2 text-xs rounded-lg border focus:ring-2 focus:ring-primary"
+        style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }}>
         <option value="low">Low</option>
         <option value="normal">Normal</option>
         <option value="high">High</option>
       </select>
       <select value={parentId ?? ''} onChange={e => setParentId(e.target.value ? parseInt(e.target.value) : null)}
-        className="checklist-inline-select px-2 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary">
+        className="checklist-inline-select px-2 py-2 text-xs rounded-lg border focus:ring-2 focus:ring-primary"
+        style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }}>
         <option value="">No parent</option>
         {checklistItems.map(item => (
           <option key={item.id} value={item.id}>{item.title.slice(0, 30)}</option>
@@ -285,11 +297,11 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
   }
 
   return (
-    <div className="px-4 pb-4 border-t border-slate-100 dark:border-slate-700 pt-3">
+    <div className="px-4 pb-4 border-t pt-3" style={{ borderColor: 'var(--color-border)' }}>
       {completedCount > 0 && mode !== 'history' && (
         <div className="flex items-center justify-end mb-2">
           <button onClick={() => setHideCompleted(!hideCompleted)}
-            className="checklist-hide-toggle flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            className="checklist-hide-toggle flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
             <span className="material-symbols-outlined text-xs">{hideCompleted ? 'visibility' : 'visibility_off'}</span>
             {hideCompleted ? `Show completed (${completedCount})` : 'Hide completed'}
           </button>
@@ -297,7 +309,7 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
       )}
 
       {visibleItems.length === 0 ? (
-        <p className="text-sm text-slate-400 dark:text-slate-500 text-center py-3">
+        <p className="text-sm text-center py-3" style={{ color: 'var(--color-text-muted)' }}>
           {hideCompleted ? 'All items completed!' : 'No items yet — add one below'}
         </p>
       ) : (
@@ -313,21 +325,25 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                   className={`checklist-item-row flex items-center gap-2.5 py-1.5 group/item ${item.completed ? 'opacity-60' : ''} ${blocked ? 'opacity-50' : ''}`}
                   style={{ paddingLeft: `${depth * 20}px` }}>
                   {mode !== 'history' && (
-                    <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 cursor-grab text-xs">drag_indicator</span>
+                    <span className="material-symbols-outlined cursor-grab text-xs" style={{ color: 'var(--color-text-muted)' }}>drag_indicator</span>
                   )}
                   <button onClick={() => mode === 'active' && !blocked && onToggleItem(c.id, item)}
-                    className={`checklist-item-checkbox w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'checklist-item-checkbox-checked bg-primary border-primary' : (blocked || mode !== 'active') ? 'border-slate-300 dark:border-slate-600 cursor-not-allowed' : 'border-slate-300 dark:border-slate-600 hover:border-primary'}`}>
+                    className={`checklist-item-checkbox w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'checklist-item-checkbox-checked bg-primary border-primary' : (blocked || mode !== 'active') ? 'cursor-not-allowed' : 'checklist-checkbox-unchecked'}`}
+                    style={!item.completed ? { borderColor: 'var(--color-border-strong)' } : undefined}>
                     {item.completed && <span className="material-symbols-outlined text-white text-xs">check</span>}
                   </button>
                   {editingId === item.id && mode !== 'history' ? (
                     <div className="flex-1 flex gap-2">
                       <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} autoFocus
                         onKeyDown={e => { if (e.key === 'Enter') saveEdit(item); if (e.key === 'Escape') setEditingId(null) }}
-                        className="checklist-item-input flex-1 text-sm px-1 py-0.5 bg-transparent border-b-2 border-primary focus:outline-none text-slate-900 dark:text-white" />
+                        className="checklist-item-input flex-1 text-sm px-1 py-0.5 bg-transparent border-b-2 border-primary focus:outline-none"
+                        style={{ color: 'var(--color-text-primary)' }} />
                       <input type="number" value={editEffort} onChange={e => setEditEffort(e.target.value ? parseInt(e.target.value) : '')} placeholder="Min"
-                        className="rf-input w-16 text-xs px-1 py-0.5 bg-transparent border-b border-slate-300 focus:outline-none text-slate-900 dark:text-white" />
+                        className="rf-input w-16 text-xs px-1 py-0.5 bg-transparent border-b focus:outline-none"
+                        style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }} />
                       <select value={editBlockedBy} onChange={e => setEditBlockedBy(e.target.value ? parseInt(e.target.value) : '')}
-                        className="todo-select text-xs px-1 py-0.5 bg-transparent border-b border-slate-300 focus:outline-none text-slate-900 dark:text-white">
+                        className="todo-select text-xs px-1 py-0.5 bg-transparent border-b focus:outline-none"
+                        style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}>
                         <option value="">No blocker</option>
                         {itemsList.filter(i => i.id !== item.id).map(i => (
                           <option key={i.id} value={i.id}>{i.title.slice(0, 20)}</option>
@@ -336,16 +352,17 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                     </div>
                   ) : (
                     <span onDoubleClick={() => mode !== 'history' && startEdit(item)}
-                      className={`flex-1 text-sm ${item.completed ? 'checklist-item-completed line-through text-slate-400' : blocked ? 'checklist-item-blocked text-slate-400' : 'text-slate-900 dark:text-white'}`}>
+                      className={`flex-1 text-sm ${item.completed ? 'checklist-item-completed line-through' : blocked ? 'checklist-item-blocked' : ''}`}
+                      style={{ color: item.completed || blocked ? 'var(--color-text-muted)' : 'var(--color-text-primary)' }}>
                       {item.title}
                       {blocked && (
-                        <span className="checklist-item-blocked-badge ml-2 text-xs text-amber-500 inline-flex items-center gap-0.5">
+                        <span className="checklist-item-blocked-badge ml-2 text-xs inline-flex items-center gap-0.5" style={{ color: 'var(--color-warning)' }}>
                           <span className="material-symbols-outlined text-xs">lock</span>
                           Blocked
                         </span>
                       )}
                       {item.effortEstimate && (
-                        <span className="ml-2 text-xs text-slate-400">({item.effortEstimate}m)</span>
+                        <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>({item.effortEstimate}m)</span>
                       )}
                     </span>
                   )}
@@ -353,24 +370,29 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                     <>
                       <button onClick={() => { setNotesId(notesId === item.id ? null : item.id); setNotesValue(item.notes || '') }}
                         title={item.notes || 'Add notes'}
-                        className={`todo-action-btn p-0.5 transition-opacity ${item.notes ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600 opacity-0 group-hover/item:opacity-100'}`}>
+                        className={`todo-action-btn p-0.5 transition-opacity ${item.notes ? '' : 'opacity-0 group-hover/item:opacity-100'}`}
+                        style={{ color: item.notes ? 'var(--color-warning)' : 'var(--color-text-muted)' }}>
                         <span className="material-symbols-outlined text-xs">sticky_note_2</span>
                       </button>
                       <button onClick={() => {
                           const next: Record<string, Priority> = { normal: 'high', high: 'low', low: 'normal' }
                           onUpdateItem(c.id, item, { priority: next[item.priority] || 'normal' })
                         }} title={`Priority: ${item.priority}`}
-                        className={`material-symbols-outlined text-xs cursor-pointer hover:scale-125 transition-transform ${prio.class}`}>{prio.icon}</button>
+                        className="material-symbols-outlined text-xs cursor-pointer hover:scale-125 transition-transform"
+                        style={{ color: prio.color }}>{prio.icon}</button>
                       <button onClick={() => startEdit(item)}
-                        className="todo-action-btn p-0.5 text-slate-300 hover:text-primary opacity-0 group-hover/item:opacity-100 transition-opacity">
+                        className="todo-action-btn p-0.5 hover:text-primary opacity-0 group-hover/item:opacity-100 transition-opacity"
+                        style={{ color: 'var(--color-text-muted)' }}>
                         <span className="material-symbols-outlined text-sm">edit</span>
                       </button>
                       <button onClick={() => onCreateReminder(c.id, item)} title="Set reminder"
-                        className="todo-action-btn p-0.5 text-slate-300 hover:text-amber-500 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                        className="todo-action-btn p-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity checklist-action-btn-reminder"
+                        style={{ color: 'var(--color-text-muted)' }}>
                         <span className="material-symbols-outlined text-sm">notifications</span>
                       </button>
                       <button onClick={() => handleDeleteItem(item.id)}
-                        className="todo-action-btn todo-action-btn-danger p-0.5 text-slate-300 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                        className="todo-action-btn todo-action-btn-danger p-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                        style={{ color: 'var(--color-text-muted)' }}>
                         <span className="material-symbols-outlined text-sm">close</span>
                       </button>
                     </>
@@ -380,12 +402,13 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                 {notesId === item.id && mode !== 'history' && (
                   <div className="ml-10 mt-1 mb-2" style={{ marginLeft: `${depth * 20 + 40}px` }}>
                     <textarea value={notesValue} onChange={e => setNotesValue(e.target.value)} rows={2} placeholder="Add notes..."
-                      className="checklist-notes-area w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+                      className="checklist-notes-area w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                     <div className="flex gap-2 mt-1">
                       <button onClick={() => { onUpdateItem(c.id, item, { notes: notesValue || null }); setNotesId(null) }}
                         className="btn-neon px-3 py-1 text-xs bg-primary text-white rounded-lg hover:bg-primary/90">Save</button>
                       <button onClick={() => setNotesId(null)}
-                        className="btn-outline px-3 py-1 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Cancel</button>
+                        className="btn-outline px-3 py-1 text-xs checklist-cancel-btn" style={{ color: 'var(--color-text-muted)' }}>Cancel</button>
                     </div>
                   </div>
                 )}
@@ -467,8 +490,8 @@ export default function ChecklistList({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Checklists</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">{checklists.length} checklists</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Checklists</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>{checklists.length} checklists</p>
         </div>
         <button onClick={onNew} className="btn-neon flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium">
           <span className="material-symbols-outlined text-sm">add</span>
@@ -477,11 +500,12 @@ export default function ChecklistList({
       </div>
 
       {/* Tabs */}
-      <div className="checklist-tabs flex gap-1 border-b border-slate-200 dark:border-slate-700 pb-1">
+      <div className="checklist-tabs flex gap-1 border-b pb-1" style={{ borderColor: 'var(--color-border)' }}>
         {tabLabels.map(t => (
           <button key={t.value} onClick={() => onTabChange(t.value)}
             data-active={tab === t.value}
-            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${tab === t.value ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${tab === t.value ? 'text-primary border-b-2 border-primary bg-primary/5' : 'checklist-tab-inactive'}`}
+            style={tab !== t.value ? { color: 'var(--color-text-muted)' } : undefined}>
             {t.label}
           </button>
         ))}
@@ -489,9 +513,10 @@ export default function ChecklistList({
 
       {/* Search */}
       <div className="relative">
-        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--color-text-muted)' }}>search</span>
         <input type="text" value={search} onChange={e => onSearchChange(e.target.value)} placeholder="Search checklists..."
-          className="checklist-search w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-slate-400 text-sm" />
+          className="checklist-search w-full pl-10 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }} />
       </div>
 
       {/* Filters + Sort */}
@@ -499,21 +524,24 @@ export default function ChecklistList({
         <div className="flex flex-wrap items-center gap-2">
           {filterOptions.map(f => (
             <button key={f.value} onClick={() => onFilterChange(f.value)}
-              className={`checklist-filter-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === f.value ? 'checklist-filter-btn-active bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+              className={`checklist-filter-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === f.value ? 'checklist-filter-btn-active bg-primary text-white' : 'checklist-filter-btn-inactive'}`}
+              style={filter !== f.value ? { background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' } : undefined}>
               {f.label}
             </button>
           ))}
           {categories.length > 0 && (
             <select value={categoryFilter ?? ''} onChange={e => onCategoryFilterChange(e.target.value ? parseInt(e.target.value) : null)}
-              className="checklist-select px-3 py-1.5 rounded-lg text-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-0 focus:ring-2 focus:ring-primary">
+              className="checklist-select px-3 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-primary"
+              style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}>
               <option value="">All categories</option>
               {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
             </select>
           )}
           <div className="ml-auto flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs text-slate-400">sort</span>
+            <span className="material-symbols-outlined text-xs" style={{ color: 'var(--color-text-muted)' }}>sort</span>
             <select value={sort} onChange={e => onSortChange(e.target.value as SortOption)}
-              className="checklist-select px-2 py-1.5 rounded-lg text-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-0 focus:ring-2 focus:ring-primary">
+              className="checklist-select px-2 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-primary"
+              style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}>
               {sortOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
@@ -522,10 +550,11 @@ export default function ChecklistList({
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="empty-state text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-          <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-4 block">fact_check</span>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">{search ? 'No results' : tab === 'templates' ? 'No templates yet' : tab === 'history' ? 'No history yet' : 'No checklists yet'}</p>
-          <p className="text-slate-400 dark:text-slate-500 mt-1">{search ? 'Try a different search' : tab === 'templates' ? 'Create a template to get started' : tab === 'history' ? 'Complete and archive checklists to see them here' : 'Create one to get started'}</p>
+        <div className="empty-state text-center py-16 rounded-xl border border-dashed"
+          style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
+          <span className="material-symbols-outlined text-5xl mb-4 block" style={{ color: 'var(--color-text-muted)' }}>fact_check</span>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{search ? 'No results' : tab === 'templates' ? 'No templates yet' : tab === 'history' ? 'No history yet' : 'No checklists yet'}</p>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>{search ? 'Try a different search' : tab === 'templates' ? 'Create a template to get started' : tab === 'history' ? 'Complete and archive checklists to see them here' : 'Create one to get started'}</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -537,63 +566,70 @@ export default function ChecklistList({
             const isHistory = tab === 'history'
             return (
               <div key={c.id}
-                className={`checklist-card bg-white dark:bg-slate-800 rounded-xl border transition-all ${isExpanded ? 'checklist-card-expanded border-primary/40 shadow-sm' : 'border-slate-200 dark:border-slate-700'}`}>
+                className={`checklist-card rounded-xl border transition-all ${isExpanded ? 'checklist-card-expanded border-primary/40 shadow-sm' : ''}`}
+                style={{ background: 'var(--color-bg-surface)', borderColor: isExpanded ? undefined : 'var(--color-border)' }}>
                 <div className="p-4 cursor-pointer group" onClick={() => onToggleExpand(c.id)}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="material-symbols-outlined text-sm text-slate-400 transition-transform" style={{ transform: isExpanded ? 'rotate(90deg)' : '' }}>
+                        <span className="material-symbols-outlined text-sm transition-transform" style={{ color: 'var(--color-text-muted)', transform: isExpanded ? 'rotate(90deg)' : '' }}>
                           chevron_right
                         </span>
                         {c.category && (
                           <span className="material-symbols-outlined text-sm" style={{ color: c.category.color }}>{c.category.icon}</span>
                         )}
-                        <h3 className="font-semibold text-slate-900 dark:text-white truncate">{c.title}</h3>
+                        <h3 className="font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{c.title}</h3>
                         {isTemplate && c.version && (
-                          <span className="badge-version px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                          <span className="badge-version px-2 py-0.5 rounded-full text-xs font-medium"
+                            style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}>
                             v{c.version}
                           </span>
                         )}
-                        <span className={`checklist-status-badge px-2 py-0.5 rounded-full text-xs font-medium ${status.class}`}>{status.label}</span>
+                        <span className="checklist-status-badge px-2 py-0.5 rounded-full text-xs font-medium" style={status.style}>{status.label}</span>
                       </div>
-                      {c.description && <p className="text-sm text-slate-500 dark:text-slate-400 truncate ml-6">{c.description}</p>}
+                      {c.description && <p className="text-sm truncate ml-6" style={{ color: 'var(--color-text-muted)' }}>{c.description}</p>}
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
                       {isTemplate && onInstantiateTemplate && (
                         <button onClick={e => { e.stopPropagation(); onInstantiateTemplate(c) }} title="Create instance"
-                          className="checklist-action-btn checklist-action-btn-green p-1.5 text-slate-400 hover:text-green-500 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
+                          className="checklist-action-btn checklist-action-btn-green p-1.5 rounded-lg transition-colors"
+                          style={{ color: 'var(--color-text-muted)' }}>
                           <span className="material-symbols-outlined text-sm">play_arrow</span>
                         </button>
                       )}
                       {!isHistory && (
                         <button onClick={e => { e.stopPropagation(); onEdit(c) }} title="Edit"
-                          className="checklist-action-btn p-1.5 text-slate-400 hover:text-primary rounded-lg hover:bg-primary/10 transition-colors">
+                          className="checklist-action-btn p-1.5 hover:text-primary rounded-lg hover:bg-primary/10 transition-colors"
+                          style={{ color: 'var(--color-text-muted)' }}>
                           <span className="material-symbols-outlined text-lg">edit</span>
                         </button>
                       )}
                       {!isTemplate && !isHistory && (
                         <button onClick={e => { e.stopPropagation(); onDuplicate(c.id) }} title="Duplicate"
-                          className="checklist-action-btn p-1.5 text-slate-400 hover:text-primary rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                          className="checklist-action-btn checklist-action-btn-copy p-1.5 hover:text-primary rounded-lg transition-colors"
+                          style={{ color: 'var(--color-text-muted)' }}>
                           <span className="material-symbols-outlined text-sm">content_copy</span>
                         </button>
                       )}
                       {!isTemplate && !isHistory && onArchive && (
                         <button onClick={e => { e.stopPropagation(); onArchive(c.id) }} title="Archive"
-                          className="checklist-action-btn checklist-action-btn-amber p-1.5 text-slate-400 hover:text-amber-500 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
+                          className="checklist-action-btn checklist-action-btn-amber p-1.5 rounded-lg transition-colors"
+                          style={{ color: 'var(--color-text-muted)' }}>
                           <span className="material-symbols-outlined text-sm">archive</span>
                         </button>
                       )}
                       <button onClick={e => { e.stopPropagation(); handleDelete(c.id) }} title="Delete"
-                        className="checklist-action-btn checklist-action-btn-danger p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                        className="checklist-action-btn checklist-action-btn-danger p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'var(--color-text-muted)' }}>
                         <span className="material-symbols-outlined text-sm">delete</span>
                       </button>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center gap-3 ml-6">
-                    <div className="checklist-progress-track flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="checklist-progress-track flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-surface-hover)' }}>
                       <div className="checklist-progress-fill h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: c.color }} />
                     </div>
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 w-16 text-right">
+                    <span className="text-xs font-medium w-16 text-right" style={{ color: 'var(--color-text-muted)' }}>
                        {(() => {
                          const itemsList = Array.isArray(c.items) ? c.items : []
                          return `${itemsList.filter(i => i.completed).length}/${itemsList.length} (${progress}%)`
@@ -602,7 +638,7 @@ export default function ChecklistList({
                   </div>
                   {/* History metrics */}
                   {isHistory && (c as any).metrics && (
-                    <div className="mt-2 ml-6 flex gap-3 text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-2 ml-6 flex gap-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       <span>Items: {(c as any).metrics.totalItems}</span>
                       <span>Completed: {(c as any).metrics.completedItems}</span>
                       <span>Completion: {(c as any).metrics.completionPercentage}%</span>

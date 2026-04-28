@@ -1,0 +1,68 @@
+/* =========================================================================
+   TOKENS BASE — Classic Light (:root default)
+   =========================================================================
+   Contrato del sistema de temas. Todos los tokens que los componentes
+   consumen están definidos aquí con sus valores Classic Light.
+   ========================================================================= */
+
+:root {
+  /* ─── Backgrounds ─── */
+  --color-bg-base: #ffffff;
+  --color-bg-surface: #f8f9fa;
+  --color-bg-surface-hover: #f1f3f5;
+  --color-bg-input: #ffffff;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* ─── Texts ─── */
+  --color-text-primary: #171717;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-text-inverse: #ffffff;
+
+  /* ─── Accents ─── */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: rgba(59, 130, 246, 0.1);
+  --color-primary-glow: rgba(59, 130, 246, 0.3);
+
+  /* ─── Borders ─── */
+  --color-border: #e5e7eb;
+  --color-border-strong: #d1d5db;
+
+  /* ─── States ─── */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* ─── Sidebar ─── */
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-border: rgba(59, 130, 246, 0.15);
+  --color-sidebar-item-active-bg: rgba(59, 130, 246, 0.1);
+  --color-sidebar-item-active-text: #3b82f6;
+  --color-sidebar-item-active-border: #3b82f6;
+
+  /* ─── Shadows ─── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+
+  /* ─── Typography ─── */
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
+  --tracking-body: 0;
+  --tracking-display: -0.02em;
+
+  /* ─── Radii ─── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* ─── Decorative (transparent/none for Classic) ─── */
+  --deco-grid-line: transparent;
+  --deco-sidebar-top-line: none;
+  --deco-logo-bg: var(--color-primary);
+  --deco-logo-shadow: none;
+}

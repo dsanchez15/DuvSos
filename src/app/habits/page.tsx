@@ -122,19 +122,20 @@ export default function HabitsPage() {
     return (
         <AppLayout>
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white dark:bg-background-dark/40 border border-primary/10 rounded-2xl p-6 shadow-sm">
+                <div className="rounded-2xl p-6" style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
                     {/* Tabs */}
-                    <div className="habits-tabs flex gap-1 mb-6 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl">
+                    <div className="habits-tabs flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'var(--color-bg-input)' }}>
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 data-active={activeTab === tab.id}
-                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all`}
+                                style={
                                     activeTab === tab.id
-                                        ? 'bg-white dark:bg-slate-700 text-primary shadow-sm'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                                }`}
+                                        ? { background: 'var(--color-bg-surface)', color: 'var(--color-primary)', boxShadow: 'var(--shadow-sm)' }
+                                        : { color: 'var(--color-text-secondary)' }
+                                }
                             >
                                 <span className="material-symbols-outlined text-lg">{tab.icon}</span>
                                 {tab.label}

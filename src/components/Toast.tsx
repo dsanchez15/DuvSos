@@ -17,18 +17,25 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
 
   const isSuccess = type === 'success';
 
+  const statusColor = isSuccess ? 'var(--color-success)' : 'var(--color-danger)';
+
   return (
     <div className="fixed top-6 right-6 z-50 animate-slide-in">
-      <div className={`rf-toast ${isSuccess ? 'rf-toast-success' : 'rf-toast-error'} flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border ${
-        isSuccess
-          ? 'bg-white dark:bg-slate-800 border-green-200 dark:border-green-800'
-          : 'bg-white dark:bg-slate-800 border-red-200 dark:border-red-800'
-      }`}>
-        <span className={`material-symbols-outlined text-lg ${isSuccess ? 'toast-icon-success text-green-500' : 'toast-icon-error text-red-500'}`}>
+      <div
+        className={`rf-toast ${isSuccess ? 'rf-toast-success' : 'rf-toast-error'} flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border`}
+        style={{
+          background: 'var(--color-bg-surface)',
+          borderColor: statusColor,
+        }}
+      >
+        <span
+          className={`material-symbols-outlined text-lg ${isSuccess ? 'toast-icon-success' : 'toast-icon-error'}`}
+          style={{ color: statusColor }}
+        >
           {isSuccess ? 'check_circle' : 'error'}
         </span>
-        <span className="toast-text text-sm font-medium text-slate-900 dark:text-white">{message}</span>
-        <button onClick={onClose} className="ml-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+        <span className="toast-text text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{message}</span>
+        <button onClick={onClose} className="ml-2" style={{ color: 'var(--color-text-secondary)' }}>
           <span className="material-symbols-outlined text-sm">close</span>
         </button>
       </div>

@@ -1,0 +1,159 @@
+/* =========================================================================
+   TOKENS RETROFUTURISTA — Light + Dark variants
+   =========================================================================
+   Defines both Retrofuturista Light (default) and Retrofuturista Dark.
+   Internal --rf-* variables are scoped to each block and used only
+   to compose the standard design tokens.
+   ========================================================================= */
+
+/* ─── Retrofuturista Light ─── */
+[data-visual-theme="retrofuturista"] {
+  /* ═══ INTERNAL PALETTE (attenuated for light backgrounds) ═══ */
+  --rf-neon-cyan: #0099aa;
+  --rf-neon-magenta: #cc0088;
+  --rf-neon-amber: #b45309;
+  --rf-neon-green: #15803d;
+  /* ═══════════════════════════════════════════════════════════ */
+
+  /* ─── Backgrounds ─── */
+  --color-bg-base: #f0f2f8;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #e8eaf4;
+  --color-bg-input: #f5f6fc;
+  --color-bg-overlay: rgba(240, 242, 248, 0.85);
+
+  /* ─── Texts ─── */
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #5a5a8a;
+  --color-text-muted: #8a8ab5;
+  --color-text-inverse: #f0f2f8;
+
+  /* ─── Primary accent (Cian atenuado) ─── */
+  --color-primary: #0099aa;
+  --color-primary-hover: #007788;
+  --color-primary-light: rgba(0, 153, 170, 0.1);
+  --color-primary-glow: rgba(0, 153, 170, 0.2);
+
+  /* ─── Borders ─── */
+  --color-border: rgba(0, 153, 170, 0.2);
+  --color-border-strong: rgba(0, 153, 170, 0.35);
+
+  /* ─── States ─── */
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #dc2626;
+  --color-info: #0099aa;
+
+  /* ─── Sidebar ─── */
+  --color-sidebar-bg: #f0f2f8;
+  --color-sidebar-border: rgba(0, 153, 170, 0.15);
+  --color-sidebar-item-active-bg: rgba(0, 153, 170, 0.1);
+  --color-sidebar-item-active-text: #0099aa;
+  --color-sidebar-item-active-border: #0099aa;
+
+  /* ─── Shadows (reduced glow for light) ─── */
+  --shadow-sm: 0 0 8px rgba(0, 153, 170, 0.06);
+  --shadow-md: 0 0 16px rgba(0, 153, 170, 0.08);
+  --shadow-lg: 0 0 30px rgba(0, 153, 170, 0.1);
+  --shadow-glow: 0 0 15px rgba(0, 153, 170, 0.12);
+
+  /* ─── Typography ─── */
+  --font-body: 'Inter', 'Orbitron', sans-serif;
+  --font-display: 'Orbitron', 'Inter', sans-serif;
+  --tracking-body: 0.02em;
+  --tracking-display: 0.08em;
+
+  /* ─── Radii ─── */
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ─── Decorative (attenuated for light mode) ─── */
+  --deco-grid-line: rgba(0, 153, 170, 0.04);
+  --deco-sidebar-top-line: linear-gradient(90deg, transparent, rgba(0, 153, 170, 0.3), rgba(153, 0, 102, 0.2), transparent);
+  --deco-logo-bg: linear-gradient(135deg, #0099aa, #5a7ab5);
+  --deco-logo-shadow: 0 0 12px rgba(0, 153, 170, 0.15);
+}
+
+/* ─── Retrofuturista Dark ─── */
+[data-visual-theme="retrofuturista"].dark,
+.dark[data-visual-theme="retrofuturista"] {
+  /* ═══ INTERNAL PALETTE (bright neons for dark backgrounds) ═══ */
+  --rf-neon-cyan: #00f0ff;
+  --rf-neon-magenta: #ff00aa;
+  --rf-neon-amber: #ffea00;
+  --rf-neon-green: #39ff14;
+  --rf-deep-bg: #0a0a12;
+  --rf-surface: #12121f;
+  --rf-surface-hover: #1a1a2e;
+  --rf-surface-elevated: #1e1e3a;
+  --rf-text-primary: #e0e0ff;
+  --rf-text-secondary: #8a8ab5;
+  --rf-text-muted: #5a5a8a;
+  --rf-border-glow: rgba(0, 240, 255, 0.25);
+  --rf-danger: #ff3366;
+  --rf-success: #39ff14;
+  --rf-warning: #ffea00;
+  /* ═══════════════════════════════════════════════════════════ */
+
+  /* ─── Backgrounds ─── */
+  --color-bg-base: var(--rf-deep-bg);
+  --color-bg-surface: var(--rf-surface);
+  --color-bg-surface-hover: var(--rf-surface-hover);
+  --color-bg-input: var(--rf-surface-elevated);
+  --color-bg-overlay: rgba(10, 10, 18, 0.85);
+
+  /* ─── Texts ─── */
+  --color-text-primary: var(--rf-text-primary);
+  --color-text-secondary: var(--rf-text-secondary);
+  --color-text-muted: var(--rf-text-muted);
+  --color-text-inverse: var(--rf-deep-bg);
+
+  /* ─── Primary accent (Neón Cian) ─── */
+  --color-primary: var(--rf-neon-cyan);
+  --color-primary-hover: #80f7ff;
+  --color-primary-light: rgba(0, 240, 255, 0.12);
+  --color-primary-glow: rgba(0, 240, 255, 0.45);
+
+  /* ─── Borders ─── */
+  --color-border: var(--rf-border-glow);
+  --color-border-strong: rgba(0, 240, 255, 0.4);
+
+  /* ─── States ─── */
+  --color-success: var(--rf-success);
+  --color-warning: var(--rf-warning);
+  --color-danger: var(--rf-danger);
+  --color-info: var(--rf-neon-cyan);
+
+  /* ─── Sidebar ─── */
+  --color-sidebar-bg: linear-gradient(180deg, #0d0d1a 0%, #12121f 100%);
+  --color-sidebar-border: rgba(0, 240, 255, 0.15);
+  --color-sidebar-item-active-bg: rgba(0, 240, 255, 0.1);
+  --color-sidebar-item-active-text: var(--rf-neon-cyan);
+  --color-sidebar-item-active-border: var(--rf-neon-cyan);
+
+  /* ─── Shadows ─── */
+  --shadow-sm: 0 0 8px rgba(0, 240, 255, 0.08);
+  --shadow-md: 0 0 16px rgba(0, 240, 255, 0.12);
+  --shadow-lg: 0 0 30px rgba(0, 240, 255, 0.18);
+  --shadow-glow: 0 0 25px rgba(0, 240, 255, 0.25), 0 0 60px rgba(0, 240, 255, 0.08);
+
+  /* ─── Typography ─── */
+  --font-body: 'Inter', 'Orbitron', sans-serif;
+  --font-display: 'Orbitron', 'Inter', sans-serif;
+  --tracking-body: 0.02em;
+  --tracking-display: 0.08em;
+
+  /* ─── Radii ─── */
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ─── Decorative ─── */
+  --deco-grid-line: rgba(0, 240, 255, 0.03);
+  --deco-sidebar-top-line: linear-gradient(90deg, transparent, var(--rf-neon-cyan), var(--rf-neon-magenta), transparent);
+  --deco-logo-bg: linear-gradient(135deg, var(--rf-neon-cyan), var(--rf-neon-magenta));
+  --deco-logo-shadow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 40px rgba(255, 0, 170, 0.15);
+}

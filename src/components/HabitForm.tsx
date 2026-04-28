@@ -93,7 +93,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
-          <label htmlFor="title" className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label htmlFor="title" className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
             Título del hábito *
           </label>
           <input
@@ -101,28 +101,30 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rf-input w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             placeholder="Ej: Ejercicio diario"
             required
           />
         </div>
 
         <div className="md:col-span-2">
-          <label htmlFor="description" className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label htmlFor="description" className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
             Descripción (opcional)
           </label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="rf-input w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             rows={2}
             placeholder="Ej: 30 minutos de ejercicio"
           />
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Color</label>
+          <label className="rf-label block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>Color</label>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => (
               <button
@@ -130,10 +132,13 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
                 type="button"
                 onClick={() => setColor(c.value)}
                 className={`w-8 h-8 rounded-full transition-all ${color === c.value
-                    ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-offset-slate-800 scale-110'
+                    ? 'ring-2 ring-offset-2 scale-110'
                     : 'hover:scale-105'
                   }`}
-                style={{ backgroundColor: c.value }}
+                style={{
+                  backgroundColor: c.value,
+                  ...(color === c.value ? { '--tw-ring-color': 'var(--color-border-strong)', '--tw-ring-offset-color': 'var(--color-bg-surface)' } as React.CSSProperties : {})
+                }}
                 title={c.name}
               />
             ))}
@@ -141,11 +146,12 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Estado</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Estado</label>
           <select
             value={state}
             onChange={(e) => setState(e.target.value as HabitState)}
-            className="rf-select w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="Active">Activo</option>
             <option value="Paused">Pausado</option>
@@ -154,11 +160,12 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Categoría</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Categoría</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="rf-select w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="">Sin categoría</option>
             {categories.map((cat) => (
@@ -168,11 +175,12 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Objetivo</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Objetivo</label>
           <select
             value={objectiveId}
             onChange={(e) => setObjectiveId(e.target.value)}
-            className="rf-select w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="">Sin objetivo</option>
             {objectives.map((obj) => (
@@ -182,7 +190,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div className="md:col-span-2">
-          <label className="rf-label flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+          <label className="rf-label flex items-center gap-2 text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
             <input
               type="checkbox"
               checked={isPermanent}
@@ -196,35 +204,38 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         {!isPermanent && (
           <>
             <div>
-              <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de inicio</label>
+              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Fecha de inicio</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="rf-input w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               />
             </div>
             <div>
-              <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de fin</label>
+              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Fecha de fin</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="rf-input w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               />
             </div>
             {cycleError && (
-              <div className="md:col-span-2 text-sm text-red-500">{cycleError}</div>
+              <div className="md:col-span-2 text-sm" style={{ color: 'var(--color-danger)' }}>{cycleError}</div>
             )}
           </>
         )}
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de meta</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Tipo de meta</label>
           <select
             value={goalType}
             onChange={(e) => setGoalType(e.target.value as GoalType)}
-            className="rf-select w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             {goalTypes.map((gt) => (
               <option key={gt.value} value={gt.value}>{gt.label}</option>
@@ -233,7 +244,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
             Valor de meta {goalType === 'Ratio' ? '(%)' : '(veces)'}
           </label>
           <input
@@ -242,7 +253,8 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             max={goalType === 'Ratio' ? 100 : 999}
             value={goalValue}
             onChange={(e) => setGoalValue(parseInt(e.target.value) || 1)}
-            className="rf-input w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
         </div>
       </div>
@@ -250,7 +262,8 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
       <div className="flex gap-2 pt-2">
         <button
           type="submit"
-          className="flex-1 px-4 py-2 btn-neon bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          className="flex-1 px-4 py-2 btn-neon rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
         >
           {initialData ? 'Actualizar' : 'Crear Hábito'}
         </button>
@@ -258,7 +271,8 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 btn-outline bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-medium"
+            className="px-4 py-2 btn-outline rounded-lg habit-cancel-btn transition-colors font-medium"
+            style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
           >
             Cancelar
           </button>

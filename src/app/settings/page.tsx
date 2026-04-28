@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import SettingCard from '@/components/SettingCard';
 import AppLayout from '@/components/AppLayout';
 import Toast from '@/components/Toast';
+import ThemePreview from '@/components/ThemePreview';
 
 const CATEGORY_COLORS = [
   { name: 'Blue', value: '#3b82f6' },
@@ -188,6 +189,8 @@ export default function SettingsPage() {
         window.location.reload();
     };
 
+    const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
     return (
         <AppLayout>
             <main className="flex-1">
@@ -202,7 +205,7 @@ export default function SettingsPage() {
                 <header className="p-6 lg:px-10 flex justify-between items-center bg-transparent">
                     <div>
                         <h1 className="text-2xl font-bold">Settings</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Manage your account preferences and app appearance.</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Manage your account preferences and app appearance.</p>
                     </div>
                 </header>
 
@@ -227,9 +230,10 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Full Name</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Full Name</label>
                                         <input
-                                            className="w-full bg-background-light dark:bg-background-dark border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            style={{ background: 'var(--color-bg-input)' }}
                                             type="text"
                                             value={user?.name || ''}
                                             onChange={(e) => {
@@ -239,9 +243,10 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Email Address</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Email Address</label>
                                         <input
-                                            className="w-full bg-background-light dark:bg-background-dark border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            style={{ background: 'var(--color-bg-input)' }}
                                             type="email"
                                             value={user?.email || ''}
                                             onChange={(e) => {
@@ -251,9 +256,10 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="md:col-span-2 space-y-2">
-                                        <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Bio / Tagline</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bio / Tagline</label>
                                         <textarea
-                                            className="w-full bg-background-light dark:bg-background-dark border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none"
+                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none"
+                                            style={{ background: 'var(--color-bg-input)' }}
                                             rows={3}
                                             value={user?.tagline || ''}
                                             onChange={(e) => {
@@ -273,34 +279,36 @@ export default function SettingsPage() {
                                 <h2 className="text-lg font-semibold">Dashboard Configuration</h2>
                             </div>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                     <div>
                                         <h3 className="font-medium">Cards to display</h3>
-                                        <p className="text-xs text-slate-500">Number of habit cards to show in the central hub.</p>
+                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Number of habit cards to show in the central hub.</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {[2, 4, 6, 8].map(num => (
                                             <button
                                                 key={num}
                                                 onClick={() => { setCardLimit(num); setIsDirty(true); }}
-                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${cardLimit === num ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-700 hover:border-primary/30'}`}
+                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${cardLimit === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
+                                                style={cardLimit !== num ? { borderColor: 'var(--color-border)' } : undefined}
                                             >
                                                 {num}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                     <div>
                                         <h3 className="font-medium">Checklist expiration alert</h3>
-                                        <p className="text-xs text-slate-500">Days before expiration to show badge in sidebar. Set to 0 to disable.</p>
+                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Days before expiration to show badge in sidebar. Set to 0 to disable.</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {[0, 1, 2, 3, 4, 5].map(num => (
                                             <button
                                                 key={num}
                                                 onClick={() => { setChecklistAlertDays(num); setIsDirty(true); }}
-                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${checklistAlertDays === num ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-700 hover:border-primary/30'}`}
+                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${checklistAlertDays === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
+                                                style={checklistAlertDays !== num ? { borderColor: 'var(--color-border)' } : undefined}
                                             >
                                                 {num}
                                             </button>
@@ -318,13 +326,14 @@ export default function SettingsPage() {
                             </div>
                             <div className="space-y-4">
                                 {categories.length === 0 ? (
-                                    <p className="text-sm text-slate-500">No categories yet.</p>
+                                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>No categories yet.</p>
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
                                         {categories.map((cat) => (
                                             <div
                                                 key={cat.id}
-                                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+                                                style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}
                                             >
                                                 <span
                                                     className="w-3 h-3 rounded-full"
@@ -334,7 +343,8 @@ export default function SettingsPage() {
                                                 {cat.name !== 'General' && (
                                                     <button
                                                         onClick={() => handleDeleteCategory(cat.id)}
-                                                        className="text-slate-400 hover:text-red-500"
+                                                        className="settings-cat-delete-btn"
+                                                        style={{ color: 'var(--color-text-muted)' }}
                                                     >
                                                         <span className="material-symbols-outlined text-sm">close</span>
                                                     </button>
@@ -345,13 +355,14 @@ export default function SettingsPage() {
                                 )}
 
                                 {showCategoryForm ? (
-                                    <form onSubmit={handleCreateCategory} className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                    <form onSubmit={handleCreateCategory} className="space-y-3 p-4 rounded-xl" style={{ background: 'var(--color-bg-surface-hover)' }}>
                                         <input
                                             type="text"
                                             value={newCategoryName}
                                             onChange={(e) => setNewCategoryName(e.target.value)}
                                             placeholder="Category name..."
-                                            className="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                            className="w-full px-4 py-2 rounded-lg border"
+                                            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}
                                             autoFocus
                                         />
                                         <div className="flex gap-2">
@@ -361,9 +372,9 @@ export default function SettingsPage() {
                                                     type="button"
                                                     onClick={() => setNewCategoryColor(c.value)}
                                                     className={`w-8 h-8 rounded-full border-2 transition-all ${
-                                                        newCategoryColor === c.value ? 'border-slate-900 dark:border-white scale-110' : 'border-transparent'
+                                                        newCategoryColor === c.value ? 'scale-110' : 'border-transparent'
                                                     }`}
-                                                    style={{ backgroundColor: c.value }}
+                                                    style={{ backgroundColor: c.value, ...(newCategoryColor === c.value ? { borderColor: 'var(--color-text-primary)' } : {}) }}
                                                     title={c.name}
                                                 />
                                             ))}
@@ -372,7 +383,8 @@ export default function SettingsPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => { setShowCategoryForm(false); setNewCategoryName(''); }}
-                                                className="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm"
+                                                className="px-4 py-2 settings-cancel-btn text-sm"
+                                                style={{ color: 'var(--color-text-muted)' }}
                                             >
                                                 Cancel
                                             </button>
@@ -408,14 +420,14 @@ export default function SettingsPage() {
                                     { title: 'Weekly Summary', desc: 'A detailed report of your progress every Sunday.' },
                                     { title: 'Sound Effects', desc: 'Play a sound when you complete a habit.' }
                                 ].map((pref, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 rounded-lg hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                    <div key={i} className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                         <div>
                                             <h3 className="font-medium">{pref.title}</h3>
-                                            <p className="text-xs text-slate-500">{pref.desc}</p>
+                                            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{pref.desc}</p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" className="sr-only peer" defaultChecked={i < 2} />
-                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary rounded-full"></div>
+                                            <div className="w-11 h-6 settings-toggle-track peer-focus:outline-none peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary rounded-full"></div>
                                         </label>
                                     </div>
                                 ))}
@@ -430,7 +442,7 @@ export default function SettingsPage() {
                             </div>
                             <div className="space-y-6">
                                 <div>
-                                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-3">Visual Style</label>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Visual Style</label>
                                     <div className="grid grid-cols-2 gap-4">
                                         {(['classic', 'retrofuturista'] as const).map((v) => (
                                             <button
@@ -438,16 +450,14 @@ export default function SettingsPage() {
                                                 onClick={() => changeVisualTheme(v)}
                                                 className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all ${visualTheme === v ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
-                                                <span className={`material-symbols-outlined ${visualTheme === v ? 'text-primary' : 'text-slate-400'}`}>
-                                                    {v === 'classic' ? 'dashboard' : 'rocket_launch'}
-                                                </span>
+                                                <ThemePreview theme={v} isDark={isDark} />
                                                 <span className="text-sm font-medium capitalize">{v === 'retrofuturista' ? 'Retrofuturista' : 'Classic'}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-3">Display Mode</label>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Display Mode</label>
                                     <div className="grid grid-cols-3 gap-4">
                                         {(['light', 'dark', 'system'] as const).map((m) => (
                                             <button
@@ -455,7 +465,7 @@ export default function SettingsPage() {
                                                 onClick={() => changeTheme(m)}
                                                 className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all ${theme === m ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
-                                                <span className={`material-symbols-outlined ${theme === m ? 'text-primary' : 'text-slate-400'}`}>
+                                                <span className={`material-symbols-outlined ${theme === m ? 'text-primary' : ''}`} style={theme !== m ? { color: 'var(--color-text-muted)' } : undefined}>
                                                     {m === 'light' ? 'light_mode' : m === 'dark' ? 'dark_mode' : 'settings_brightness'}
                                                 </span>
                                                 <span className="text-sm font-medium capitalize">{m}</span>
@@ -474,8 +484,8 @@ export default function SettingsPage() {
                             </div>
                             <div className="flex items-center justify-between gap-4">
                                 <div>
-                                    <h3 className="font-medium text-slate-800 dark:text-slate-200">Reset All Data</h3>
-                                    <p className="text-xs text-slate-500">Permanently delete all your habit history and preferences. This cannot be undone.</p>
+                                    <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Reset All Data</h3>
+                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Permanently delete all your habit history and preferences. This cannot be undone.</p>
                                 </div>
                                 <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg font-medium transition-all">Reset Account</button>
                             </div>
@@ -484,12 +494,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Sticky Footer */}
-                <footer className="fixed bottom-0 left-0 lg:left-64 right-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-t border-primary/10 p-4 lg:px-10 flex items-center justify-between z-10">
-                    <p className={`text-sm text-slate-500 italic ${isDirty ? 'opacity-100' : 'opacity-0'}`}>You have unsaved changes</p>
+                <footer className="fixed bottom-0 left-0 lg:left-64 right-0 backdrop-blur-md border-t border-primary/10 p-4 lg:px-10 flex items-center justify-between z-10" style={{ background: 'color-mix(in srgb, var(--color-bg-surface) 80%, transparent)' }}>
+                    <p className={`text-sm italic ${isDirty ? 'opacity-100' : 'opacity-0'}`} style={{ color: 'var(--color-text-muted)' }}>You have unsaved changes</p>
                     <div className="flex gap-3 ml-auto">
                         <button
                             onClick={handleDiscard}
-                            className="px-6 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors"
+                            className="px-6 py-2 border rounded-lg font-medium transition-colors settings-discard-btn"
+                            style={{ borderColor: 'var(--color-border)' }}
                         >
                             Discard
                         </button>

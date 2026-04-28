@@ -1,6 +1,13 @@
 export default function SettingCard({ children }: { children: React.ReactNode }) {
     return (
-        <section className="bg-white dark:bg-background-dark/50 border border-primary/10 rounded-xl p-6 shadow-sm">
+        <section
+            className="border rounded-xl p-6"
+            style={{
+                background: 'var(--color-bg-surface)',
+                borderColor: 'var(--color-border)',
+                boxShadow: 'var(--shadow-sm)',
+            }}
+        >
             {children}
         </section>
     )

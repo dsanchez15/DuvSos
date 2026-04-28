@@ -49,34 +49,69 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center font-display antialiased">
+        <div
+            className="min-h-screen flex items-center justify-center font-display antialiased"
+            style={{ background: 'var(--color-bg-base)' }}
+        >
             <div className="w-full max-w-md p-6">
                 {/* Logo and Title */}
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-xl mb-4">
                         <span className="material-icons text-primary text-4xl">check_circle</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">DuvSos</h1>
-                    <p className="mt-2 text-slate-500 dark:text-slate-400">
+                    <h1
+                        className="text-3xl font-bold"
+                        style={{ color: 'var(--color-text-primary)' }}
+                    >DuvSos</h1>
+                    <p
+                        className="mt-2"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         {isLogin ? "Welcome back! Let's track your progress." : "Create an account to start tracking."}
                     </p>
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl shadow-slate-900/5 p-8">
+                <div
+                    className="border rounded-xl p-8"
+                    style={{
+                        background: 'var(--color-bg-surface)',
+                        borderColor: 'var(--color-border)',
+                        boxShadow: 'var(--shadow-lg)',
+                    }}
+                >
                     {error && (
-                        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-400 rounded text-sm text-center">
+                        <div
+                            className="mb-4 p-3 border rounded text-sm text-center"
+                            style={{
+                                background: 'color-mix(in srgb, var(--color-danger) 12%, transparent)',
+                                borderColor: 'var(--color-danger)',
+                                color: 'var(--color-danger)',
+                            }}
+                        >
                             {error}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="email">Email Address</label>
+                            <label
+                                className="block text-sm font-medium mb-1.5"
+                                style={{ color: 'var(--color-text-secondary)' }}
+                                htmlFor="email"
+                            >Email Address</label>
                             <div className="relative">
-                                <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail_outline</span>
+                                <span
+                                    className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
+                                    style={{ color: 'var(--color-text-muted)' }}
+                                >mail_outline</span>
                                 <input
-                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                    style={{
+                                        background: 'var(--color-bg-input)',
+                                        borderColor: 'var(--color-border)',
+                                        color: 'var(--color-text-primary)',
+                                    }}
                                     id="email"
                                     type="email"
                                     placeholder="name@example.com"
@@ -89,11 +124,23 @@ export default function LoginPage() {
 
                         {!isLogin && (
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="name">Full Name</label>
+                                <label
+                                    className="block text-sm font-medium mb-1.5"
+                                    style={{ color: 'var(--color-text-secondary)' }}
+                                    htmlFor="name"
+                                >Full Name</label>
                                 <div className="relative">
-                                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person_outline</span>
+                                    <span
+                                        className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
+                                        style={{ color: 'var(--color-text-muted)' }}
+                                    >person_outline</span>
                                     <input
-                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                                        className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                        style={{
+                                            background: 'var(--color-bg-input)',
+                                            borderColor: 'var(--color-border)',
+                                            color: 'var(--color-text-primary)',
+                                        }}
                                         id="name"
                                         type="text"
                                         placeholder="John Doe"
@@ -106,11 +153,23 @@ export default function LoginPage() {
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="password">Password</label>
+                            <label
+                                className="block text-sm font-medium mb-1.5"
+                                style={{ color: 'var(--color-text-secondary)' }}
+                                htmlFor="password"
+                            >Password</label>
                             <div className="relative">
-                                <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">lock_open</span>
+                                <span
+                                    className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
+                                    style={{ color: 'var(--color-text-muted)' }}
+                                >lock_open</span>
                                 <input
-                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                    style={{
+                                        background: 'var(--color-bg-input)',
+                                        borderColor: 'var(--color-border)',
+                                        color: 'var(--color-text-primary)',
+                                    }}
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
@@ -123,8 +182,18 @@ export default function LoginPage() {
 
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                                <input className="h-4 w-4 text-primary focus:ring-primary border-slate-300 dark:border-slate-600 rounded" id="remember-me" name="remember-me" type="checkbox" />
-                                <label className="ml-2 block text-sm text-slate-600 dark:text-slate-400" htmlFor="remember-me">Remember me</label>
+                                <input
+                                    className="h-4 w-4 text-primary focus:ring-primary rounded"
+                                    style={{ borderColor: 'var(--color-border)' }}
+                                    id="remember-me"
+                                    name="remember-me"
+                                    type="checkbox"
+                                />
+                                <label
+                                    className="ml-2 block text-sm"
+                                    style={{ color: 'var(--color-text-secondary)' }}
+                                    htmlFor="remember-me"
+                                >Remember me</label>
                             </div>
                             <div className="text-sm">
                                 <a className="font-medium text-primary hover:text-primary/80 transition-colors" href="#">Forgot password?</a>
@@ -140,7 +209,10 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <p className="mt-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <p
+                        className="mt-10 text-center text-sm"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         {isLogin ? "Don't have an account? " : "Already have an account? "}
                         <button onClick={toggleMode} className="font-semibold text-primary hover:text-primary/80 transition-colors">
                             {isLogin ? 'Sign up for free' : 'Log in'}
@@ -148,9 +220,9 @@ export default function LoginPage() {
                     </p>
 
                     <div className="mt-12 flex justify-center space-x-6">
-                        <a className="text-xs text-slate-400 hover:text-primary" href="#">Privacy Policy</a>
-                        <a className="text-xs text-slate-400 hover:text-primary" href="#">Terms of Service</a>
-                        <a className="text-xs text-slate-400 hover:text-primary" href="#">Support</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Privacy Policy</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Terms of Service</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Support</a>
                     </div>
                 </div>
             </div>

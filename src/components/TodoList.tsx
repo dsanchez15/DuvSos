@@ -585,7 +585,8 @@ export default function TodoList() {
             {unchecked.length > 0 && (
               <button
                 onClick={() => setCompletedCollapsed(!completedCollapsed)}
-                className="completed-toggle w-full flex items-center gap-2 py-2 text-sm text-slate-400 dark:text-slate-500 font-medium hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="completed-toggle w-full flex items-center gap-2 py-2 text-sm font-medium todo-completed-toggle transition-colors"
+                style={{ color: 'var(--color-text-muted)' }}
               >
                 <span className="material-symbols-outlined text-sm">
                   {completedCollapsed ? 'expand_more' : 'expand_less'}
@@ -624,7 +625,7 @@ export default function TodoList() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">{error}</p>
+        <p style={{ color: 'var(--color-danger)' }}>{error}</p>
         <button onClick={fetchTodos} className="btn-neon mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
           Retry
         </button>
@@ -637,25 +638,34 @@ export default function TodoList() {
       {/* Header with Metrics */}
       <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Todos</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>My Todos</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
             {metrics ? `${metrics.pending} pending · ${metrics.completed} completed · ${metrics.completionRate}% rate` : 'Loading...'}
           </p>
         </div>
 
         {metrics && (
           <div className="flex gap-3 text-sm flex-wrap">
-            <div className="todo-metric-card px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <span className="metric-value text-blue-600 dark:text-blue-400 font-bold">{metrics.today.pending}</span>
-              <span className="text-slate-500 dark:text-slate-400 ml-1">today</span>
+            <div
+              className="todo-metric-card px-3 py-2 rounded-lg"
+              style={{ background: 'color-mix(in srgb, var(--color-info) 10%, transparent)' }}
+            >
+              <span className="metric-value font-bold" style={{ color: 'var(--color-info)' }}>{metrics.today.pending}</span>
+              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>today</span>
             </div>
-            <div className="todo-metric-card px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-              <span className="metric-value text-amber-600 dark:text-amber-400 font-bold">{metrics.overdue}</span>
-              <span className="text-slate-500 dark:text-slate-400 ml-1">overdue</span>
+            <div
+              className="todo-metric-card px-3 py-2 rounded-lg"
+              style={{ background: 'color-mix(in srgb, var(--color-warning) 10%, transparent)' }}
+            >
+              <span className="metric-value font-bold" style={{ color: 'var(--color-warning)' }}>{metrics.overdue}</span>
+              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>overdue</span>
             </div>
-            <div className="todo-metric-card px-3 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <span className="metric-value text-purple-600 dark:text-purple-400 font-bold">{formatEffort(metrics.totalEffortMinutes)}</span>
-              <span className="text-slate-500 dark:text-slate-400 ml-1">effort</span>
+            <div
+              className="todo-metric-card px-3 py-2 rounded-lg"
+              style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}
+            >
+              <span className="metric-value font-bold" style={{ color: 'var(--color-primary)' }}>{formatEffort(metrics.totalEffortMinutes)}</span>
+              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>effort</span>
             </div>
           </div>
         )}
@@ -663,12 +673,19 @@ export default function TodoList() {
 
       {/* API Error Banner */}
       {apiError && (
-        <div className="todo-error-banner flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300">
+        <div
+          className="todo-error-banner flex items-center gap-3 p-4 border rounded-xl"
+          style={{
+            background: 'color-mix(in srgb, var(--color-danger) 8%, transparent)',
+            borderColor: 'color-mix(in srgb, var(--color-danger) 30%, transparent)',
+            color: 'var(--color-danger)',
+          }}
+        >
           <span className="material-symbols-outlined">error</span>
           <span className="flex-1 text-sm font-medium">{apiError}</span>
           <button
             onClick={() => setApiError('')}
-            className="p-1 hover:bg-red-100 dark:hover:bg-red-800 rounded"
+            className="todo-error-close p-1 rounded"
           >
             <span className="material-symbols-outlined text-sm">close</span>
           </button>
@@ -678,17 +695,22 @@ export default function TodoList() {
       {/* Filters Bar */}
       <div className="flex flex-wrap gap-2 items-center">
         {/* View Mode */}
-        <div className="todo-view-tabs flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        <div
+          className="todo-view-tabs flex rounded-lg p-1"
+          style={{ background: 'var(--color-bg-surface-hover)' }}
+        >
           {(['all', 'today', 'week'] as ViewMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
               data-active={viewMode === mode}
               className={`px-3 py-1.5 rounded-md text-sm font-medium capitalize transition-colors ${
-                viewMode === mode
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                viewMode === mode ? 'shadow-sm' : ''
               }`}
+              style={{
+                background: viewMode === mode ? 'var(--color-bg-surface)' : 'transparent',
+                color: viewMode === mode ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              }}
             >
               {mode}
             </button>
@@ -699,7 +721,8 @@ export default function TodoList() {
         <select
           value={groupBy}
           onChange={(e) => setGroupBy(e.target.value as GroupBy)}
-          className="todo-select px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="none">No grouping</option>
           <option value="category">By Category</option>
@@ -709,19 +732,21 @@ export default function TodoList() {
 
         {/* Search with clear */}
         <div className="relative flex-1 min-w-[200px]">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--color-text-muted)' }}>search</span>
           <input
             ref={searchRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search todos..."
-            className="todo-search w-full pl-9 pr-9 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+            className="todo-search w-full pl-9 pr-9 py-2 rounded-lg border text-sm"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
           {searchQuery && (
             <button
               onClick={() => { setSearchQuery(''); setDebouncedSearch(''); searchRef.current?.focus() }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-2 top-1/2 -translate-y-1/2 todo-search-clear"
+              style={{ color: 'var(--color-text-muted)' }}
             >
               <span className="material-symbols-outlined text-sm">close</span>
             </button>
@@ -732,7 +757,8 @@ export default function TodoList() {
         <select
           value={filterPriority}
           onChange={(e) => setFilterPriority(e.target.value)}
-          className="todo-select px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">All priorities</option>
           <option value="high">High</option>
@@ -744,7 +770,8 @@ export default function TodoList() {
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="todo-select px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">All categories</option>
           {categories.map((cat) => (
@@ -756,7 +783,8 @@ export default function TodoList() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-          className="todo-select px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">All statuses</option>
           <option value="pending">Pending</option>
@@ -767,7 +795,8 @@ export default function TodoList() {
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="todo-clear-filters px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            className="todo-clear-filters px-3 py-2 text-sm rounded-lg transition-colors"
+            style={{ color: 'var(--color-danger)' }}
           >
             Clear filters
           </button>
@@ -783,7 +812,8 @@ export default function TodoList() {
             value={newTodoTitle}
             onChange={(e) => setNewTodoTitle(e.target.value)}
             placeholder="Add a new todo... (press N to focus)"
-            className="todo-add-input flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-slate-400"
+            className="todo-add-input flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
           <button
             type="submit"
@@ -795,28 +825,34 @@ export default function TodoList() {
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="btn-outline px-3 py-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800"
+            className="btn-outline px-3 py-3 border rounded-xl todo-advanced-toggle"
+            style={{ borderColor: 'var(--color-border)' }}
             title="Advanced options"
           >
-            <span className="material-symbols-outlined text-slate-500">
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-text-secondary)' }}>
               {showAdvanced ? 'expand_less' : 'expand_more'}
             </span>
           </button>
         </div>
 
         {showAdvanced && (
-          <div className="todo-advanced-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+          <div
+            className="todo-advanced-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-xl"
+            style={{ background: 'var(--color-bg-surface-hover)' }}
+          >
             <input
               type="text"
               value={newTodoDescription}
               onChange={(e) => setNewTodoDescription(e.target.value)}
               placeholder="Description..."
-              className="rf-input px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <select
               value={newTodoPriority}
               onChange={(e) => setNewTodoPriority(e.target.value)}
-              className="todo-select px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="todo-select px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             >
               <option value="low">Low Priority</option>
               <option value="normal">Normal Priority</option>
@@ -826,13 +862,15 @@ export default function TodoList() {
               type="date"
               value={newTodoDueDate}
               onChange={(e) => setNewTodoDueDate(e.target.value)}
-              className="rf-input px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <input
               type="time"
               value={newTodoDueTime}
               onChange={(e) => setNewTodoDueTime(e.target.value)}
-              className="rf-input px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <input
               type="number"
@@ -841,12 +879,14 @@ export default function TodoList() {
               placeholder="Effort (hours)"
               min="0"
               step="0.5"
-              className="rf-input px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <select
               value={newTodoCategory}
               onChange={(e) => setNewTodoCategory(e.target.value)}
-              className="todo-select sm:col-span-2 lg:col-span-5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
+              className="todo-select sm:col-span-2 lg:col-span-5 px-3 py-2 rounded-lg border text-sm"
+              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             >
               <option value="">No category</option>
               {categories.map((cat) => (
@@ -862,20 +902,29 @@ export default function TodoList() {
         <div className="space-y-6">
           {Object.entries(groupedTodos).map(([groupName, groupTodos]) => (
             <div key={groupName}>
-              <h3 className="todo-group-header text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+              <h3
+                className="todo-group-header text-lg font-semibold mb-3 flex items-center gap-2"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
                 <span className="group-dot w-2 h-2 rounded-full bg-primary"></span>
                 {groupName}
-                <span className="text-sm font-normal text-slate-400">({groupTodos.length})</span>
+                <span className="text-sm font-normal" style={{ color: 'var(--color-text-muted)' }}>({groupTodos.length})</span>
               </h3>
               {renderTodoList(groupTodos)}
             </div>
           ))}
         </div>
       ) : todos.length === 0 ? (
-        <div className="empty-state text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-          <span className="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-4 block">checklist</span>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">No todos found</p>
-          <p className="text-slate-400 dark:text-slate-500 mt-1">Try adjusting your filters or add a new todo</p>
+        <div
+          className="empty-state text-center py-16 rounded-xl border border-dashed"
+          style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}
+        >
+          <span
+            className="material-symbols-outlined text-5xl mb-4 block"
+            style={{ color: 'var(--color-text-muted)' }}
+          >checklist</span>
+          <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>No todos found</p>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Try adjusting your filters or add a new todo</p>
         </div>
       ) : (
         renderTodoList(todos)
@@ -884,34 +933,40 @@ export default function TodoList() {
       {/* Edit Modal */}
       {editingTodo && (
         <div className="delete-modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="todo-edit-modal bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Edit Todo</h3>
+          <div
+            className="todo-edit-modal rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto"
+            style={{ background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }}
+          >
+            <h3 className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>Edit Todo</h3>
             <div className="space-y-3">
               <div>
-                <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Title</label>
+                <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Title</label>
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="modal-input w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="modal-input w-full px-4 py-2 rounded-lg border"
+                  style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
               <div>
-                <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
+                <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Description</label>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   rows={2}
-                  className="modal-input w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="modal-input w-full px-4 py-2 rounded-lg border"
+                  style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Priority</label>
                   <select
                     value={editPriority}
                     onChange={(e) => setEditPriority(e.target.value)}
-                    className="modal-select w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    className="modal-select w-full px-3 py-2 rounded-lg border"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="low">Low</option>
                     <option value="normal">Normal</option>
@@ -919,11 +974,12 @@ export default function TodoList() {
                   </select>
                 </div>
                 <div>
-                  <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Category</label>
                   <select
                     value={editCategory}
                     onChange={(e) => setEditCategory(e.target.value)}
-                    className="modal-select w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    className="modal-select w-full px-3 py-2 rounded-lg border"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="">No category</option>
                     {categories.map((cat) => (
@@ -934,40 +990,44 @@ export default function TodoList() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Due Date</label>
                   <input
                     type="date"
                     value={editDueDate}
                     onChange={(e) => setEditDueDate(e.target.value)}
-                    className="modal-input w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    className="modal-input w-full px-3 py-2 rounded-lg border"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
                 <div>
-                  <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Due Time</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Due Time</label>
                   <input
                     type="time"
                     value={editDueTime}
                     onChange={(e) => setEditDueTime(e.target.value)}
-                    className="modal-input w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                    className="modal-input w-full px-3 py-2 rounded-lg border"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
               </div>
               <div>
-                <label className="rf-label block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Effort (hours)</label>
+                <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Effort (hours)</label>
                 <input
                   type="number"
                   value={editEffort}
                   onChange={(e) => setEditEffort(e.target.value)}
                   min="0"
                   step="0.5"
-                  className="modal-input w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                  className="modal-input w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
             </div>
             <div className="flex gap-2 justify-end pt-2">
               <button
                 onClick={() => setEditingTodo(null)}
-                className="btn-cancel px-4 py-2 text-slate-500 hover:text-slate-700"
+                className="btn-cancel px-4 py-2"
+                style={{ color: 'var(--color-text-secondary)' }}
               >
                 Cancel
               </button>

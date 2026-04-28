@@ -162,13 +162,17 @@ export default function Sidebar() {
                 ref={sidebarRef}
                 id="main-sidebar"
                 className={`
-                    bg-white dark:bg-background-dark/50 border-r border-primary/10 flex flex-col py-8 fixed h-full z-40
+                    border-r border-primary/10 flex flex-col py-8 fixed h-full z-40
                     ${isMobileOverlayOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                     ${sidebarWidthClass}
                     transition-transform duration-300 ease-in-out
                     motion-reduce:transition-none
                 `}
+                style={{ background: 'var(--color-sidebar-bg)' }}
             >
+                {/* Decorative top line (visible in retrofuturista, invisible in classic) */}
+                <div style={{ height: '1px', background: 'var(--deco-sidebar-top-line)', opacity: 0.6 }} />
+
                 {/* Toggle Button */}
                 <button
                     ref={toggleRef}
@@ -177,7 +181,8 @@ export default function Sidebar() {
                     aria-expanded={isExpanded || isMobileOverlayOpen}
                     aria-controls="main-sidebar"
                     aria-label={isExpanded || isMobileOverlayOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-                    className="absolute -right-2.5 top-9 w-5 h-5 bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center shadow-sm hover:bg-slate-300/90 dark:hover:bg-slate-600/90 hover:shadow-md focus:outline-none focus:ring-1 focus:ring-slate-400/50 hidden lg:flex backdrop-blur-sm transition-all"
+                    className="absolute -right-2.5 top-9 w-5 h-5 rounded-full flex items-center justify-center shadow-sm hover:shadow-md focus:outline-none focus:ring-1 focus:ring-slate-400/50 hidden lg:flex backdrop-blur-sm transition-all"
+                    style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
                 >
                     <span className="material-symbols-outlined text-xs">
                         {isExpanded ? 'chevron_left' : 'chevron_right'}
@@ -186,7 +191,10 @@ export default function Sidebar() {
 
                 {/* Logo */}
                 <div className="px-6 mb-10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0 sidebar-logo-bg">
+                    <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0"
+                        style={{ background: 'var(--deco-logo-bg)', boxShadow: 'var(--deco-logo-shadow)' }}
+                    >
                         <span className="material-symbols-outlined">grid_view</span>
                     </div>
                     <span className={[
@@ -251,7 +259,7 @@ export default function Sidebar() {
                         aria-expanded={profileMenuOpen}
                         aria-haspopup="menu"
                         aria-controls="profile-menu"
-                        className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
+                        className="flex items-center gap-3 w-full p-2 rounded-xl transition-colors text-left sidebar-profile-btn"
                     >
                         <img
                             src={user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=random"}
@@ -266,10 +274,10 @@ export default function Sidebar() {
                             <p className="text-xs truncate" style={{ color: 'var(--color-text-secondary)' }}>{user?.tagline || "Productivity Enthusiast"}</p>
                         </div>
                         <span className={[
-                            'material-symbols-outlined text-slate-400 transition-transform duration-200 shrink-0',
+                            'material-symbols-outlined transition-transform duration-200 shrink-0',
                             profileMenuOpen ? 'rotate-180' : '',
                             isExpanded ? 'opacity-100' : 'opacity-0 w-0',
-                        ].join(' ')}>
+                        ].join(' ')} style={{ color: 'var(--color-text-muted)' }}>
                             expand_more
                         </span>
                     </button>
@@ -280,13 +288,15 @@ export default function Sidebar() {
                             ref={profileMenuRef}
                             id="profile-menu"
                             role="menu"
-                            className="absolute left-4 right-4 bottom-full mb-2 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
+                            className="absolute left-4 right-4 bottom-full mb-2 rounded-xl shadow-lg border py-1 z-50"
+                            style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
                         >
                             <Link
                                 href="/settings"
                                 onClick={() => setProfileMenuOpen(false)}
                                 role="menuitem"
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                                className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors sidebar-dropdown-item"
+                                style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">settings</span>
                                 Settings
@@ -295,12 +305,13 @@ export default function Sidebar() {
                                 href="/support"
                                 onClick={() => setProfileMenuOpen(false)}
                                 role="menuitem"
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                                className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors sidebar-dropdown-item"
+                                style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">help_outline</span>
                                 Support
                             </Link>
-                            <div className="border-t border-slate-100 dark:border-slate-700 my-1" />
+                            <div className="border-t my-1" style={{ borderColor: 'var(--color-border)' }} />
                             <button
                                 onClick={() => { setProfileMenuOpen(false); handleLogout(); }}
                                 role="menuitem"
@@ -321,7 +332,8 @@ export default function Sidebar() {
                 aria-expanded={isMobileOverlayOpen}
                 aria-controls="main-sidebar"
                 aria-label={isMobileOverlayOpen ? 'Close sidebar' : 'Open sidebar'}
-                className="fixed top-4 left-4 z-50 p-2 bg-white dark:bg-background-dark/80 border border-primary/10 rounded-lg shadow-sm lg:hidden"
+                className="fixed top-4 left-4 z-50 p-2 border border-primary/10 rounded-lg shadow-sm lg:hidden"
+                style={{ background: 'var(--color-bg-surface)' }}
             >
                 <span className="material-symbols-outlined">{isMobileOverlayOpen ? 'close' : 'menu'}</span>
             </button>
