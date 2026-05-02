@@ -53,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (body.deadline !== undefined) updateData.deadline = body.deadline ? new Date(body.deadline) : null
     if (body.estimatedHours !== undefined) updateData.estimatedHours = body.estimatedHours ? parseFloat(body.estimatedHours) : null
     if (body.milestones !== undefined) {
-      await prisma.milestone.deleteMany({ where: { goalId: id } })
+      await prisma.goalMilestone.deleteMany({ where: { goalId: id } })
     }
 
     const goal = await prisma.goal.update({
