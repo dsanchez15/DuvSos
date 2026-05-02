@@ -25,22 +25,22 @@ export default function UserProgressionBadge() {
   const progress = Math.min(100, (progression.totalXP / nextLevelXP) * 100)
 
   return (
-    <div className="progression-badge px-3 py-2 bg-white/10 dark:bg-white/5 rounded-lg backdrop-blur-sm">
+    <div className="progression-badge px-3 py-2 rounded-lg backdrop-blur-sm" style={{ background: 'var(--color-bg-surface-hover)' }}>
       <div className="flex items-center gap-2">
-        <div className="level-circle w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white text-sm font-bold">
+        <div className="level-circle w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-sm font-bold" style={{ color: 'var(--color-text-inverse)' }}>
           {progression.currentLevel}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
+          <p className="text-xs font-medium truncate" style={{ color: 'var(--color-text-secondary)' }}>
             {levelName}
           </p>
-          <div className="xp-track h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
+          <div className="xp-track h-1.5 rounded-full overflow-hidden mt-1" style={{ background: 'var(--color-border)' }}>
             <div
               className="xp-fill h-full bg-primary rounded-full transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-[10px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
             {progression.totalXP} / {nextLevelXP} XP
           </p>
         </div>

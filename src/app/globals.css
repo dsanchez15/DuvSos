@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import "../styles/themes.css";
+@import "../styles/tokens-base.css";
+@import "../styles/tokens-classic.css";
+@import "../styles/tokens-retrofuturista.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -56,4 +58,253 @@ body {
 }
 .animate-slide-in {
   animation: slide-in 0.3s ease-out;
+}
+
+/* Sidebar token-based hover states */
+.sidebar-profile-btn:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.sidebar-dropdown-item:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Habit component token-based hover states */
+.habit-state-btn-warning:hover {
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.habit-state-btn-success:hover {
+  background: color-mix(in srgb, var(--color-success) 10%, transparent);
+}
+
+.habit-state-btn-muted:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.habit-delete-btn:hover {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.habit-cancel-btn:hover {
+  background: var(--color-bg-surface-hover);
+  filter: brightness(0.95);
+}
+
+.habit-completion-done:hover {
+  background: color-mix(in srgb, var(--color-success) 22%, transparent);
+}
+
+.habit-completion-pending:hover {
+  background: var(--color-bg-surface-hover);
+  filter: brightness(0.95);
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Todo component token-based hover states */
+.todo-item-hover:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-checkbox-unchecked:hover {
+  border-color: var(--color-success) !important;
+}
+
+.subtask-checkbox-unchecked:hover {
+  border-color: var(--color-success) !important;
+}
+
+.todo-action-btn-info:hover {
+  color: var(--color-info);
+  background: color-mix(in srgb, var(--color-info) 10%, transparent);
+}
+
+.todo-action-btn-primary:hover {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.todo-action-btn-danger:hover {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.todo-completed-toggle:hover {
+  color: var(--color-text-secondary);
+}
+
+.todo-subtask-toggle:hover {
+  color: var(--color-text-primary);
+}
+
+.todo-clear-filters:hover {
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.todo-error-close:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent);
+}
+
+.todo-search-clear:hover {
+  color: var(--color-text-secondary);
+}
+
+.todo-advanced-toggle:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Checklist component token-based hover states */
+.checklist-close-btn:hover {
+  color: var(--color-text-secondary);
+}
+
+.checklist-hide-toggle:hover {
+  color: var(--color-text-secondary);
+}
+
+.checklist-tab-inactive:hover {
+  color: var(--color-text-secondary);
+}
+
+.checklist-filter-btn-inactive:hover {
+  filter: brightness(0.92);
+}
+
+.checklist-action-btn-green:hover {
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 10%, transparent);
+}
+
+.checklist-action-btn-copy:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.checklist-action-btn-amber:hover {
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.checklist-action-btn-danger:hover {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.checklist-action-btn-reminder:hover {
+  color: var(--color-warning);
+}
+
+.checklist-checkbox-unchecked:hover {
+  border-color: var(--color-primary) !important;
+}
+
+.checklist-cancel-btn:hover {
+  color: var(--color-text-secondary);
+}
+
+.checklist-form-cancel:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Energy selector token-based hover states */
+.energy-btn-idle:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Action view token-based hover states */
+.action-toggle-btn-pending:hover {
+  background: var(--color-bg-surface-hover) !important;
+}
+
+/* Planning view token-based hover states */
+.planning-filter-inactive:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Category manager token-based hover states */
+.cat-close-btn:hover {
+  color: var(--color-text-secondary);
+}
+
+.cat-icon-btn:hover {
+  color: var(--color-text-secondary);
+}
+
+.cat-row-hover:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Login page token-based hover states */
+.login-footer-link:hover {
+  color: var(--color-primary);
+}
+
+/* Settings page token-based hover/state classes */
+.settings-num-btn-inactive {
+  border-color: var(--color-border);
+}
+
+.settings-num-btn-inactive:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.settings-toggle-track {
+  background: var(--color-border);
+}
+
+.settings-toggle-track::after {
+  background: var(--color-text-inverse);
+}
+
+.settings-cat-delete-btn:hover {
+  color: var(--color-danger);
+}
+
+.settings-cancel-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.settings-discard-btn:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.settings-row-hover:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Dashboard page token-based hover states */
+.dashboard-nav-btn:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.dashboard-cal-day:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+/* Reminder page token-based hover/state classes */
+.reminder-filter-btn-inactive:hover {
+  filter: brightness(0.92);
+}
+
+.reminder-add-btn:hover {
+  filter: brightness(0.92);
+}
+
+.reminder-remove-btn:hover {
+  color: var(--color-danger);
+}
+
+.reminder-cancel-btn:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.reminder-date-default {
+  color: var(--color-text-secondary);
+}
+
+.reminder-prio-normal-icon {
+  color: var(--color-text-muted);
 }

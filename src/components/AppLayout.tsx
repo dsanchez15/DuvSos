@@ -8,6 +8,19 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen" style={{ background: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}>
+        {/* Grid overlay — visible only in retrofuturista (classic uses transparent) */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 0,
+            background:
+              'linear-gradient(var(--deco-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--deco-grid-line) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
         <Sidebar />
         <MainContent>{children}</MainContent>
       </div>

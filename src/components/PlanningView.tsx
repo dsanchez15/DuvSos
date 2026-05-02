@@ -51,8 +51,8 @@ export default function PlanningView({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Planificación</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Planificación</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>
             {habits.length} hábito{habits.length !== 1 ? 's' : ''} configurado{habits.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -73,8 +73,9 @@ export default function PlanningView({
             className={`habit-filter-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               filter === f
                 ? 'habit-filter-btn-active bg-primary text-white'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                : 'planning-filter-inactive'
             }`}
+            style={filter !== f ? { background: 'var(--color-bg-input)', color: 'var(--color-text-secondary)' } : undefined}
           >
             {f === 'All' ? 'Todos' : f === 'Active' ? 'Activos' : f === 'Paused' ? 'Pausados' : 'Archivados'}
           </button>
@@ -82,8 +83,8 @@ export default function PlanningView({
       </div>
 
       {showForm && (
-        <div className="habit-form-container bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Crear Nuevo Hábito</h3>
+        <div className="habit-form-container rounded-xl p-6 border" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Crear Nuevo Hábito</h3>
           <HabitForm
             onSubmit={async (data) => { await onCreate(data); setShowForm(false) }}
             onCancel={() => setShowForm(false)}
@@ -94,15 +95,15 @@ export default function PlanningView({
       )}
 
       {filteredHabits.length === 0 ? (
-        <div className="empty-state text-center py-16 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-          <p className="text-slate-500 dark:text-slate-400 text-lg">No hay hábitos en esta categoría</p>
+        <div className="empty-state text-center py-16 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>No hay hábitos en esta categoría</p>
         </div>
       ) : (
         <div className="grid gap-4">
           {filteredHabits.map((habit) => (
             <div key={habit.id}>
               {editingId === habit.id ? (
-                <div className="dashboard-card bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border-l-4" style={{ borderLeftColor: habit.color }}>
+                <div className="dashboard-card rounded-xl shadow-md p-6 border-l-4" style={{ background: 'var(--color-bg-surface)', borderLeftColor: habit.color }}>
                   <HabitForm
                     initialData={habit}
                     onSubmit={(data) => handleUpdate(habit.id, data)}

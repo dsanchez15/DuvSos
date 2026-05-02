@@ -68,8 +68,8 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Archivo Histórico</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Analiza tu progreso pasado</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Archivo Histórico</h2>
+        <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Analiza tu progreso pasado</p>
       </div>
 
       {/* Period Selector */}
@@ -77,7 +77,8 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
         <select
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-          className="rf-select px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="rf-select px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           {months.map((m) => (
             <option key={m.value} value={m.value}>{m.label}</option>
@@ -86,7 +87,8 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-          className="rf-select px-3 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="rf-select px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           {years.map((y) => (
             <option key={y} value={y}>{y}</option>
@@ -96,17 +98,17 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="summary-card dashboard-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Total Completaciones</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{totalCompletions}</p>
+        <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Total Completaciones</p>
+          <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>{totalCompletions}</p>
         </div>
-        <div className="summary-card dashboard-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Hábitos Activos</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{habits.filter((h) => h.state === 'Active').length}</p>
+        <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Hábitos Activos</p>
+          <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>{habits.filter((h) => h.state === 'Active').length}</p>
         </div>
-        <div className="summary-card dashboard-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Mejor Racha</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
+        <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Mejor Racha</p>
+          <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>
             {Math.max(0, ...periodData.map((d) => d.streak))}
           </p>
         </div>
@@ -114,33 +116,34 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
 
       {/* Habit Breakdown */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Detalle por Hábito</h3>
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Detalle por Hábito</h3>
         {periodData.length === 0 ? (
-          <div className="empty-state text-center py-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-            <p className="text-slate-500 dark:text-slate-400">No hay hábitos para mostrar</p>
+          <div className="empty-state text-center py-8 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
+            <p style={{ color: 'var(--color-text-muted)' }}>No hay hábitos para mostrar</p>
           </div>
         ) : (
           periodData.map(({ habit, completions, streak, rate }) => (
             <div
               key={habit.id}
-              className="archive-habit-card dashboard-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border-l-4"
-              style={{ borderLeftColor: habit.color }}
+              className="archive-habit-card dashboard-card rounded-xl p-4 shadow-sm border-l-4"
+              style={{ background: 'var(--color-bg-surface)', borderLeftColor: habit.color }}
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">{habit.title}</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  <h4 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{habit.title}</h4>
+                  <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                     {completions} completaciones · Racha actual: {streak} · Tasa: {rate}%
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                    habit.state === 'Active'
-                      ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400'
-                      : habit.state === 'Paused'
-                      ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400'
-                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-                  }`}>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium`}
+                    style={
+                      habit.state === 'Active'
+                        ? { background: 'color-mix(in srgb, var(--color-success) 15%, transparent)', color: 'var(--color-success)' }
+                        : habit.state === 'Paused'
+                        ? { background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)', color: 'var(--color-warning)' }
+                        : { background: 'var(--color-bg-input)', color: 'var(--color-text-secondary)' }
+                    }>
                     {habit.state === 'Active' ? 'Activo' : habit.state === 'Paused' ? 'Pausado' : 'Archivado'}
                   </span>
                 </div>
@@ -162,7 +165,7 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
                       )
                     })}
                   </div>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Últimas completaciones</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>Últimas completaciones</p>
                 </div>
               )}
             </div>

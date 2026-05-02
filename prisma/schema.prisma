@@ -24,6 +24,26 @@ enum GoalType {
   Ratio
 }
 
+// ─── Performance Plan Enums ────────────────────────────────────────────────
+
+enum GoalCategory {
+  PROFESIONAL
+  PERSONAL
+}
+
+enum Priority {
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
 // ─── Core Models ─────────────────────────────────────────────────────────
 
 model User {
@@ -50,6 +70,10 @@ model User {
   userProgression     UserProgression?
   energyLogs          EnergyLog[]
   milestones          Milestone[]
+  goals               Goal[]
+  phases              Phase[]
+  dailyProgress       DailyProgress[]
+  weeklyCheckIns      WeeklyCheckIn[]
 }
 
 model Category {
@@ -401,4 +425,104 @@ model PriorityEscalationRule {
 
   @@unique([sourceModule, sourceId])
   @@index([sourceModule, sourceId])
+}
+
+// ─── Performance Plan Models ────────────────────────────────────────────────
+
+model Goal {
+  id              String     @id @default(cuid())
+  userId          Int
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category        GoalCategory
+  title           String
+  description     String?
+
+  priority        Priority   @default(MEDIA)
+  status          GoalStatus @default(ACTIVE)
+
+  deadline        DateTime?
+  estimatedHours  Float?
+  totalHoursSpent Float      @default(0)
+
+  milestones      GoalMilestone[]
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  completedAt     DateTime?
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([userId, category])
+}
+
+model GoalMilestone {
+  id          String    @id @default(cuid())
+  goalId      String
+  goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  title       String
+  targetDate  DateTime?
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  order       Int       @default(0)
+
+  @@index([goalId])
+  @@index([goalId, completed])
+}
+
+model Phase {
+  id          String    @id @default(cuid())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  number      Int
+  title       String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([userId, number])
+}
+
+model DailyProgress {
+  id        String    @id @default(cuid())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date      DateTime  @db.Date
+  goalId    String?
+
+  gymCompleted     Boolean @default(false)
+  sleepHours       Float?
+  studyHours       Float?
+  workHours        Float?
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date, goalId])
+  @@index([userId, date])
+}
+
+model WeeklyCheckIn {
+  id              String    @id @default(cuid())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  weekStartDate   DateTime  @db.Date
+  fatigueLevel    Int       @default(3)
+  completedHours  Float?
+  deviations      String?
+  adjustmentNotes String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, weekStartDate])
+  @@index([userId])
 }

@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -43,7 +44,8 @@ next-env.d.ts
 /src/generated/prisma
 
 # AI Agent Folders (synced from .agent/)
-/.agente/
+.agent
+/.agents/
 /.claude/
 /.cursor/
 /.kilocode/
@@ -68,3 +70,6 @@ next-env.d.ts
 /bob/
 /amazonq/
 /.github/
+
+# VS Code
+.vscode
