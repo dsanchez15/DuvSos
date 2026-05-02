@@ -56,13 +56,17 @@ export default function LoginPage() {
             <div className="w-full max-w-md p-6">
                 {/* Logo and Title */}
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-xl mb-4">
-                        <span className="material-icons text-primary text-4xl">check_circle</span>
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl mb-4" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-white">
+                            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" fill="currentColor" fillOpacity="0.3"/>
+                            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                            <path d="M12 6L8 9V15L12 18L16 15V9L12 6Z" fill="currentColor"/>
+                        </svg>
                     </div>
                     <h1
                         className="text-3xl font-bold"
                         style={{ color: 'var(--color-text-primary)' }}
-                    >DuvSos</h1>
+                    >Aure</h1>
                     <p
                         className="mt-2"
                         style={{ color: 'var(--color-text-secondary)' }}

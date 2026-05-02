@@ -69,6 +69,15 @@ interface DashboardMetrics {
   weeklyCompliance: number
 }
 
+interface PerformanceStats {
+  gymStreak: number
+  hoursThisWeek: number
+  hoursThisMonth: number
+  totalGoals: number
+  completedGoals: number
+  nextMilestones: { id: string; title: string; targetDate: string | null; goal: { id: string; title: string } }[]
+}
+
 const PRIORITY_ORDER: Record<string, number> = { high: 0, normal: 1, low: 2 }
 
 function sortByPriority<T extends { priority: string }>(items: T[]): T[] {
@@ -90,6 +99,8 @@ export default function DashboardPage() {
   const [calendarData, setCalendarData] = useState<Record<string, DayData>>({})
   const [workloadData, setWorkloadData] = useState<Record<string, WorkloadDay>>({})
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
+  const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null)
+  const [quickForm, setQuickForm] = useState({ sleepHours: '', studyHours: '', workHours: '', gymCompleted: false })
 
   const [loading, setLoading] = useState(false)
 
@@ -192,13 +203,23 @@ export default function DashboardPage() {
     }
   }, [])
 
+  const fetchPerformanceStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/stats')
+      if (res.ok) setPerformanceStats(await res.json())
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
   useEffect(() => {
     fetchHabits()
     fetchChecklistsAndTodos()
     fetchUpcomingReminders()
     fetchCalendar()
     fetchAnalytics()
-  }, [fetchHabits, fetchChecklistsAndTodos, fetchUpcomingReminders, fetchCalendar, fetchAnalytics])
+    fetchPerformanceStats()
+  }, [fetchHabits, fetchChecklistsAndTodos, fetchUpcomingReminders, fetchCalendar, fetchAnalytics, fetchPerformanceStats])
 
   // ─── Actions ───
 
@@ -282,6 +303,36 @@ export default function DashboardPage() {
         setUpcomingReminders((prev) => prev.filter((r) => r.id !== id && !String(r.id).startsWith(`${id}-`)))
         fetchCalendar()
         fetchAnalytics()
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleQuickProgressSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (quickForm.gymCompleted && quickForm.sleepHours && parseFloat(quickForm.sleepHours) < 7) {
+      alert('Gym requires at least 7 hours of sleep')
+      return
+    }
+    try {
+      const res = await fetch('/api/progress/daily', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: new Date().toISOString().split('T')[0],
+          sleepHours: quickForm.sleepHours ? parseFloat(quickForm.sleepHours) : null,
+          studyHours: quickForm.studyHours ? parseFloat(quickForm.studyHours) : null,
+          workHours: quickForm.workHours ? parseFloat(quickForm.workHours) : null,
+          gymCompleted: quickForm.gymCompleted,
+        }),
+      })
+      if (res.ok) {
+        setQuickForm({ sleepHours: '', studyHours: '', workHours: '', gymCompleted: false })
+        fetchPerformanceStats()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Error')
       }
     } catch (err) {
       console.error(err)
@@ -456,6 +507,70 @@ export default function DashboardPage() {
               ))}
             </div>
 
+            {/* ═══ PERFORMANCE PLAN ═══ */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>Performance Plan</h3>
+                <a href="/goals" className="text-xs px-2 py-1 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+                  View all →
+                </a>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-500 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-sm">local_fire_department</span>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.gymStreak ?? 0}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Gym Streak</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-500 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-sm">schedule</span>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.hoursThisWeek ?? 0}h</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>This Week</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-sm">track_changes</span>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.totalGoals ?? 0}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Active Goals</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {performanceStats?.nextMilestones && performanceStats.nextMilestones.length > 0 && (
+                <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Upcoming Milestones</h4>
+                  <div className="space-y-2">
+                    {performanceStats.nextMilestones.slice(0, 3).map((m: any) => (
+                      <div key={m.id} className="flex items-center gap-3 p-2 rounded-lg" style={{ background: 'var(--color-bg-input)' }}>
+                        <span className="material-symbols-outlined text-sm" style={{ color: 'var(--color-text-muted)' }}>flag</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{m.title}</p>
+                          <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{m.goal.title}</p>
+                        </div>
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                          {m.targetDate ? new Date(m.targetDate).toLocaleDateString('es', { month: 'short', day: 'numeric' }) : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
             {/* Weekly Compliance — part of Habit Trackers section */}
             <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex items-center justify-between mb-2">
@@ -554,6 +669,78 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* ═══ QUICK REGISTER ═══ */}
+          <section>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>Quick Register</h3>
+            <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+              <form onSubmit={handleQuickProgressSubmit} className="space-y-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Sueño</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      max="24"
+                      value={quickForm.sleepHours}
+                      onChange={e => setQuickForm(f => ({ ...f, sleepHours: e.target.value }))}
+                      placeholder="7.5"
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Estudio</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      value={quickForm.studyHours}
+                      onChange={e => setQuickForm(f => ({ ...f, studyHours: e.target.value }))}
+                      placeholder="2"
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Trabajo</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      value={quickForm.workHours}
+                      onChange={e => setQuickForm(f => ({ ...f, workHours: e.target.value }))}
+                      placeholder="1"
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => setQuickForm(f => ({ ...f, gymCompleted: !f.gymCompleted }))}
+                      className={`w-full px-3 py-2 rounded-lg border font-medium transition-colors text-sm ${
+                        quickForm.gymCompleted ? 'bg-emerald-500 text-white border-emerald-500' : ''
+                      }`}
+                      style={quickForm.gymCompleted ? {} : { background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
+                    >
+                      {quickForm.gymCompleted ? '✓ Gym' : 'Gym'}
+                    </button>
+                  </div>
+                </div>
+                {quickForm.gymCompleted && quickForm.sleepHours && parseFloat(quickForm.sleepHours) < 7 && (
+                  <p className="text-xs text-amber-500">⚠️ Gym requiere ≥7h de sueño</p>
+                )}
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors text-sm"
+                >
+                  Registrar día
+                </button>
+              </form>
             </div>
           </section>
 

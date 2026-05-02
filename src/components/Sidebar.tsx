@@ -195,13 +195,17 @@ export default function Sidebar() {
                         className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0"
                         style={{ background: 'var(--deco-logo-bg)', boxShadow: 'var(--deco-logo-shadow)' }}
                     >
-                        <span className="material-symbols-outlined">grid_view</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white">
+                            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" fill="currentColor" fillOpacity="0.3"/>
+                            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                            <path d="M12 6L8 9V15L12 18L16 15V9L12 6Z" fill="currentColor"/>
+                        </svg>
                     </div>
                     <span className={[
                         'text-xl font-bold tracking-tight overflow-hidden whitespace-nowrap transition-all duration-300',
                         isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0',
                     ].join(' ')} style={{ color: 'var(--color-text-primary)' }}>
-                        DuvSos
+                        Aure
                     </span>
                 </div>
 
@@ -247,6 +251,27 @@ export default function Sidebar() {
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
                         `}>Habits</span>
+                    </Link>
+                    <Link href="/goals" className={getLinkClass('/goals')}>
+                        <span className="material-symbols-outlined shrink-0">track_changes</span>
+                        <span className={`
+                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                        `}>Goals</span>
+                    </Link>
+                    <Link href="/progress" className={getLinkClass('/progress')}>
+                        <span className="material-symbols-outlined shrink-0">trending_up</span>
+                        <span className={`
+                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                        `}>Progress</span>
+                    </Link>
+                    <Link href="/checkin" className={getLinkClass('/checkin')}>
+                        <span className="material-symbols-outlined shrink-0">edit_calendar</span>
+                        <span className={`
+                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                        `}>Check-in</span>
                     </Link>
 
                 </nav>
