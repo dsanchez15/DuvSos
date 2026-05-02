@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <!-- Hexagon background -->
+  <path d="M256 24L92 108V404L256 488L420 404V108L256 24Z" fill="url(#bgGrad)"/>
+  <!-- Inner hexagon -->
+  <path d="M256 80L130 146V266L256 332L382 266V146L256 80Z" fill="white" fill-opacity="0.2"/>
+  <!-- Star/growth symbol -->
+  <path d="M256 140L200 200H180L160 140L140 200H160L200 260L256 200L312 260L332 200H312L292 140L272 200H252L256 140Z" fill="white"/>
+</svg>
