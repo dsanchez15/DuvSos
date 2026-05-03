@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSidebar } from '@/components/SidebarContext';
+import { t } from '@/lib/i18n';
 
 export default function Sidebar() {
     const router = useRouter();
@@ -230,21 +231,21 @@ export default function Sidebar() {
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Dashboard</span>
+                        `}>{t('sidebar.dashboard')}</span>
                     </Link>
                     <Link href="/todos" className={getLinkClass('/todos')}>
                         <span className="material-symbols-outlined shrink-0">check_circle</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>To-Do List</span>
+                        `}>{t('sidebar.todos')}</span>
                     </Link>
                     <Link href="/checklists" className={getLinkClass('/checklists')}>
                         <span className="material-symbols-outlined shrink-0">fact_check</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Checklists</span>
+                        `}>{t('sidebar.checklists')}</span>
                         {expiringCount > 0 && isExpanded && (
                             <span className="ml-auto bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                                 {expiringCount}
@@ -256,14 +257,14 @@ export default function Sidebar() {
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Reminders</span>
+                        `}>{t('sidebar.reminders')}</span>
                     </Link>
                     <Link href="/habits" className={getLinkClass('/habits')}>
                         <span className="material-symbols-outlined shrink-0">routine</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Habits</span>
+                        `}>{t('sidebar.habits')}</span>
                     </Link>
 
                     {/* Plan Section */}
@@ -279,7 +280,7 @@ export default function Sidebar() {
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Plan</span>
+                        `}>{t('sidebar.plan')}</span>
                         {isExpanded && (
                             <span className="material-symbols-outlined text-sm transition-transform ml-auto" style={{ transform: planExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
                                 chevron_right
@@ -294,14 +295,14 @@ export default function Sidebar() {
                                 <span className={`
                                     font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                                     ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                                `}>Goals</span>
+                                `}>{t('sidebar.goals')}</span>
                             </Link>
                             <Link href="/progress" className={getLinkClass('/progress') + ' pl-12'}>
                                 <span className="material-symbols-outlined shrink-0 text-sm">trending_up</span>
                                 <span className={`
                                     font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                                     ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                                `}>Progress y Check-in</span>
+                                `}>{t('sidebar.progressAndCheckIn')}</span>
                             </Link>
                         </div>
                     )}
@@ -356,7 +357,7 @@ export default function Sidebar() {
                                 style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">settings</span>
-                                Settings
+                                {t('sidebar.settings')}
                             </Link>
                             <Link
                                 href="/support"
@@ -366,7 +367,7 @@ export default function Sidebar() {
                                 style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">help_outline</span>
-                                Support
+                                {t('sidebar.support')}
                             </Link>
                             <div className="border-t my-1" style={{ borderColor: 'var(--color-border)' }} />
                             <button
@@ -375,7 +376,7 @@ export default function Sidebar() {
                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left"
                             >
                                 <span className="material-symbols-outlined text-lg">logout</span>
-                                Log Out
+                                {t('sidebar.logout')}
                             </button>
                         </div>
                     )}
