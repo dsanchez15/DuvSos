@@ -9,14 +9,17 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filter, setFilter] = useState<{ status?: string; category?: string }>({})
+  const [showInactive, setShowInactive] = useState(false)
+  const [categoryFilter, setCategoryFilter] = useState<string>('')
 
   const fetchGoals = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
-      if (filter.status) params.set('status', filter.status)
-      if (filter.category) params.set('category', filter.category)
+      if (!showInactive) {
+        params.set('status', 'ACTIVE,PENDING')
+      }
+      if (categoryFilter) params.set('category', categoryFilter)
 
       const res = await fetch(`/api/goals?${params}`)
       if (!res.ok) throw new Error('Error al cargar objetivos')
@@ -30,11 +33,26 @@ export default function GoalsPage() {
     } finally {
       setLoading(false)
     }
-  }, [filter])
+  }, [showInactive, categoryFilter])
 
   useEffect(() => {
     fetchGoals()
   }, [fetchGoals])
+
+  const deleteGoal = async (goalId: string) => {
+    if (!confirm('¿Eliminar este objetivo? Esta acción no se puede deshacer.')) return
+    try {
+      const res = await fetch(`/api/goals/${goalId}`, { method: 'DELETE' })
+      if (res.ok) {
+        setGoals(goals.filter(g => g.id !== goalId))
+      } else {
+        alert('Error al eliminar')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error al eliminar')
+    }
+  }
 
   return (
     <AppLayout>
@@ -48,30 +66,39 @@ export default function GoalsPage() {
               Plan de mejora continua
             </p>
           </div>
-          <a
-            href="/goals/new"
-            className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
-          >
-            + Nuevo objetivo
-          </a>
+          <div className="flex gap-2">
+            <a
+              href="/goals/phases"
+              className="px-4 py-2 border rounded-lg font-medium hover:bg-primary/5 transition-colors"
+              style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
+            >
+              Fases
+            </a>
+            <a
+              href="/goals/new"
+              className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            >
+              + Nuevo objetivo
+            </a>
+          </div>
         </header>
 
-        <div className="flex gap-2 flex-wrap">
-          <select
-            value={filter.status || ''}
-            onChange={e => setFilter(f => ({ ...f, status: e.target.value || undefined }))}
-            className="px-3 py-2 rounded-lg border"
-            style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
-          >
-            <option value="">Todos los estados</option>
-            <option value="ACTIVE">Activo</option>
-            <option value="COMPLETED">Completado</option>
-            <option value="PAUSED">Pausado</option>
-          </select>
+        <div className="flex gap-4 items-center flex-wrap">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showInactive}
+              onChange={e => setShowInactive(e.target.checked)}
+              className="w-4 h-4 rounded"
+            />
+            <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              Mostrar pausados y completados
+            </span>
+          </label>
 
           <select
-            value={filter.category || ''}
-            onChange={e => setFilter(f => ({ ...f, category: e.target.value || undefined }))}
+            value={categoryFilter}
+            onChange={e => setCategoryFilter(e.target.value)}
             className="px-3 py-2 rounded-lg border"
             style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
           >
@@ -93,7 +120,7 @@ export default function GoalsPage() {
               Sin objetivos
             </p>
             <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
-              Crea tu primer objetivo para empezar
+              {showInactive ? 'No hay objetivos que mostrar' : 'Crea tu primer objetivo para empezar'}
             </p>
             <a
               href="/goals/new"
@@ -105,11 +132,26 @@ export default function GoalsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {goals.map(goal => (
-              <GoalCard
-                key={goal.id}
-                goal={goal}
-                onClick={() => window.location.href = `/goals/${goal.id}`}
-              />
+              <div key={goal.id} className="relative">
+                <GoalCard
+                  goal={goal}
+                  onClick={() => window.location.href = `/goals/${goal.id}`}
+                />
+                {(goal.status === 'PAUSED' || goal.status === 'CANCELLED') && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteGoal(goal.id)
+                    }}
+                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors"
+                    title="Eliminar objetivo"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         )}

@@ -11,6 +11,7 @@ export default function Sidebar() {
     const [user, setUser] = React.useState<any>(null);
     const [expiringCount, setExpiringCount] = React.useState(0);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [planExpanded, setPlanExpanded] = useState(true);
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const profileTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -252,27 +253,46 @@ export default function Sidebar() {
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
                         `}>Habits</span>
                     </Link>
-                    <Link href="/goals" className={getLinkClass('/goals')}>
+
+                    {/* Plan Section */}
+                    <button
+                        onClick={() => setPlanExpanded(!planExpanded)}
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
+                            pathname.startsWith('/goals') || pathname.startsWith('/progress')
+                                ? 'active'
+                                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
+                        }`}
+                    >
                         <span className="material-symbols-outlined shrink-0">track_changes</span>
                         <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300 flex-1
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Goals</span>
-                    </Link>
-                    <Link href="/progress" className={getLinkClass('/progress')}>
-                        <span className="material-symbols-outlined shrink-0">trending_up</span>
-                        <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
-                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Progress</span>
-                    </Link>
-                    <Link href="/checkin" className={getLinkClass('/checkin')}>
-                        <span className="material-symbols-outlined shrink-0">edit_calendar</span>
-                        <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
-                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Check-in</span>
-                    </Link>
+                        `}>Plan</span>
+                        {isExpanded && (
+                            <span className="material-symbols-outlined text-sm transition-transform" style={{ transform: planExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                                chevron_right
+                            </span>
+                        )}
+                    </button>
+
+                    {planExpanded && (
+                        <div className="ml-6 space-y-1">
+                            <Link href="/goals" className={getLinkClass('/goals')}>
+                                <span className="material-symbols-outlined shrink-0 text-sm">flag</span>
+                                <span className={`
+                                    font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                                    ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                                `}>Goals</span>
+                            </Link>
+                            <Link href="/progress" className={getLinkClass('/progress')}>
+                                <span className="material-symbols-outlined shrink-0 text-sm">trending_up</span>
+                                <span className={`
+                                    font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                                    ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                                `}>Progress y Check-in</span>
+                            </Link>
+                        </div>
+                    )}
 
                 </nav>
 

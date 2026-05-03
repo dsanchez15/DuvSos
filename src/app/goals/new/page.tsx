@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
-import MilestoneItem from '@/components/MilestoneItem'
 import PriorityBadge from '@/components/PriorityBadge'
-import { Goal } from '@/types/goal'
+import { Goal, Phase } from '@/types/goal'
 
 export default function NewGoalPage() {
   const router = useRouter()
+  const [phases, setPhases] = useState<Phase[]>([])
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -16,10 +16,17 @@ export default function NewGoalPage() {
     priority: 'MEDIA' as 'ALTA' | 'MEDIA' | 'BAJA',
     deadline: '',
     estimatedHours: '',
+    phaseId: '',
   })
   const [milestones, setMilestones] = useState<{ title: string; targetDate: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/phases').then(res => res.ok && res.json()).then(data => {
+      if (data?.phases) setPhases(data.phases)
+    }).catch(() => {})
+  }, [])
 
   const addMilestone = () => {
     setMilestones([...milestones, { title: '', targetDate: '' }])
@@ -42,6 +49,12 @@ export default function NewGoalPage() {
       return
     }
 
+    const invalidMilestones = milestones.filter(m => m.title.trim() && !m.targetDate)
+    if (invalidMilestones.length > 0) {
+      setError('Todos los hitos deben tener una fecha objetivo')
+      return
+    }
+
     setLoading(true)
     setError('')
 
@@ -53,6 +66,7 @@ export default function NewGoalPage() {
           ...form,
           deadline: form.deadline || null,
           estimatedHours: form.estimatedHours ? parseFloat(form.estimatedHours) : null,
+          phaseId: form.phaseId || null,
           milestones: milestones.filter(m => m.title.trim()),
         }),
       })
@@ -78,7 +92,7 @@ export default function NewGoalPage() {
             Nuevo objetivo
           </h1>
           <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Define tu meta y hitos
+            Define tu meta, fases e hitos
           </p>
         </header>
 
@@ -152,6 +166,25 @@ export default function NewGoalPage() {
                   </select>
                 </div>
               </div>
+
+              {phases.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+                    Fase
+                  </label>
+                  <select
+                    value={form.phaseId}
+                    onChange={e => setForm(f => ({ ...f, phaseId: e.target.value }))}
+                    className="w-full px-4 py-2 rounded-lg border"
+                    style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                  >
+                    <option value="">Sin fase</option>
+                    {phases.sort((a, b) => a.number - b.number).map(p => (
+                      <option key={p.id} value={p.id}>Fase {p.number}: {p.title}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>

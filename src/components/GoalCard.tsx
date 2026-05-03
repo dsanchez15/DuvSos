@@ -73,15 +73,21 @@ export default function GoalCard({ goal, onClick }: GoalCardProps) {
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
           goal.status === 'ACTIVE' ? 'badge-active' :
           goal.status === 'COMPLETED' ? 'badge-completed' :
-          goal.status === 'PAUSED' ? 'badge-paused' : ''
+          goal.status === 'PAUSED' ? 'badge-paused' :
+          goal.status === 'PENDING' ? 'badge-pending' : ''
         }`}
           style={
             goal.status === 'ACTIVE' ? { background: 'rgba(16,185,129,0.1)', color: '#10b981' } :
             goal.status === 'COMPLETED' ? { background: 'rgba(59,130,246,0.1)', color: '#3b82f6' } :
-            { background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }
+            goal.status === 'PAUSED' ? { background: 'rgba(245,158,11,0.1)', color: '#f59e0b' } :
+            goal.status === 'PENDING' ? { background: 'rgba(107,114,128,0.1)', color: '#6b7280' } :
+            { background: 'rgba(239,68,68,0.1)', color: '#ef4444' }
           }
         >
-          {goal.status === 'ACTIVE' ? 'Activo' : goal.status === 'COMPLETED' ? 'Completado' : 'Pausado'}
+          {goal.status === 'ACTIVE' ? 'Activo' :
+           goal.status === 'COMPLETED' ? 'Completado' :
+           goal.status === 'PAUSED' ? 'Pausado' :
+           goal.status === 'PENDING' ? 'Pendiente' : 'Cancelado'}
         </span>
       </div>
     </div>

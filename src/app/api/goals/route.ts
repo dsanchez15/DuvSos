@@ -20,13 +20,23 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
 
     const where: any = { userId }
-    if (status) where.status = status
+    if (status) {
+      const statuses = status.split(',').filter(Boolean)
+      if (statuses.length > 1) {
+        where.status = { in: statuses }
+      } else {
+        where.status = status
+      }
+    }
     if (category) where.category = category
     if (priority) where.priority = priority
 
     const goals = await prisma.goal.findMany({
       where,
-      include: { milestones: { orderBy: { order: 'asc' } } },
+      include: {
+        milestones: { orderBy: { order: 'asc' } },
+        phase: { select: { id: true, number: true, title: true } },
+      },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -43,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await request.json()
-    const { title, description, category, priority, deadline, estimatedHours, milestones } = body
+    const { title, description, category, priority, deadline, estimatedHours, milestones, phaseId } = body
 
     if (!title || typeof title !== 'string') {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
@@ -51,6 +61,11 @@ export async function POST(request: NextRequest) {
 
     if (!category || !['PROFESIONAL', 'PERSONAL'].includes(category)) {
       return NextResponse.json({ error: 'Valid category is required (PROFESIONAL or PERSONAL)' }, { status: 400 })
+    }
+
+    if (phaseId) {
+      const phase = await prisma.phase.findFirst({ where: { id: phaseId, userId } })
+      if (!phase) return NextResponse.json({ error: 'Phase not found' }, { status: 400 })
     }
 
     const goal = await prisma.goal.create({
@@ -62,6 +77,7 @@ export async function POST(request: NextRequest) {
         priority: priority || 'MEDIA',
         deadline: deadline ? new Date(deadline) : null,
         estimatedHours: estimatedHours ? parseFloat(estimatedHours) : null,
+        phaseId: phaseId || null,
         milestones: milestones?.length > 0 ? {
           create: milestones.map((m: any, i: number) => ({
             title: m.title,
@@ -70,7 +86,7 @@ export async function POST(request: NextRequest) {
           }))
         } : undefined,
       },
-      include: { milestones: { orderBy: { order: 'asc' } } },
+      include: { milestones: { orderBy: { order: 'asc' } }, phase: true },
     })
 
     return NextResponse.json({ goal }, { status: 201 })

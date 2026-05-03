@@ -1,9 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Goal } from '@/types/goal'
 
 interface DailyProgressForm {
   date: string
+  goalId: string
+  plannedTime: string | null
+  actualTime: string | null
   gymCompleted: boolean
   sleepHours: number | null
   studyHours: number | null
@@ -17,8 +21,12 @@ interface DayTrackerProps {
 }
 
 export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
+  const [goals, setGoals] = useState<Goal[]>([])
   const [form, setForm] = useState<DailyProgressForm>({
     date: initialData?.date || new Date().toISOString().split('T')[0],
+    goalId: initialData?.goalId || '',
+    plannedTime: initialData?.plannedTime ?? null,
+    actualTime: initialData?.actualTime ?? null,
     gymCompleted: initialData?.gymCompleted || false,
     sleepHours: initialData?.sleepHours ?? null,
     studyHours: initialData?.studyHours ?? null,
@@ -28,12 +36,20 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    fetch('/api/goals?status=ACTIVE')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.goals) setGoals(data.goals) })
+      .catch(() => {})
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     try {
       await onSubmit(form)
+      setForm(f => ({ ...f, plannedTime: null, actualTime: null, notes: '' }))
     } catch (err: any) {
       setError(err.message || 'Error al guardar')
     } finally {
@@ -61,6 +77,52 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
           required
         />
+      </div>
+
+      {goals.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+            Objetivo
+          </label>
+          <select
+            value={form.goalId}
+            onChange={e => setForm(f => ({ ...f, goalId: e.target.value }))}
+            className="w-full px-3 py-2 rounded-lg border"
+            style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+          >
+            <option value="">General</option>
+            {goals.map(g => (
+              <option key={g.id} value={g.id}>{g.title}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+            Hora planeada
+          </label>
+          <input
+            type="time"
+            value={form.plannedTime ?? ''}
+            onChange={e => setForm(f => ({ ...f, plannedTime: e.target.value || null }))}
+            className="w-full px-3 py-2 rounded-lg border"
+            style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+            Hora real
+          </label>
+          <input
+            type="time"
+            value={form.actualTime ?? ''}
+            onChange={e => setForm(f => ({ ...f, actualTime: e.target.value || null }))}
+            className="w-full px-3 py-2 rounded-lg border"
+            style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

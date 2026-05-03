@@ -18,7 +18,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const goal = await prisma.goal.findFirst({
       where: { id, userId },
-      include: { milestones: { orderBy: { order: 'asc' } } },
+      include: {
+        milestones: { orderBy: { order: 'asc' } },
+        phase: { select: { id: true, number: true, title: true } },
+      },
     })
 
     if (!goal) return NextResponse.json({ error: 'Goal not found' }, { status: 404 })

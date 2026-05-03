@@ -1,6 +1,6 @@
 export type GoalCategory = 'PROFESIONAL' | 'PERSONAL'
 export type Priority = 'ALTA' | 'MEDIA' | 'BAJA'
-export type GoalStatus = 'ACTIVE' | 'COMPLETED' | 'PAUSED' | 'CANCELLED'
+export type GoalStatus = 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'PAUSED' | 'CANCELLED'
 
 export interface GoalMilestone {
   id: string
@@ -26,6 +26,8 @@ export interface Goal {
   deadline?: string | Date | null
   estimatedHours?: number | null
   totalHoursSpent: number
+  phaseId?: string | null
+  phase?: Phase
   milestones?: Milestone[]
   createdAt: string | Date
   updatedAt: string | Date
@@ -41,6 +43,7 @@ export interface Phase {
   startDate?: string | Date | null
   endDate?: string | Date | null
   createdAt: string | Date
+  _count?: { goals: number }
 }
 
 export interface DailyProgress {
@@ -48,6 +51,8 @@ export interface DailyProgress {
   userId: number
   date: string | Date
   goalId?: string | null
+  plannedTime?: string | null
+  actualTime?: string | null
   gymCompleted: boolean
   sleepHours?: number | null
   studyHours?: number | null
