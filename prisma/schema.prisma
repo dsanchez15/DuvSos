@@ -57,6 +57,7 @@ model User {
   theme     String   @default("system")
   visualTheme String @default("classic")
   checklistAlertDays Int @default(3)
+  language    String   @default("es")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
