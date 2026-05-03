@@ -23,9 +23,9 @@ export async function GET(request: NextRequest) {
     if (status) {
       const statuses = status.split(',').filter(Boolean)
       if (statuses.length > 1) {
-        where.status = { in: statuses }
+        where.status = { in: statuses as any }
       } else {
-        where.status = status
+        where.status = status as any
       }
     }
     if (category) where.category = category

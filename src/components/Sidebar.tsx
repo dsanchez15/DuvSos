@@ -11,7 +11,12 @@ export default function Sidebar() {
     const [user, setUser] = React.useState<any>(null);
     const [expiringCount, setExpiringCount] = React.useState(0);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-    const [planExpanded, setPlanExpanded] = useState(true);
+    const [planExpanded, setPlanExpanded] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('sidebar-plan-expanded') !== 'false';
+        }
+        return true;
+    });
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const profileTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -71,6 +76,13 @@ export default function Sidebar() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [profileMenuOpen]);
+
+    // Persist Plan expanded state
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('sidebar-plan-expanded', String(planExpanded));
+        }
+    }, [planExpanded]);
 
     // Close profile menu on Escape
     useEffect(() => {
@@ -257,7 +269,7 @@ export default function Sidebar() {
                     {/* Plan Section */}
                     <button
                         onClick={() => setPlanExpanded(!planExpanded)}
-                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap ${
                             pathname.startsWith('/goals') || pathname.startsWith('/progress')
                                 ? 'active'
                                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
