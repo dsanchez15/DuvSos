@@ -58,7 +58,7 @@ export default function ProgressPage() {
 
       const [entriesRes, goalsRes, phasesRes, checkinsRes] = await Promise.all([
         fetch(`/api/progress/daily?startDate=${currentWeek.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`),
-        fetch('/api/goals?status=ACTIVE'),
+        fetch('/api/goals?status=ACTIVE,PENDING'),
         fetch('/api/phases'),
         fetch('/api/checkin'),
       ])
@@ -277,6 +277,22 @@ export default function ProgressPage() {
                     </div>
 
                     <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('progress.phase')} *</label>
+                      <select
+                        value={activityForm.phaseId}
+                        onChange={e => setActivityForm(f => ({ ...f, phaseId: e.target.value, goalId: '' }))}
+                        className="w-full px-3 py-2 rounded-lg border"
+                        style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                        required
+                      >
+                        <option value="">{lang === 'es' ? 'Seleccionar fase' : 'Select phase'}</option>
+                        {phases.sort((a, b) => a.number - b.number).map(p => (
+                          <option key={p.id} value={p.id}>Phase {p.number}: {p.title}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
                       <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('progress.goal')} *</label>
                       <select
                         value={activityForm.goalId}
@@ -284,26 +300,14 @@ export default function ProgressPage() {
                         className="w-full px-3 py-2 rounded-lg border"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         required
+                        disabled={!activityForm.phaseId}
                       >
                         <option value="">{lang === 'es' ? 'Seleccionar objetivo' : 'Select goal'}</option>
-                        {goals.map(g => (
-                          <option key={g.id} value={g.id}>{g.title}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('progress.phase')}</label>
-                      <select
-                        value={activityForm.phaseId}
-                        onChange={e => setActivityForm(f => ({ ...f, phaseId: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg border"
-                        style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
-                      >
-                        <option value="">{lang === 'es' ? 'Seleccionar fase' : 'Select phase'}</option>
-                        {phases.sort((a, b) => a.number - b.number).map(p => (
-                          <option key={p.id} value={p.id}>Phase {p.number}: {p.title}</option>
-                        ))}
+                        {goals
+                          .filter(g => !activityForm.phaseId || g.phaseId === activityForm.phaseId)
+                          .map(g => (
+                            <option key={g.id} value={g.id}>{g.title}</option>
+                          ))}
                       </select>
                     </div>
 

@@ -40,7 +40,13 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ goals, total: goals.length })
+    // Flatten phaseId for easier client-side filtering
+    const goalsWithPhaseId = goals.map(g => ({
+      ...g,
+      phaseId: g.phaseId,
+    }))
+
+    return NextResponse.json({ goals: goalsWithPhaseId, total: goalsWithPhaseId.length })
   } catch (error) {
     console.error('Error fetching goals:', error)
     return NextResponse.json({ error: 'Failed to fetch goals' }, { status: 500 })

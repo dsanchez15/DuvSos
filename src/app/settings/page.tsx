@@ -35,6 +35,15 @@ export default function SettingsPage() {
         }
         return 'classic';
     });
+    const [language, setLanguage] = useState<'en' | 'es'>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('app-language');
+            if (saved && ['en', 'es'].includes(saved)) {
+                return saved as 'en' | 'es';
+            }
+        }
+        return 'es';
+    });
     const [cardLimit, setCardLimit] = useState(4);
     const [checklistAlertDays, setChecklistAlertDays] = useState(3);
     const [isDirty, setIsDirty] = useState(false);
@@ -65,6 +74,9 @@ export default function SettingsPage() {
                     }
                     if (data.user.visualTheme) {
                         setVisualTheme(data.user.visualTheme as 'classic' | 'retrofuturista');
+                    }
+                    if (data.user.language) {
+                        setLanguage(data.user.language as 'en' | 'es');
                     }
                 } else {
                     window.location.href = '/login';
@@ -151,10 +163,17 @@ export default function SettingsPage() {
         setIsDirty(true);
     };
 
+    const changeLanguage = (newLang: 'en' | 'es') => {
+        setLanguage(newLang);
+        localStorage.setItem('app-language', newLang);
+        setIsDirty(true);
+    };
+
     const handleSave = async () => {
         try {
             localStorage.setItem('app-theme', theme);
             localStorage.setItem('app-visual-theme', visualTheme);
+            localStorage.setItem('app-language', language);
             localStorage.setItem('dashboard-card-limit', cardLimit.toString());
 
             if (user) {
@@ -167,6 +186,7 @@ export default function SettingsPage() {
                         tagline: user.tagline,
                         theme: theme,
                         visualTheme: visualTheme,
+                        language: language,
                         checklistAlertDays: checklistAlertDays,
                     }),
                 });
@@ -452,6 +472,24 @@ export default function SettingsPage() {
                                             >
                                                 <ThemePreview theme={v} isDark={isDark} />
                                                 <span className="text-sm font-medium capitalize">{v === 'retrofuturista' ? 'Retrofuturista' : 'Classic'}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Language</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {([
+                                            { code: 'es' as const, label: 'Español', flag: '🇪🇸' },
+                                            { code: 'en' as const, label: 'English', flag: '🇬🇧' },
+                                        ]).map((l) => (
+                                            <button
+                                                key={l.code}
+                                                onClick={() => changeLanguage(l.code)}
+                                                className={`flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${language === l.code ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
+                                            >
+                                                <span className="text-2xl">{l.flag}</span>
+                                                <span className="text-sm font-medium">{l.label}</span>
                                             </button>
                                         ))}
                                     </div>
