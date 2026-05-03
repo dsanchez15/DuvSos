@@ -74,14 +74,19 @@ export default function PhasesPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-              Fases del plan
-            </h1>
-            <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              Organiza tus objetivos en fases temporizadas
-            </p>
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <a href="/goals" className="p-2 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+              ←
+            </a>
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                Fases del plan
+              </h1>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                Organiza tus objetivos en fases temporizadas
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}

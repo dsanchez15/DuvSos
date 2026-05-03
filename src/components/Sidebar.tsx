@@ -269,7 +269,7 @@ export default function Sidebar() {
                     {/* Plan Section */}
                     <button
                         onClick={() => setPlanExpanded(!planExpanded)}
-                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap ${
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap relative ${
                             pathname.startsWith('/goals') || pathname.startsWith('/progress')
                                 ? 'active'
                                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
@@ -277,26 +277,26 @@ export default function Sidebar() {
                     >
                         <span className="material-symbols-outlined shrink-0">track_changes</span>
                         <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300 flex-1
+                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
                         `}>Plan</span>
                         {isExpanded && (
-                            <span className="material-symbols-outlined text-sm transition-transform" style={{ transform: planExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                            <span className="material-symbols-outlined text-sm transition-transform ml-auto" style={{ transform: planExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
                                 chevron_right
                             </span>
                         )}
                     </button>
 
                     {planExpanded && (
-                        <div className="ml-6 space-y-1">
-                            <Link href="/goals" className={getLinkClass('/goals')}>
+                        <div className="space-y-1">
+                            <Link href="/goals" className={getLinkClass('/goals') + ' pl-12'}>
                                 <span className="material-symbols-outlined shrink-0 text-sm">flag</span>
                                 <span className={`
                                     font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                                     ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
                                 `}>Goals</span>
                             </Link>
-                            <Link href="/progress" className={getLinkClass('/progress')}>
+                            <Link href="/progress" className={getLinkClass('/progress') + ' pl-12'}>
                                 <span className="material-symbols-outlined shrink-0 text-sm">trending_up</span>
                                 <span className={`
                                     font-medium overflow-hidden whitespace-nowrap transition-all duration-300
