@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+import { useAppTranslation } from '@/components/LanguageProvider'
+
 interface CheckInFormProps {
   onSubmit: (data: {
     weekStartDate: string
@@ -18,6 +21,7 @@ interface CheckInFormProps {
 }
 
 export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps) {
+  const { t } = useAppTranslation()
   const today = new Date()
   const weekStart = new Date(today)
   const day = weekStart.getDay()
@@ -41,7 +45,7 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
     try {
       await onSubmit(form)
     } catch (err: any) {
-      setError(err.message || 'Error al guardar')
+      setError(err.message || t('progress.saveError'))
     } finally {
       setLoading(false)
     }
@@ -57,7 +61,7 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Semana del
+          {t('progress.weekOfLabel')}
         </label>
         <input
           type="date"
@@ -71,7 +75,7 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Nivel de fatiga (1-5)
+          {t('progress.fatigueLevelLabel')}
         </label>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map(level => (
@@ -92,7 +96,7 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Horas completadas
+          {t('progress.hoursCompletedLabel')}
         </label>
         <input
           type="number"
@@ -108,12 +112,12 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Desviaciones
+          {t('progress.deviationsLabel')}
         </label>
         <textarea
           value={form.deviations}
           onChange={e => setForm(f => ({ ...f, deviations: e.target.value }))}
-          placeholder="¿Qué salió del plan?"
+          placeholder={t('progress.deviationsPlaceholder')}
           rows={2}
           className="w-full px-3 py-2 rounded-lg border resize-none"
           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -122,12 +126,12 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Notas de ajuste
+          {t('progress.adjustmentNotesLabel')}
         </label>
         <textarea
           value={form.adjustmentNotes}
           onChange={e => setForm(f => ({ ...f, adjustmentNotes: e.target.value }))}
-          placeholder="¿Qué ajustes harás para la próxima semana?"
+          placeholder={t('progress.adjustmentNotesPlaceholder')}
           rows={2}
           className="w-full px-3 py-2 rounded-lg border resize-none"
           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -139,10 +143,8 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
         disabled={loading}
         className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
-        {loading ? 'Guardando...' : 'Guardar check-in'}
+        {loading ? t('progress.saving') : t('progress.saveCheckIn')}
       </button>
     </form>
   )
 }
-
-import { useState } from 'react'

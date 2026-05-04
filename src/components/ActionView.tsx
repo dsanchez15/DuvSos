@@ -5,6 +5,7 @@ import { Habit, HabitWithMetrics } from '@/types/habit'
 import { calculateStreak, calculateCompletionRate, getPeriodLabel, getPeriodRangeText, getTodayDateString, isCompletedOnDate, getLevelName } from '@/lib/habit-utils'
 import UserProgressionBadge from './UserProgressionBadge'
 import EnergySelector from './EnergySelector'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 interface ActionViewProps {
   habits: Habit[]
@@ -21,6 +22,7 @@ interface XPPopup {
 }
 
 export default function ActionView({ habits, onToggleCompletion, loading }: ActionViewProps) {
+  const { t } = useAppTranslation()
   const [completingId, setCompletingId] = useState<number | null>(null)
   const [xpPopups, setXpPopups] = useState<XPPopup[]>([])
   const today = getTodayDateString()
@@ -102,8 +104,8 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
               {popup.leveledUp && (
                 <div className="text-center mb-2">
                   <span className="text-2xl">🎉</span>
-                  <p className="level-up-text text-lg font-bold text-primary">¡Subiste de nivel!</p>
-                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Nivel {popup.newLevel} - {getLevelName(popup.newLevel)}</p>
+                  <p className="level-up-text text-lg font-bold text-primary">{t('habits.action.levelUp')}</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.action.level', { level: popup.newLevel, name: getLevelName(popup.newLevel) })}</p>
                 </div>
               )}
               {popup.milestone && (
@@ -123,9 +125,9 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Acción Diaria</h2>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('habits.action.title')}</h2>
           <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>
-            {completedCount}/{habitsWithMetrics.length} completados hoy
+            {t('habits.action.completedToday', { completed: completedCount, total: habitsWithMetrics.length })}
           </p>
         </div>
         <UserProgressionBadge />
@@ -155,8 +157,8 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
 
       {habitsWithMetrics.length === 0 ? (
         <div className="empty-state text-center py-16 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
-          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>No hay hábitos activos para hoy</p>
-          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Crea hábitos en la vista de planificación</p>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{t('habits.action.noActiveHabits')}</p>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('habits.action.createInPlanning')}</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -206,7 +208,7 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
                       {habit.title}
                     </h3>
                     <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                      {habit.metrics.completionsThisPeriod} de {habit.goalValue} {periodLabel}
+                      {habit.metrics.completionsThisPeriod} / {habit.goalValue} {periodLabel}
                       {periodRange && ` (${periodRange})`}
                     </p>
                     <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-input)' }}>
@@ -240,10 +242,10 @@ export default function ActionView({ habits, onToggleCompletion, loading }: Acti
         <div className="day-summary dashboard-card rounded-xl p-4 border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'var(--color-border)' }}>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             {completedCount === habitsWithMetrics.length
-              ? '🎉 Excelente! Completaste todos tus hábitos hoy.'
+              ? t('habits.action.allCompleted')
               : completedCount === 0
-              ? '💪 Empieza con un hábito y construye momentum.'
-              : `🌟 Vas bien! ${completedCount}/${habitsWithMetrics.length} hábitos completados.`}
+              ? t('habits.action.startMomentum')
+              : t('habits.action.progress', { completed: completedCount, total: habitsWithMetrics.length })}
           </p>
         </div>
       )}

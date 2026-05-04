@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/AppLayout'
+import { t } from '@/lib/i18n'
+import { useAppTranslation } from '@/components/LanguageProvider'
 import { Reminder, ReminderPriority } from '@/types/reminder'
 
 const priorityConfig: Record<ReminderPriority, { icon: string; class: string; bg: string }> = {
@@ -14,15 +16,16 @@ function formatDate(d: string) {
   const date = new Date(d)
   const now = new Date()
   const diff = Math.ceil((date.getTime() - now.getTime()) / 86400000)
-  const formatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined })
-  if (diff < 0) return { text: `${formatted} (overdue)`, class: 'text-red-500 font-medium' }
-  if (diff === 0) return { text: `Today`, class: 'text-amber-600 font-medium' }
-  if (diff === 1) return { text: `Tomorrow`, class: 'text-amber-500' }
-  if (diff <= 3) return { text: `${formatted} (${diff}d)`, class: 'text-amber-500' }
+  const formatted = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined })
+  if (diff < 0) return { text: t('reminders.date.overdue', { date: formatted }), class: 'text-red-500 font-medium' }
+  if (diff === 0) return { text: t('reminders.date.today'), class: 'text-amber-600 font-medium' }
+  if (diff === 1) return { text: t('reminders.date.tomorrow'), class: 'text-amber-500' }
+  if (diff <= 3) return { text: t('reminders.date.daysUntil', { date: formatted, count: diff }), class: 'text-amber-500' }
   return { text: formatted, class: 'reminder-date-default' }
 }
 
 export default function RemindersPage() {
+  const { t } = useAppTranslation()
   const [reminders, setReminders] = useState<Reminder[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -220,14 +223,14 @@ export default function RemindersPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Reminders</h2>
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('reminders.title')}</h2>
             <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              {reminders.filter(r => !r.completed).length} pending · {reminders.filter(r => r.completed).length} completed
+              {t('reminders.subtitle', { pending: reminders.filter(r => !r.completed).length, completed: reminders.filter(r => r.completed).length })}
             </p>
           </div>
           <button onClick={openNew} className="btn-neon flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium">
             <span className="material-symbols-outlined text-sm">add</span>
-            New Reminder
+            {t('reminders.newReminder')}
           </button>
         </div>
 
@@ -237,7 +240,7 @@ export default function RemindersPage() {
             <button key={f} onClick={() => setFilter(f)}
               className={`reminder-filter-btn px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize ${filter === f ? 'reminder-filter-btn-active bg-primary text-white' : 'reminder-filter-btn-inactive'}`}
               style={filter === f ? undefined : { background: 'var(--color-bg-input)', color: 'var(--color-text-secondary)' }}>
-              {f}
+              {t(`reminders.filters.${f}`)}
             </button>
           ))}
         </div>
@@ -246,7 +249,7 @@ export default function RemindersPage() {
         {filtered.length === 0 ? (
           <div className="empty-state text-center py-16 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
             <span className="material-symbols-outlined text-5xl mb-4 block" style={{ color: 'var(--color-text-muted)' }}>notifications_active</span>
-            <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>No reminders</p>
+            <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.noReminders')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -296,32 +299,32 @@ export default function RemindersPage() {
         <div className="delete-modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowForm(false)}>
           <div className="reminder-modal rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="p-6">
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>{editing ? 'Edit Reminder' : 'New Reminder'}</h3>
+              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>{editing ? t('reminders.form.editTitle') : t('reminders.form.newTitle')}</h3>
               <form onSubmit={handleSave} className="space-y-4">
                 {/* Basic */}
                 <div>
-                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Title</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.title')}</label>
                   <input type="text" value={title} onChange={e => setTitle(e.target.value)} autoFocus required
                     className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Description</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.description')}</label>
                   <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
                     className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary resize-none" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Due Date</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.dueDate')}</label>
                     <input type="date" value={dueDate} onChange={e => { setDueDate(e.target.value); setConflictWarning(null) }} onBlur={checkConflicts} required
                       className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                   </div>
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Priority</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.priority')}</label>
                     <select value={priority} onChange={e => setPriority(e.target.value as ReminderPriority)}
                       className="form-select w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}>
-                      <option value="low">Low</option>
-                      <option value="normal">Normal</option>
-                      <option value="high">High</option>
+                      <option value="low">{t('reminders.form.low')}</option>
+                      <option value="normal">{t('reminders.form.normal')}</option>
+                      <option value="high">{t('reminders.form.high')}</option>
                     </select>
                   </div>
                 </div>
@@ -331,7 +334,7 @@ export default function RemindersPage() {
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-amber-500">warning</span>
-                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">{conflictWarning.conflicts.length} conflicts on {conflictWarning.date}</span>
+                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">{t('reminders.form.conflictsOn', { count: conflictWarning.conflicts.length, date: conflictWarning.date })}</span>
                     </div>
                     <ul className="mt-1 ml-6 text-xs text-amber-600 dark:text-amber-400 list-disc">
                       {conflictWarning.conflicts.slice(0, 3).map((c, i) => (
@@ -344,18 +347,18 @@ export default function RemindersPage() {
                 {/* Source Linking */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Source Module</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.sourceModule')}</label>
                     <select value={sourceModule} onChange={e => setSourceModule(e.target.value)}
                       className="form-select w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}>
-                      <option value="">None</option>
-                      <option value="habit">Habit</option>
-                      <option value="checklist">Checklist</option>
-                      <option value="todo">ToDo</option>
-                      <option value="milestone">Milestone</option>
+                      <option value="">{t('reminders.form.moduleNone')}</option>
+                      <option value="habit">{t('reminders.form.moduleHabit')}</option>
+                      <option value="checklist">{t('reminders.form.moduleChecklist')}</option>
+                      <option value="todo">{t('reminders.form.moduleTodo')}</option>
+                      <option value="milestone">{t('reminders.form.moduleMilestone')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Source ID</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.sourceId')}</label>
                     <input type="number" value={sourceId} onChange={e => setSourceId(e.target.value)}
                       className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                   </div>
@@ -364,12 +367,12 @@ export default function RemindersPage() {
                 {/* Lifecycle */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Lifecycle Start</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.lifecycleStart')}</label>
                     <input type="date" value={lifecycleStart} onChange={e => setLifecycleStart(e.target.value)}
                       className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                   </div>
                   <div>
-                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Lifecycle End</label>
+                    <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.lifecycleEnd')}</label>
                     <input type="date" value={lifecycleEnd} onChange={e => setLifecycleEnd(e.target.value)}
                       className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
                   </div>
@@ -377,14 +380,14 @@ export default function RemindersPage() {
 
                 {/* Recurrence */}
                 <div>
-                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Recurrence</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.recurrence')}</label>
                   <select value={frequency} onChange={e => setFrequency(e.target.value as any)}
                     className="form-select w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}>
-                    <option value="once">Once</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="annual">Annual</option>
+                    <option value="once">{t('reminders.form.once')}</option>
+                    <option value="daily">{t('reminders.form.daily')}</option>
+                    <option value="weekly">{t('reminders.form.weekly')}</option>
+                    <option value="monthly">{t('reminders.form.monthly')}</option>
+                    <option value="annual">{t('reminders.form.annual')}</option>
                   </select>
                 </div>
 
@@ -392,12 +395,12 @@ export default function RemindersPage() {
                   <div className="space-y-3 p-3 rounded-xl" style={{ background: 'var(--color-bg-input)' }}>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Interval</label>
+                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.interval')}</label>
                         <input type="number" min={1} value={interval} onChange={e => setInterval(parseInt(e.target.value) || 1)}
                           className="form-input w-full px-4 py-2 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                       </div>
                       <div>
-                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>End Date</label>
+                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.endDate')}</label>
                         <input type="date" value={recurrenceEnd} onChange={e => setRecurrenceEnd(e.target.value)}
                           className="form-input w-full px-4 py-2 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                       </div>
@@ -405,7 +408,7 @@ export default function RemindersPage() {
 
                     {frequency === 'weekly' && (
                       <div>
-                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Days of Week</label>
+                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.daysOfWeek')}</label>
                         <div className="flex gap-1">
                           {['S','M','T','W','T','F','S'].map((d, i) => (
                             <button key={i} type="button" onClick={() => toggleDayOfWeek(i)}
@@ -420,7 +423,7 @@ export default function RemindersPage() {
 
                     {frequency === 'monthly' && (
                       <div>
-                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Day of Month</label>
+                        <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.dayOfMonth')}</label>
                         <input type="number" min={1} max={31} value={dayOfMonth} onChange={e => setDayOfMonth(e.target.value)}
                           className="form-input w-full px-4 py-2 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                       </div>
@@ -429,12 +432,12 @@ export default function RemindersPage() {
                     {frequency === 'annual' && (
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Month</label>
+                          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.month')}</label>
                           <input type="number" min={1} max={12} value={monthOfYear} onChange={e => setMonthOfYear(e.target.value)}
                             className="form-input w-full px-4 py-2 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                         </div>
                         <div>
-                          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Day</label>
+                          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.day')}</label>
                           <input type="number" min={1} max={31} value={dayOfMonth} onChange={e => setDayOfMonth(e.target.value)}
                             className="form-input w-full px-4 py-2 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                         </div>
@@ -445,14 +448,14 @@ export default function RemindersPage() {
 
                 {/* Exceptions */}
                 <div>
-                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Exceptions</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.exceptions')}</label>
                   <div className="flex gap-2 mb-2">
                     <input type="date" value={newExceptionDate} onChange={e => setNewExceptionDate(e.target.value)}
                       className="form-input flex-1 px-3 py-2 rounded-xl border text-sm" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
-                    <input type="text" value={newExceptionReason} onChange={e => setNewExceptionReason(e.target.value)} placeholder="Reason"
+                    <input type="text" value={newExceptionReason} onChange={e => setNewExceptionReason(e.target.value)} placeholder={t('reminders.form.reason')}
                       className="form-input flex-1 px-3 py-2 rounded-xl border text-sm" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                     <button type="button" onClick={addException}
-                      className="px-3 py-2 rounded-xl text-sm font-medium reminder-add-btn" style={{ background: 'var(--color-bg-input)' }}>Add</button>
+                      className="px-3 py-2 rounded-xl text-sm font-medium reminder-add-btn" style={{ background: 'var(--color-bg-input)' }}>{t('reminders.form.add')}</button>
                   </div>
                   {exceptions.length > 0 && (
                     <div className="space-y-1">
@@ -470,20 +473,20 @@ export default function RemindersPage() {
 
                 {/* Blockers */}
                 <div>
-                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Blockers</label>
+                  <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('reminders.form.blockers')}</label>
                   <div className="flex gap-2 mb-2">
                     <select value={newBlockerModule} onChange={e => setNewBlockerModule(e.target.value)}
                       className="form-select px-3 py-2 rounded-xl border text-sm" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}>
-                      <option value="">Module</option>
-                      <option value="habit">Habit</option>
-                      <option value="checklist">Checklist</option>
-                      <option value="todo">ToDo</option>
-                      <option value="reminder">Reminder</option>
+                      <option value="">{t('reminders.form.module')}</option>
+                      <option value="habit">{t('reminders.form.moduleHabit')}</option>
+                      <option value="checklist">{t('reminders.form.moduleChecklist')}</option>
+                      <option value="todo">{t('reminders.form.moduleTodo')}</option>
+                      <option value="reminder">{t('reminders.form.moduleMilestone')}</option>
                     </select>
-                    <input type="number" value={newBlockerId} onChange={e => setNewBlockerId(e.target.value)} placeholder="ID"
+                    <input type="number" value={newBlockerId} onChange={e => setNewBlockerId(e.target.value)} placeholder={t('reminders.form.id')}
                       className="form-input flex-1 px-3 py-2 rounded-xl border text-sm" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }} />
                     <button type="button" onClick={addBlocker}
-                      className="px-3 py-2 rounded-xl text-sm font-medium reminder-add-btn" style={{ background: 'var(--color-bg-input)' }}>Add</button>
+                      className="px-3 py-2 rounded-xl text-sm font-medium reminder-add-btn" style={{ background: 'var(--color-bg-input)' }}>{t('reminders.form.add')}</button>
                   </div>
                   {blockers.length > 0 && (
                     <div className="space-y-1">
@@ -502,11 +505,11 @@ export default function RemindersPage() {
                 <div className="flex gap-3 pt-2">
                   <button type="button" onClick={() => { setShowForm(false); resetForm() }}
                     className="btn-outline flex-1 px-4 py-2.5 rounded-xl border font-medium reminder-cancel-btn" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" disabled={!title.trim() || !dueDate}
                     className="btn-neon flex-1 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 font-medium disabled:opacity-50">
-                    {editing ? 'Save' : 'Create'}
+                    {editing ? t('common.save') : t('common.create')}
                   </button>
                 </div>
               </form>

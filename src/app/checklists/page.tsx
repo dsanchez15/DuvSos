@@ -6,10 +6,12 @@ import ChecklistList from '@/components/ChecklistList'
 import ChecklistForm from '@/components/ChecklistForm'
 import CategoryManager from '@/components/CategoryManager'
 import Toast from '@/components/Toast'
+import { useAppTranslation } from '@/components/LanguageProvider'
 import { Checklist, ChecklistCategory, ChecklistFilter, ChecklistFormData, ChecklistItem, Priority, ChecklistTab } from '@/types/checklist'
 import { SortOption } from '@/components/ChecklistList'
 
 export default function ChecklistsPage() {
+  const { t } = useAppTranslation()
   const [checklists, setChecklists] = useState<Checklist[]>([])
   const [templates, setTemplates] = useState<Checklist[]>([])
   const [history, setHistory] = useState<Checklist[]>([])
@@ -47,7 +49,7 @@ export default function ChecklistsPage() {
 
   const api = async (url: string, method: string, body?: unknown) => {
     const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}) })
-    if (!res.ok) throw new Error('API error')
+    if (!res.ok) throw new Error(t('checklists.errors.api'))
     return res.json()
   }
 
@@ -75,7 +77,7 @@ export default function ChecklistsPage() {
       setExpandedId(instance.id)
       setInstantiatingTemplate(null)
       setEditingChecklist(null)
-      setToast('Template instantiated!')
+      setToast(t('checklists.toast.templateInstantiated'))
     } else if (editingChecklist) {
       const updated = await api(`/api/checklists/${editingChecklist.id}`, 'PUT', data)
       if (updated.isTemplate) {
@@ -159,11 +161,11 @@ export default function ChecklistsPage() {
     const dueDate = checklist?.endDate || new Date(Date.now() + 86400000).toISOString()
     await api('/api/reminders', 'POST', {
       title: item.title,
-      description: checklist ? `From checklist: ${checklist.title}` : null,
+      description: checklist ? `${t('checklists.reminderFromChecklist')}: ${checklist.title}` : null,
       dueDate,
       priority: item.priority,
     })
-    setToast(`Reminder created for "${item.title}"`)
+    setToast(t('checklists.reminderCreated', { title: item.title }))
   }
 
   // Category CRUD
