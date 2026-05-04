@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "GoalStatus" ADD VALUE 'PENDING';
+
+-- AlterTable
+ALTER TABLE "Goal" ALTER COLUMN "status" SET DEFAULT 'PENDING';

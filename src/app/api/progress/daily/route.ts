@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await request.json()
-    const { date, goalId, gymCompleted, sleepHours, studyHours, workHours, notes } = body
+    const { date, goalId, plannedTime, actualTime, gymCompleted, sleepHours, studyHours, workHours, notes } = body
 
     if (!date) {
       return NextResponse.json({ error: 'Date is required' }, { status: 400 })
@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
         userId,
         date: new Date(date),
         goalId: goalId || null,
+        plannedTime: plannedTime || null,
+        actualTime: actualTime || null,
         gymCompleted: gymCompleted || false,
         sleepHours: sleepHours ? parseFloat(sleepHours) : null,
         studyHours: studyHours ? parseFloat(studyHours) : null,

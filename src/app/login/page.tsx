@@ -2,12 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAppTranslation } from '@/components/LanguageProvider'
+
+type Language = 'en' | 'es';
 
 export default function LoginPage() {
+    const { t, language } = useAppTranslation()
     const router = useRouter()
     const [isLogin, setIsLogin] = useState(true)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [lang] = useState<Language>(language as Language)
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -71,7 +76,7 @@ export default function LoginPage() {
                         className="mt-2"
                         style={{ color: 'var(--color-text-secondary)' }}
                     >
-                        {isLogin ? "Welcome back! Let's track your progress." : "Create an account to start tracking."}
+                        {isLogin ? t('login.welcomeBack') : t('login.createAccount')}
                     </p>
                 </div>
 
@@ -103,7 +108,7 @@ export default function LoginPage() {
                                 className="block text-sm font-medium mb-1.5"
                                 style={{ color: 'var(--color-text-secondary)' }}
                                 htmlFor="email"
-                            >Email Address</label>
+                            >{t('login.emailLabel')}</label>
                             <div className="relative">
                                 <span
                                     className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
@@ -118,7 +123,7 @@ export default function LoginPage() {
                                     }}
                                     id="email"
                                     type="email"
-                                    placeholder="name@example.com"
+                                    placeholder={t('login.emailPlaceholder')}
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -132,7 +137,7 @@ export default function LoginPage() {
                                     className="block text-sm font-medium mb-1.5"
                                     style={{ color: 'var(--color-text-secondary)' }}
                                     htmlFor="name"
-                                >Full Name</label>
+                                >{t('login.nameLabel')}</label>
                                 <div className="relative">
                                     <span
                                         className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
@@ -147,7 +152,7 @@ export default function LoginPage() {
                                         }}
                                         id="name"
                                         type="text"
-                                        placeholder="John Doe"
+                                        placeholder={t('login.namePlaceholder')}
                                         required={!isLogin}
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -161,7 +166,7 @@ export default function LoginPage() {
                                 className="block text-sm font-medium mb-1.5"
                                 style={{ color: 'var(--color-text-secondary)' }}
                                 htmlFor="password"
-                            >Password</label>
+                            >{t('login.passwordLabel')}</label>
                             <div className="relative">
                                 <span
                                     className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg"
@@ -197,10 +202,10 @@ export default function LoginPage() {
                                     className="ml-2 block text-sm"
                                     style={{ color: 'var(--color-text-secondary)' }}
                                     htmlFor="remember-me"
-                                >Remember me</label>
+                                >{t('login.rememberMe')}</label>
                             </div>
                             <div className="text-sm">
-                                <a className="font-medium text-primary hover:text-primary/80 transition-colors" href="#">Forgot password?</a>
+                                <a className="font-medium text-primary hover:text-primary/80 transition-colors" href="#">{t('login.forgotPassword')}</a>
                             </div>
                         </div>
 
@@ -209,7 +214,7 @@ export default function LoginPage() {
                             type="submit"
                             disabled={loading}
                         >
-                            {loading ? 'Processing...' : (isLogin ? 'Log In' : 'Sign Up')}
+                            {loading ? t('login.processing') : (isLogin ? t('login.logIn') : t('login.signUp'))}
                         </button>
                     </form>
 
@@ -217,16 +222,16 @@ export default function LoginPage() {
                         className="mt-10 text-center text-sm"
                         style={{ color: 'var(--color-text-secondary)' }}
                     >
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                        {isLogin ? t('login.noAccount') : t('login.hasAccount')}
                         <button onClick={toggleMode} className="font-semibold text-primary hover:text-primary/80 transition-colors">
-                            {isLogin ? 'Sign up for free' : 'Log in'}
+                            {isLogin ? t('login.signUpFree') : t('login.logInLink')}
                         </button>
                     </p>
 
                     <div className="mt-12 flex justify-center space-x-6">
-                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Privacy Policy</a>
-                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Terms of Service</a>
-                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">Support</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">{t('login.privacyPolicy')}</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">{t('login.termsOfService')}</a>
+                        <a className="text-xs login-footer-link" style={{ color: 'var(--color-text-muted)' }} href="#">{t('login.support')}</a>
                     </div>
                 </div>
             </div>

@@ -4,13 +4,21 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSidebar } from '@/components/SidebarContext';
+import { useAppTranslation } from '@/components/LanguageProvider';
 
 export default function Sidebar() {
+    const { t } = useAppTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const [user, setUser] = React.useState<any>(null);
     const [expiringCount, setExpiringCount] = React.useState(0);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [planExpanded, setPlanExpanded] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('sidebar-plan-expanded') !== 'false';
+        }
+        return true;
+    });
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const profileTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -70,6 +78,13 @@ export default function Sidebar() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [profileMenuOpen]);
+
+    // Persist Plan expanded state
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('sidebar-plan-expanded', String(planExpanded));
+        }
+    }, [planExpanded]);
 
     // Close profile menu on Escape
     useEffect(() => {
@@ -217,21 +232,21 @@ export default function Sidebar() {
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Dashboard</span>
+                        `}>{t('sidebar.dashboard')}</span>
                     </Link>
                     <Link href="/todos" className={getLinkClass('/todos')}>
                         <span className="material-symbols-outlined shrink-0">check_circle</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>To-Do List</span>
+                        `}>{t('sidebar.todos')}</span>
                     </Link>
                     <Link href="/checklists" className={getLinkClass('/checklists')}>
                         <span className="material-symbols-outlined shrink-0">fact_check</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Checklists</span>
+                        `}>{t('sidebar.checklists')}</span>
                         {expiringCount > 0 && isExpanded && (
                             <span className="ml-auto bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                                 {expiringCount}
@@ -243,36 +258,55 @@ export default function Sidebar() {
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Reminders</span>
+                        `}>{t('sidebar.reminders')}</span>
                     </Link>
                     <Link href="/habits" className={getLinkClass('/habits')}>
                         <span className="material-symbols-outlined shrink-0">routine</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Habits</span>
+                        `}>{t('sidebar.habits')}</span>
                     </Link>
-                    <Link href="/goals" className={getLinkClass('/goals')}>
+
+                    {/* Plan Section */}
+                    <button
+                        onClick={() => setPlanExpanded(!planExpanded)}
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap relative ${
+                            pathname.startsWith('/goals') || pathname.startsWith('/progress')
+                                ? 'active'
+                                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
+                        }`}
+                    >
                         <span className="material-symbols-outlined shrink-0">track_changes</span>
                         <span className={`
                             font-medium overflow-hidden whitespace-nowrap transition-all duration-300
                             ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Goals</span>
-                    </Link>
-                    <Link href="/progress" className={getLinkClass('/progress')}>
-                        <span className="material-symbols-outlined shrink-0">trending_up</span>
-                        <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
-                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Progress</span>
-                    </Link>
-                    <Link href="/checkin" className={getLinkClass('/checkin')}>
-                        <span className="material-symbols-outlined shrink-0">edit_calendar</span>
-                        <span className={`
-                            font-medium overflow-hidden whitespace-nowrap transition-all duration-300
-                            ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
-                        `}>Check-in</span>
-                    </Link>
+                        `}>{t('sidebar.plan')}</span>
+                        {isExpanded && (
+                            <span className="material-symbols-outlined text-sm transition-transform ml-auto" style={{ transform: planExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                                chevron_right
+                            </span>
+                        )}
+                    </button>
+
+                    {planExpanded && (
+                        <div className="space-y-1">
+                            <Link href="/goals" className={getLinkClass('/goals') + ' pl-12'}>
+                                <span className="material-symbols-outlined shrink-0 text-sm">flag</span>
+                                <span className={`
+                                    font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                                    ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                                `}>{t('sidebar.goals')}</span>
+                            </Link>
+                            <Link href="/progress" className={getLinkClass('/progress') + ' pl-12'}>
+                                <span className="material-symbols-outlined shrink-0 text-sm">trending_up</span>
+                                <span className={`
+                                    font-medium overflow-hidden whitespace-nowrap transition-all duration-300
+                                    ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+                                `}>{t('sidebar.progressAndCheckIn')}</span>
+                            </Link>
+                        </div>
+                    )}
 
                 </nav>
 
@@ -324,7 +358,7 @@ export default function Sidebar() {
                                 style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">settings</span>
-                                Settings
+                                {t('sidebar.settings')}
                             </Link>
                             <Link
                                 href="/support"
@@ -334,7 +368,7 @@ export default function Sidebar() {
                                 style={{ color: 'var(--color-text-secondary)' }}
                             >
                                 <span className="material-symbols-outlined text-lg">help_outline</span>
-                                Support
+                                {t('sidebar.support')}
                             </Link>
                             <div className="border-t my-1" style={{ borderColor: 'var(--color-border)' }} />
                             <button
@@ -343,7 +377,7 @@ export default function Sidebar() {
                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left"
                             >
                                 <span className="material-symbols-outlined text-lg">logout</span>
-                                Log Out
+                                {t('sidebar.logout')}
                             </button>
                         </div>
                     )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/AppLayout'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 const MODULE_COLORS: Record<string, string> = {
   reminder: '#3b82f6',
@@ -87,6 +88,7 @@ function sortByPriority<T extends { priority: string }>(items: T[]): T[] {
 // ─── Component ───
 
 export default function DashboardPage() {
+  const { t, language } = useAppTranslation()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
@@ -312,7 +314,7 @@ export default function DashboardPage() {
   const handleQuickProgressSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (quickForm.gymCompleted && quickForm.sleepHours && parseFloat(quickForm.sleepHours) < 7) {
-      alert('Gym requires at least 7 hours of sleep')
+      alert(t('dashboard.gymSleepWarning'))
       return
     }
     try {
@@ -332,7 +334,7 @@ export default function DashboardPage() {
         fetchPerformanceStats()
       } else {
         const err = await res.json()
-        alert(err.error || 'Error')
+        alert(err.error || t('common.error'))
       }
     } catch (err) {
       console.error(err)
@@ -414,21 +416,21 @@ export default function DashboardPage() {
         {/* ═══ HEADER (full width) ═══ */}
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Central Hub</h1>
-              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Your productivity command center</p>
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.title')}</h1>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.subtitle')}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <div className="flex rounded-lg p-1" style={{ background: 'var(--color-bg-input)' }}>
-                <button onClick={() => setViewMode('month')} className={`px-3 py-1.5 rounded-md text-sm font-medium`} style={viewMode === 'month' ? { background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--color-text-muted)' }}>Month</button>
-                <button onClick={() => setViewMode('week')} className={`px-3 py-1.5 rounded-md text-sm font-medium`} style={viewMode === 'week' ? { background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--color-text-muted)' }}>Week</button>
+                <button onClick={() => setViewMode('month')} className={`px-3 py-1.5 rounded-md text-sm font-medium`} style={viewMode === 'month' ? { background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--color-text-muted)' }}>{t('dashboard.month')}</button>
+                <button onClick={() => setViewMode('week')} className={`px-3 py-1.5 rounded-md text-sm font-medium`} style={viewMode === 'week' ? { background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-sm)' } : { color: 'var(--color-text-muted)' }}>{t('dashboard.week')}</button>
               </div>
-              <button onClick={goToday} className="px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg">Today</button>
+              <button onClick={goToday} className="px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg">{t('dashboard.today')}</button>
               <div className="flex items-center gap-1">
                 <button onClick={goPrev} className="p-2 rounded-lg dashboard-nav-btn">
                   <span className="material-symbols-outlined text-sm">chevron_left</span>
                 </button>
                 <span className="text-sm font-medium min-w-[120px] text-center" style={{ color: 'var(--color-text-primary)' }}>
-                  {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  {currentDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'long', year: 'numeric' })}
                 </span>
                 <button onClick={goNext} className="p-2 rounded-lg dashboard-nav-btn">
                   <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -447,9 +449,9 @@ export default function DashboardPage() {
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
               <span className="material-symbols-outlined text-red-500">warning</span>
               <div>
-                <p className="text-sm font-medium text-red-800 dark:text-red-300">This day is very loaded</p>
+                <p className="text-sm font-medium text-red-800 dark:text-red-300">{t('dashboard.overloadWarning.title')}</p>
                 <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
-                  {selectedWorkload.score} items scheduled. Consider rescheduling some items.
+                  {t('dashboard.overloadWarning.message', { count: selectedWorkload.score })}
                 </p>
               </div>
             </div>
@@ -457,11 +459,11 @@ export default function DashboardPage() {
 
           {/* ═══ HABIT TRACKERS + WEEKLY COMPLIANCE ═══ */}
           <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>Habit Trackers</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.habitTrackers')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {habits.length === 0 && (
                 <div className="col-span-full dashboard-card rounded-2xl border p-8 text-center" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>No active habits. Start building one!</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noHabits')}</p>
                 </div>
               )}
               {habits.slice(0, 5).map((habit) => (
@@ -488,10 +490,10 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                        {habit.streak > 0 ? `${habit.streak}-day streak` : 'Start a streak'}
+                        {habit.streak > 0 ? t('dashboard.streakDays', { count: habit.streak }) : t('dashboard.startStreak')}
                       </p>
                       <p className="text-[10px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                        {habit.goalType === 'Daily' ? 'Daily goal' : `${habit.goalValue} per ${habit.goalType.toLowerCase()}`}
+                        {habit.goalType === 'Daily' ? t('dashboard.dailyGoal') : t('dashboard.goalFormat', { value: habit.goalValue, type: habit.goalType.toLowerCase() })}
                       </p>
                     </div>
                     {!habit.completedToday && (
@@ -499,7 +501,7 @@ export default function DashboardPage() {
                         onClick={() => markHabitDone(habit.id)}
                         className="text-xs px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium"
                       >
-                        Realizado
+                        {t('dashboard.markDone')}
                       </button>
                     )}
                   </div>
@@ -510,9 +512,9 @@ export default function DashboardPage() {
             {/* ═══ PERFORMANCE PLAN ═══ */}
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>Performance Plan</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.performancePlan')}</h3>
                 <a href="/goals" className="text-xs px-2 py-1 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
-                  View all →
+                  {t('dashboard.viewAll')}
                 </a>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -523,7 +525,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.gymStreak ?? 0}</p>
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Gym Streak</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.gymStreak')}</p>
                     </div>
                   </div>
                 </div>
@@ -534,7 +536,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.hoursThisWeek ?? 0}h</p>
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>This Week</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.thisWeek')}</p>
                     </div>
                   </div>
                 </div>
@@ -545,14 +547,14 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{performanceStats?.totalGoals ?? 0}</p>
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Active Goals</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.activeGoals')}</p>
                     </div>
                   </div>
                 </div>
               </div>
               {performanceStats?.nextMilestones && performanceStats.nextMilestones.length > 0 && (
                 <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-                  <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Upcoming Milestones</h4>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.upcomingMilestones')}</h4>
                   <div className="space-y-2">
                     {performanceStats.nextMilestones.slice(0, 3).map((m: any) => (
                       <div key={m.id} className="flex items-center gap-3 p-2 rounded-lg" style={{ background: 'var(--color-bg-input)' }}>
@@ -562,7 +564,7 @@ export default function DashboardPage() {
                           <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{m.goal.title}</p>
                         </div>
                         <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                          {m.targetDate ? new Date(m.targetDate).toLocaleDateString('es', { month: 'short', day: 'numeric' }) : ''}
+                          {m.targetDate ? new Date(m.targetDate).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'short', day: 'numeric' }) : ''}
                         </span>
                       </div>
                     ))}
@@ -574,7 +576,7 @@ export default function DashboardPage() {
             {/* Weekly Compliance — part of Habit Trackers section */}
             <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex items-center justify-between mb-2">
-                <h4 className="card-title font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>Weekly Compliance</h4>
+                <h4 className="card-title font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.weeklyCompliance')}</h4>
                 {metrics && (
                   <span className="text-sm font-bold text-emerald-500">{metrics.weeklyCompliance}%</span>
                 )}
@@ -589,34 +591,34 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                     {metrics.weeklyCompliance >= 80
-                      ? 'Great job! You are on track this week.'
+                      ? t('dashboard.compliance.high')
                       : metrics.weeklyCompliance >= 50
-                      ? 'Good progress. Keep pushing to reach your goals.'
-                      : 'Let us get back on track. Small steps matter.'}
+                      ? t('dashboard.compliance.medium')
+                      : t('dashboard.compliance.low')}
                   </p>
                 </div>
               ) : (
-                <p className="text-sm py-2 text-center" style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
+                <p className="text-sm py-2 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('common.loading')}</p>
               )}
             </div>
           </section>
 
           {/* ═══ CHECKLISTS & TODOS ═══ */}
           <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>Checklists & ToDos</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.checklistsAndTodos')}</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Checklists */}
               <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
-                    <span className="w-2 h-2 rounded-full bg-amber-500" />
-                    Checklists
-                  </h4>
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{checklists.length} pending</span>
+                    <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      {t('dashboard.checklists')}
+                    </h4>
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.pendingCount', { count: checklists.length })}</span>
                 </div>
                 <div className="space-y-2 max-h-[280px] overflow-y-auto">
                   {checklists.length === 0 && (
-                    <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>No pending checklist items</p>
+                    <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noPendingChecklists')}</p>
                   )}
                   {checklists.map((item) => (
                     <div key={`cl-${item.id}`} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
@@ -639,15 +641,15 @@ export default function DashboardPage() {
               {/* ToDos */}
               <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
-                    <span className="w-2 h-2 rounded-full bg-red-500" />
-                    ToDos
-                  </h4>
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{todos.length} pending</span>
+                    <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                      <span className="w-2 h-2 rounded-full bg-red-500" />
+                      {t('dashboard.todos')}
+                    </h4>
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.pendingCount', { count: todos.length })}</span>
                 </div>
                 <div className="space-y-2 max-h-[280px] overflow-y-auto">
                   {todos.length === 0 && (
-                    <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>No pending ToDos</p>
+                    <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noPendingTodos')}</p>
                   )}
                   {todos.map((todo) => (
                     <div key={`td-${todo.id}`} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
@@ -663,7 +665,7 @@ export default function DashboardPage() {
                         onClick={() => markTodoDone(todo.id)}
                         className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 whitespace-nowrap"
                       >
-                        Done
+                        {t('common.done')}
                       </button>
                     </div>
                   ))}
@@ -674,12 +676,12 @@ export default function DashboardPage() {
 
           {/* ═══ QUICK REGISTER ═══ */}
           <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>Quick Register</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.quickRegister')}</h3>
             <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <form onSubmit={handleQuickProgressSubmit} className="space-y-3">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Sueño</label>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.sleep')}</label>
                     <input
                       type="number"
                       step="0.5"
@@ -693,7 +695,7 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Estudio</label>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.study')}</label>
                     <input
                       type="number"
                       step="0.5"
@@ -706,7 +708,7 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Trabajo</label>
+                    <label className="block text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.work')}</label>
                     <input
                       type="number"
                       step="0.5"
@@ -727,18 +729,18 @@ export default function DashboardPage() {
                       }`}
                       style={quickForm.gymCompleted ? {} : { background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
                     >
-                      {quickForm.gymCompleted ? '✓ Gym' : 'Gym'}
+                      {quickForm.gymCompleted ? t('dashboard.gymDone') : t('dashboard.gym')}
                     </button>
                   </div>
                 </div>
                 {quickForm.gymCompleted && quickForm.sleepHours && parseFloat(quickForm.sleepHours) < 7 && (
-                  <p className="text-xs text-amber-500">⚠️ Gym requiere ≥7h de sueño</p>
+                  <p className="text-xs text-amber-500">⚠️ {t('dashboard.gymSleepWarning')}</p>
                 )}
                 <button
                   type="submit"
                   className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors text-sm"
                 >
-                  Registrar día
+                  {t('dashboard.registerDay')}
                 </button>
               </form>
             </div>
@@ -746,7 +748,7 @@ export default function DashboardPage() {
 
           {/* ═══ PLANNING (Calendar) ═══ */}
           <section>
-            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>Planning</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.planning')}</h3>
             <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               {/* Legend */}
               <div className="flex flex-wrap gap-3 mb-4">
@@ -759,7 +761,7 @@ export default function DashboardPage() {
               </div>
               {/* Day headers */}
               <div className="grid grid-cols-7 gap-2 mb-2">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                  {[t('dashboard.daySun'), t('dashboard.dayMon'), t('dashboard.dayTue'), t('dashboard.dayWed'), t('dashboard.dayThu'), t('dashboard.dayFri'), t('dashboard.daySat')].map((d) => (
                   <div key={d} className="text-center text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>{d}</div>
                 ))}
               </div>
@@ -775,44 +777,44 @@ export default function DashboardPage() {
         <aside className="w-full lg:w-80 space-y-6">
           {/* Scorecard */}
           <div className="dashboard-card rounded-2xl border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-            <h4 className="card-title font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Scorecard</h4>
+            <h4 className="card-title font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.scorecard')}</h4>
             {metrics ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-primary">{metrics.overallStreak}</p>
-                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>Day Streak</p>
+                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.dayStreak')}</p>
                   </div>
                   <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-emerald-500">{metrics.activeProjects}</p>
-                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>Active Projects</p>
+                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.activeProjects')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-amber-500">{metrics.pendingTasks}</p>
-                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>Pending Tasks</p>
+                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.pendingTasks')}</p>
                   </div>
                   <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-blue-500">{metrics.weeklyCompliance}%</p>
-                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>Compliance</p>
+                    <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.complianceLabel')}</p>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>Loading metrics...</p>
+              <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.loadingMetrics')}</p>
             )}
           </div>
 
           {/* Upcoming Reminders */}
           <div className="dashboard-card rounded-2xl border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="card-title font-semibold" style={{ color: 'var(--color-text-primary)' }}>Upcoming Reminders</h4>
-              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Next 14 days</span>
+              <h4 className="card-title font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.upcomingReminders')}</h4>
+              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.next14Days')}</span>
             </div>
             <div className="space-y-3 max-h-[360px] overflow-y-auto">
               {upcomingReminders.length === 0 && (
-                <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>No upcoming reminders</p>
+                <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noUpcomingReminders')}</p>
               )}
               {upcomingReminders.map((r) => (
                 <div key={String(r.id)} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
@@ -831,7 +833,7 @@ export default function DashboardPage() {
                         ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                         : ''
                     }`} style={r.daysUntil > 3 ? { background: 'var(--color-bg-input)', color: 'var(--color-text-secondary)' } : undefined}>
-                      {r.daysUntil === 0 ? 'Today' : `${r.daysUntil}d`}
+                      {r.daysUntil === 0 ? t('dashboard.todayReminder') : t('dashboard.daysUntil', { count: r.daysUntil })}
                     </span>
                     <button
                       onClick={() => {
@@ -840,8 +842,8 @@ export default function DashboardPage() {
                       }}
                       className="text-[10px] px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-500/20 whitespace-nowrap"
                     >
-                      Done
-                    </button>
+                        {t('common.done')}
+                      </button>
                   </div>
                 </div>
               ))}

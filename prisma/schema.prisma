@@ -38,6 +38,7 @@ enum Priority {
 }
 
 enum GoalStatus {
+  PENDING
   ACTIVE
   COMPLETED
   PAUSED
@@ -56,6 +57,7 @@ model User {
   theme     String   @default("system")
   visualTheme String @default("classic")
   checklistAlertDays Int @default(3)
+  language    String   @default("es")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -439,11 +441,14 @@ model Goal {
   description     String?
 
   priority        Priority   @default(MEDIA)
-  status          GoalStatus @default(ACTIVE)
+  status          GoalStatus @default(PENDING)
 
   deadline        DateTime?
   estimatedHours  Float?
   totalHoursSpent Float      @default(0)
+
+  phaseId         String?
+  phase           Phase?     @relation(fields: [phaseId], references: [id], onDelete: SetNull)
 
   milestones      GoalMilestone[]
 
@@ -454,6 +459,7 @@ model Goal {
   @@index([userId])
   @@index([userId, status])
   @@index([userId, category])
+  @@index([phaseId])
 }
 
 model GoalMilestone {
@@ -483,6 +489,8 @@ model Phase {
   startDate   DateTime?
   endDate     DateTime?
 
+  goals       Goal[]
+
   createdAt   DateTime  @default(now())
 
   @@index([userId])
@@ -496,6 +504,9 @@ model DailyProgress {
 
   date      DateTime  @db.Date
   goalId    String?
+
+  plannedTime   String?
+  actualTime    String?
 
   gymCompleted     Boolean @default(false)
   sleepHours       Float?

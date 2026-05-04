@@ -1,4 +1,5 @@
 import { HabitCompletion, GoalType } from '@/types/habit'
+import { t, getLanguage } from '@/lib/i18n'
 
 /**
  * Calculate the current streak for a habit based on its completions
@@ -262,15 +263,15 @@ export function getTodayDateString(): string {
 export function getPeriodLabel(goalType: GoalType): string {
     switch (goalType) {
         case 'Daily':
-            return 'hoy'
+            return t('habits.action.periodLabel.daily')
         case 'Weekly':
-            return 'esta semana'
+            return t('habits.action.periodLabel.weekly')
         case 'Monthly':
-            return 'este mes'
+            return t('habits.action.periodLabel.monthly')
         case 'Ratio':
-            return 'este período'
+            return t('habits.action.periodLabel.ratio')
         default:
-            return 'este período'
+            return t('habits.action.periodLabel.ratio')
     }
 }
 
@@ -279,18 +280,18 @@ export function getPeriodLabel(goalType: GoalType): string {
  */
 export function getPeriodRangeText(goalType: GoalType): string {
     const now = new Date()
+    const locale = getLanguage() === 'es' ? 'es-ES' : 'en-US'
     switch (goalType) {
         case 'Weekly': {
             const start = getWeekStart(now)
             const end = new Date(start)
             end.setDate(end.getDate() + 6)
-            const fmt = (d: Date) => d.toLocaleDateString('es', { weekday: 'long', day: 'numeric' })
+            const fmt = (d: Date) => d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric' })
             return `${fmt(start)} – ${fmt(end)}`
         }
         case 'Monthly': {
             const start = new Date(now.getFullYear(), now.getMonth(), 1)
-            const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-            const fmt = (d: Date) => d.toLocaleDateString('es', { month: 'long', year: 'numeric' })
+            const fmt = (d: Date) => d.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
             return fmt(start)
         }
         default:
@@ -328,14 +329,14 @@ export function validateCycle(
     }
 
     if (!startDate || !endDate) {
-        return { valid: false, error: 'Las fechas de inicio y fin son requeridas para hábitos no permanentes' }
+        return { valid: false, error: t('habits.form.cycleDatesRequired') }
     }
 
     const start = new Date(startDate)
     const end = new Date(endDate)
 
     if (end < start) {
-        return { valid: false, error: 'La fecha de fin debe ser posterior o igual a la fecha de inicio' }
+        return { valid: false, error: t('habits.form.cycleEndDateAfterStart') }
     }
 
     return { valid: true }
@@ -376,11 +377,11 @@ export function getXPForNextLevel(currentLevel: number): number {
 }
 
 export function getLevelName(level: number): string {
-    if (level <= 3) return 'Principiante'
-    if (level <= 6) return 'Aspirante'
-    if (level <= 10) return 'Competente'
-    if (level <= 15) return 'Experto'
-    return 'Maestro'
+    if (level <= 3) return t('habits.levels.beginner')
+    if (level <= 6) return t('habits.levels.aspirant')
+    if (level <= 10) return t('habits.levels.competent')
+    if (level <= 15) return t('habits.levels.expert')
+    return t('habits.levels.master')
 }
 
 export function getXPForHabitCompletion(goalType: GoalType): number {
@@ -401,7 +402,7 @@ export function getXPForHabitCompletion(goalType: GoalType): number {
 export function checkMilestones(totalCompletions: number): string | null {
     const milestones = [10, 30, 50, 100, 250, 500, 1000]
     if (milestones.includes(totalCompletions)) {
-        return `${totalCompletions} completaciones! Sigue así!`
+        return t('habits.milestones.congrats', { count: totalCompletions })
     }
     return null
 }

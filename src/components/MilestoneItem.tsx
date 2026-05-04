@@ -6,9 +6,10 @@ import { Milestone } from '@/types/goal'
 interface MilestoneItemProps {
   milestone: Milestone
   onToggle?: (id: string, completed: boolean) => void
+  readOnly?: boolean
 }
 
-export default function MilestoneItem({ milestone, onToggle }: MilestoneItemProps) {
+export default function MilestoneItem({ milestone, onToggle, readOnly }: MilestoneItemProps) {
   const [loading, setLoading] = useState(false)
 
   const isOverdue = milestone.targetDate &&
@@ -16,7 +17,7 @@ export default function MilestoneItem({ milestone, onToggle }: MilestoneItemProp
     new Date(milestone.targetDate) < new Date()
 
   const handleToggle = async () => {
-    if (!onToggle) return
+    if (!onToggle || readOnly) return
     setLoading(true)
     try {
       await onToggle(milestone.id, !milestone.completed)
@@ -37,11 +38,13 @@ export default function MilestoneItem({ milestone, onToggle }: MilestoneItemProp
     >
       <button
         onClick={handleToggle}
-        disabled={loading}
+        disabled={loading || readOnly}
         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
           milestone.completed
             ? 'bg-emerald-500 border-emerald-500'
-            : 'border-gray-300 hover:border-emerald-500'
+            : readOnly
+              ? 'border-gray-200 cursor-not-allowed'
+              : 'border-gray-300 hover:border-emerald-500'
         }`}
       >
         {milestone.completed && (

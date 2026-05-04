@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
-import MilestoneItem from '@/components/MilestoneItem'
-import PriorityBadge from '@/components/PriorityBadge'
-import { Goal } from '@/types/goal'
+import { Phase } from '@/types/goal'
+import { useAppTranslation } from '@/components/LanguageProvider'
+
+type Language = 'en' | 'es';
 
 export default function NewGoalPage() {
+  const { t, language } = useAppTranslation()
   const router = useRouter()
+  const [phases, setPhases] = useState<Phase[]>([])
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -16,10 +19,19 @@ export default function NewGoalPage() {
     priority: 'MEDIA' as 'ALTA' | 'MEDIA' | 'BAJA',
     deadline: '',
     estimatedHours: '',
+    phaseId: '',
   })
   const [milestones, setMilestones] = useState<{ title: string; targetDate: string }[]>([])
+  const [milestoneErrors, setMilestoneErrors] = useState<Record<number, string>>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [lang] = useState<Language>(language as Language)
+
+  useEffect(() => {
+    fetch('/api/phases').then(res => res.ok && res.json()).then(data => {
+      if (data?.phases) setPhases(data.phases)
+    }).catch(() => {})
+  }, [])
 
   const addMilestone = () => {
     setMilestones([...milestones, { title: '', targetDate: '' }])
@@ -29,16 +41,37 @@ export default function NewGoalPage() {
     const updated = [...milestones]
     updated[index][field] = value
     setMilestones(updated)
+    if (milestoneErrors[index]) {
+      setMilestoneErrors(prev => { const n = { ...prev }; delete n[index]; return n; })
+    }
   }
 
   const removeMilestone = (index: number) => {
     setMilestones(milestones.filter((_, i) => i !== index))
+    if (milestoneErrors[index]) {
+      setMilestoneErrors(prev => { const n = { ...prev }; delete n[index]; return n; })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.title.trim()) {
-      setError('El título es requerido')
+      setError(t('goals.titleLabel').replace(' *', '') + ' ' + t('common.required').toLowerCase())
+      return
+    }
+
+    const errors: Record<number, string> = {}
+    let hasError = false
+    milestones.forEach((m, i) => {
+      if (m.title.trim() && !m.targetDate) {
+        errors[i] = t('goals.milestoneDateRequired')
+        hasError = true
+      }
+    })
+    setMilestoneErrors(errors)
+
+    if (hasError) {
+      setError('')
       return
     }
 
@@ -53,13 +86,14 @@ export default function NewGoalPage() {
           ...form,
           deadline: form.deadline || null,
           estimatedHours: form.estimatedHours ? parseFloat(form.estimatedHours) : null,
+          phaseId: form.phaseId || null,
           milestones: milestones.filter(m => m.title.trim()),
         }),
       })
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || 'Error al crear objetivo')
+        throw new Error(data.error || t('common.error'))
       }
 
       router.push('/goals')
@@ -70,15 +104,21 @@ export default function NewGoalPage() {
     }
   }
 
+  const priorityLabel = (p: string) => {
+    if (p === 'ALTA') return t('goals.priorityHigh')
+    if (p === 'MEDIA') return t('goals.priorityMedium')
+    return t('goals.priorityLow')
+  }
+
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto space-y-6">
         <header>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-            Nuevo objetivo
+            {t('goals.newGoal')}
           </h1>
           <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Define tu meta y hitos
+            {t('goals.newPageSubtitle')}
           </p>
         </header>
 
@@ -93,13 +133,13 @@ export default function NewGoalPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  Título *
+                  {t('goals.titleLabel')}
                 </label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  placeholder="Aprender TypeScript"
+                  placeholder={t('goals.titlePlaceholder')}
                   className="w-full px-4 py-2 rounded-lg border"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   required
@@ -108,12 +148,12 @@ export default function NewGoalPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  Descripción
+                  {t('goals.descriptionLabel')}
                 </label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="Objetivo general..."
+                  placeholder={t('goals.descriptionPlaceholder')}
                   rows={3}
                   className="w-full px-4 py-2 rounded-lg border resize-none"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -123,7 +163,7 @@ export default function NewGoalPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Categoría
+                    {t('goals.categoryLabel')}
                   </label>
                   <select
                     value={form.category}
@@ -131,14 +171,14 @@ export default function NewGoalPage() {
                     className="w-full px-4 py-2 rounded-lg border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
-                    <option value="PERSONAL">Personal</option>
-                    <option value="PROFESIONAL">Profesional</option>
+                    <option value="PERSONAL">{t('goals.categoryPersonal')}</option>
+                    <option value="PROFESIONAL">{t('goals.categoryProfessional')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Prioridad
+                    {t('goals.priorityLabel')}
                   </label>
                   <select
                     value={form.priority}
@@ -146,17 +186,36 @@ export default function NewGoalPage() {
                     className="w-full px-4 py-2 rounded-lg border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
-                    <option value="BAJA">Baja</option>
-                    <option value="MEDIA">Media</option>
-                    <option value="ALTA">Alta</option>
+                    <option value="BAJA">{priorityLabel('BAJA')}</option>
+                    <option value="MEDIA">{priorityLabel('MEDIA')}</option>
+                    <option value="ALTA">{priorityLabel('ALTA')}</option>
                   </select>
                 </div>
               </div>
 
+              {phases.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
+                    {t('goals.phaseLabel')}
+                  </label>
+                  <select
+                    value={form.phaseId}
+                    onChange={e => setForm(f => ({ ...f, phaseId: e.target.value }))}
+                    className="w-full px-4 py-2 rounded-lg border"
+                    style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                  >
+                    <option value="">{t('goals.noPhase')}</option>
+                    {phases.sort((a, b) => a.number - b.number).map(p => (
+                      <option key={p.id} value={p.id}>Phase {p.number}: {p.title}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Fecha límite
+                    {t('goals.deadlineLabel')}
                   </label>
                   <input
                     type="date"
@@ -169,7 +228,7 @@ export default function NewGoalPage() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Horas estimadas
+                    {t('goals.estimatedHoursLabel')}
                   </label>
                   <input
                     type="number"
@@ -189,7 +248,7 @@ export default function NewGoalPage() {
           <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                Hitos
+                {t('goals.milestones')}
               </h3>
               <button
                 type="button"
@@ -197,13 +256,13 @@ export default function NewGoalPage() {
                 className="text-sm px-3 py-1 rounded-lg border border-dashed"
                 style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
               >
-                + Añadir hito
+                {t('goals.addMilestone')}
               </button>
             </div>
 
             {milestones.length === 0 ? (
               <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>
-                Sin hitos definidos
+                {t('goals.noMilestones')}
               </p>
             ) : (
               <div className="space-y-3">
@@ -214,17 +273,22 @@ export default function NewGoalPage() {
                         type="text"
                         value={m.title}
                         onChange={e => updateMilestone(i, 'title', e.target.value)}
-                        placeholder="Título del hito"
+                        placeholder={t('goals.milestoneTitlePlaceholder')}
                         className="w-full px-3 py-2 rounded-lg border text-sm"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
-                      <input
-                        type="date"
-                        value={m.targetDate}
-                        onChange={e => updateMilestone(i, 'targetDate', e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border text-sm"
-                        style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
-                      />
+                      <div>
+                        <input
+                          type="date"
+                          value={m.targetDate}
+                          onChange={e => updateMilestone(i, 'targetDate', e.target.value)}
+                          className={`w-full px-3 py-2 rounded-lg border text-sm ${milestoneErrors[i] ? 'border-red-500' : ''}`}
+                          style={{ background: 'var(--color-bg-input)', borderColor: milestoneErrors[i] ? '#ef4444' : 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                        />
+                        {milestoneErrors[i] && (
+                          <p className="text-xs text-red-500 mt-1">{milestoneErrors[i]}</p>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -245,14 +309,14 @@ export default function NewGoalPage() {
               className="flex-1 px-4 py-2 rounded-lg border font-medium text-center"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
-              Cancelar
+              {t('common.cancel')}
             </a>
             <button
               type="submit"
               disabled={loading}
               className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Guardando...' : 'Crear objetivo'}
+              {loading ? t('common.loading') : t('common.create')}
             </button>
           </div>
         </form>

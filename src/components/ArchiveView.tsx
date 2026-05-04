@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { Habit } from '@/types/habit'
 import { calculateStreak, calculateCompletionRate } from '@/lib/habit-utils'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 interface ArchiveViewProps {
   habits: Habit[]
@@ -10,6 +11,7 @@ interface ArchiveViewProps {
 }
 
 export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
+  const { t } = useAppTranslation()
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
 
@@ -19,18 +21,18 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
   }, [])
 
   const months = [
-    { value: 1, label: 'Enero' },
-    { value: 2, label: 'Febrero' },
-    { value: 3, label: 'Marzo' },
-    { value: 4, label: 'Abril' },
-    { value: 5, label: 'Mayo' },
-    { value: 6, label: 'Junio' },
-    { value: 7, label: 'Julio' },
-    { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Septiembre' },
-    { value: 10, label: 'Octubre' },
-    { value: 11, label: 'Noviembre' },
-    { value: 12, label: 'Diciembre' },
+    { value: 1, label: t('habits.archive.months.january') },
+    { value: 2, label: t('habits.archive.months.february') },
+    { value: 3, label: t('habits.archive.months.march') },
+    { value: 4, label: t('habits.archive.months.april') },
+    { value: 5, label: t('habits.archive.months.may') },
+    { value: 6, label: t('habits.archive.months.june') },
+    { value: 7, label: t('habits.archive.months.july') },
+    { value: 8, label: t('habits.archive.months.august') },
+    { value: 9, label: t('habits.archive.months.september') },
+    { value: 10, label: t('habits.archive.months.october') },
+    { value: 11, label: t('habits.archive.months.november') },
+    { value: 12, label: t('habits.archive.months.december') },
   ]
 
   const periodStart = new Date(selectedYear, selectedMonth - 1, 1)
@@ -68,8 +70,8 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Archivo Histórico</h2>
-        <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Analiza tu progreso pasado</p>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('habits.archive.title')}</h2>
+        <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.subtitle')}</p>
       </div>
 
       {/* Period Selector */}
@@ -99,15 +101,15 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Total Completaciones</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.totalCompletions')}</p>
           <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>{totalCompletions}</p>
         </div>
         <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Hábitos Activos</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.activeHabits')}</p>
           <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>{habits.filter((h) => h.state === 'Active').length}</p>
         </div>
         <div className="summary-card dashboard-card rounded-xl p-4 shadow-sm border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Mejor Racha</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.bestStreak')}</p>
           <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text-primary)' }}>
             {Math.max(0, ...periodData.map((d) => d.streak))}
           </p>
@@ -116,10 +118,10 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
 
       {/* Habit Breakdown */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Detalle por Hábito</h3>
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('habits.archive.habitDetail')}</h3>
         {periodData.length === 0 ? (
           <div className="empty-state text-center py-8 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
-            <p style={{ color: 'var(--color-text-muted)' }}>No hay hábitos para mostrar</p>
+            <p style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.noHabits')}</p>
           </div>
         ) : (
           periodData.map(({ habit, completions, streak, rate }) => (
@@ -132,7 +134,7 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
                 <div>
                   <h4 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{habit.title}</h4>
                   <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                    {completions} completaciones · Racha actual: {streak} · Tasa: {rate}%
+                    {t('habits.archive.completions', { count: completions })} · {t('habits.archive.currentStreak', { count: streak })} · {t('habits.archive.rate', { rate })}
                   </p>
                 </div>
                 <div className="text-right">
@@ -144,7 +146,7 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
                         ? { background: 'color-mix(in srgb, var(--color-warning) 15%, transparent)', color: 'var(--color-warning)' }
                         : { background: 'var(--color-bg-input)', color: 'var(--color-text-secondary)' }
                     }>
-                    {habit.state === 'Active' ? 'Activo' : habit.state === 'Paused' ? 'Pausado' : 'Archivado'}
+                    {habit.state === 'Active' ? t('habits.archive.status.active') : habit.state === 'Paused' ? t('habits.archive.status.paused') : t('habits.archive.status.archived')}
                   </span>
                 </div>
               </div>
@@ -160,12 +162,12 @@ export default function ArchiveView({ habits, loading }: ArchiveViewProps) {
                           key={i}
                           className="completion-dot w-3 h-3 rounded-sm"
                           style={{ backgroundColor: habit.color }}
-                          title={new Date(completion.date).toLocaleDateString('es')}
+                          title={new Date(completion.date).toLocaleDateString()}
                         />
                       )
                     })}
                   </div>
-                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>Últimas completaciones</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('habits.archive.lastCompletions')}</p>
                 </div>
               )}
             </div>
