@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { t } from '@/lib/i18n'
+import { useAppTranslation } from '@/components/LanguageProvider'
 import { HabitFormData, Category, Objective, HabitState, GoalType } from '@/types/habit'
 
 interface HabitFormProps {
@@ -12,24 +14,25 @@ interface HabitFormProps {
 }
 
 const colors = [
-  { name: 'Azul', value: '#3b82f6' },
-  { name: 'Verde', value: '#22c55e' },
-  { name: 'Rojo', value: '#ef4444' },
-  { name: 'Amarillo', value: '#eab308' },
-  { name: 'Morado', value: '#a855f7' },
-  { name: 'Rosa', value: '#ec4899' },
-  { name: 'Naranja', value: '#f97316' },
-  { name: 'Cyan', value: '#06b6d4' },
+  { name: t('habits.colors.blue'), value: '#3b82f6' },
+  { name: t('habits.colors.green'), value: '#22c55e' },
+  { name: t('habits.colors.red'), value: '#ef4444' },
+  { name: t('habits.colors.yellow'), value: '#eab308' },
+  { name: t('habits.colors.purple'), value: '#a855f7' },
+  { name: t('habits.colors.pink'), value: '#ec4899' },
+  { name: t('habits.colors.orange'), value: '#f97316' },
+  { name: t('habits.colors.cyan'), value: '#06b6d4' },
 ]
 
 const goalTypes: { value: GoalType; label: string }[] = [
-  { value: 'Daily', label: 'Diario' },
-  { value: 'Weekly', label: 'Semanal' },
-  { value: 'Monthly', label: 'Mensual' },
-  { value: 'Ratio', label: 'Ratio (%)' },
+  { value: 'Daily', label: t('habits.goalTypes.daily') },
+  { value: 'Weekly', label: t('habits.goalTypes.weekly') },
+  { value: 'Monthly', label: t('habits.goalTypes.monthly') },
+  { value: 'Ratio', label: t('habits.goalTypes.ratio') },
 ]
 
 export default function HabitForm({ onSubmit, onCancel, initialData, categories = [], objectives = [] }: HabitFormProps) {
+  const { t } = useAppTranslation()
   const [title, setTitle] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
   const [color, setColor] = useState(initialData?.color || '#3b82f6')
@@ -46,7 +49,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
   useEffect(() => {
     if (!isPermanent) {
       if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
-        setCycleError('La fecha de fin debe ser posterior o igual a la de inicio')
+        setCycleError(t('habits.form.cycleError'))
       } else {
         setCycleError('')
       }
@@ -94,7 +97,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
           <label htmlFor="title" className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Título del hábito *
+            {t('habits.form.titleLabel')}
           </label>
           <input
             type="text"
@@ -103,14 +106,14 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             onChange={(e) => setTitle(e.target.value)}
             className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            placeholder="Ej: Ejercicio diario"
+            placeholder={t('habits.form.titlePlaceholder')}
             required
           />
         </div>
 
         <div className="md:col-span-2">
           <label htmlFor="description" className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Descripción (opcional)
+            {t('habits.form.descriptionLabel')}
           </label>
           <textarea
             id="description"
@@ -119,12 +122,12 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             rows={2}
-            placeholder="Ej: 30 minutos de ejercicio"
+            placeholder={t('habits.form.descriptionPlaceholder')}
           />
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>Color</label>
+          <label className="rf-label block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.colorLabel')}</label>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => (
               <button
@@ -146,28 +149,28 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Estado</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.stateLabel')}</label>
           <select
             value={state}
             onChange={(e) => setState(e.target.value as HabitState)}
             className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
-            <option value="Active">Activo</option>
-            <option value="Paused">Pausado</option>
-            <option value="Archived">Archivado</option>
+            <option value="Active">{t('habits.card.statusActive')}</option>
+            <option value="Paused">{t('habits.card.statusPaused')}</option>
+            <option value="Archived">{t('habits.card.statusArchived')}</option>
           </select>
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Categoría</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.categoryLabel')}</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
-            <option value="">Sin categoría</option>
+            <option value="">{t('habits.form.noCategory')}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
@@ -175,14 +178,14 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         </div>
 
         <div>
-          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Objetivo</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.objectiveLabel')}</label>
           <select
             value={objectiveId}
             onChange={(e) => setObjectiveId(e.target.value)}
             className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
-            <option value="">Sin objetivo</option>
+            <option value="">{t('habits.form.noObjective')}</option>
             {objectives.map((obj) => (
               <option key={obj.id} value={obj.id}>{obj.name}</option>
             ))}
@@ -197,14 +200,14 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
               onChange={(e) => setIsPermanent(e.target.checked)}
               className="w-4 h-4 text-primary rounded focus:ring-primary"
             />
-            Hábito permanente (sin fecha de fin)
+            {t('habits.form.permanentLabel')}
           </label>
         </div>
 
         {!isPermanent && (
           <>
             <div>
-              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Fecha de inicio</label>
+              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.startDateLabel')}</label>
               <input
                 type="date"
                 value={startDate}
@@ -214,7 +217,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
               />
             </div>
             <div>
-              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Fecha de fin</label>
+              <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.endDateLabel')}</label>
               <input
                 type="date"
                 value={endDate}
@@ -230,7 +233,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
         )}
 
         <div>
-          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Tipo de meta</label>
+          <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('habits.form.goalTypeLabel')}</label>
           <select
             value={goalType}
             onChange={(e) => setGoalType(e.target.value as GoalType)}
@@ -245,7 +248,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
 
         <div>
           <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Valor de meta {goalType === 'Ratio' ? '(%)' : '(veces)'}
+            {t('habits.form.goalValueLabel', { unit: goalType === 'Ratio' ? '(%)' : '(times)' })}
           </label>
           <input
             type="number"
@@ -265,7 +268,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           className="flex-1 px-4 py-2 btn-neon rounded-lg hover:bg-primary/90 transition-colors font-medium"
           style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
         >
-          {initialData ? 'Actualizar' : 'Crear Hábito'}
+          {initialData ? t('habits.form.update') : t('habits.form.create')}
         </button>
         {onCancel && (
           <button
@@ -274,7 +277,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             className="px-4 py-2 btn-outline rounded-lg habit-cancel-btn transition-colors font-medium"
             style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
         )}
       </div>

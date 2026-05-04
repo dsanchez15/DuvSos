@@ -4,18 +4,19 @@ import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/AppLayout'
 import WeekCalendar from '@/components/WeekCalendar'
 import { DailyProgress, WeeklyCheckIn, Goal, Phase } from '@/types/goal'
-import { t, getLanguage } from '@/lib/i18n'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 type Language = 'en' | 'es';
 type EntryType = 'activity' | 'checkin' | null;
 
 export default function ProgressPage() {
+  const { t, language } = useAppTranslation()
   const [entries, setEntries] = useState<DailyProgress[]>([])
   const [checkins, setCheckins] = useState<WeeklyCheckIn[]>([])
   const [goals, setGoals] = useState<Goal[]>([])
   const [phases, setPhases] = useState<Phase[]>([])
   const [loading, setLoading] = useState(true)
-  const [lang] = useState<Language>(getLanguage())
+  const [lang] = useState<Language>(language as Language)
   const [currentWeek, setCurrentWeek] = useState(() => {
     const d = new Date()
     const day = d.getDay()

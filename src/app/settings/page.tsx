@@ -5,6 +5,7 @@ import SettingCard from '@/components/SettingCard';
 import AppLayout from '@/components/AppLayout';
 import Toast from '@/components/Toast';
 import ThemePreview from '@/components/ThemePreview';
+import { useAppTranslation } from '@/components/LanguageProvider';
 
 const CATEGORY_COLORS = [
   { name: 'Blue', value: '#3b82f6' },
@@ -17,6 +18,7 @@ const CATEGORY_COLORS = [
 ];
 
 export default function SettingsPage() {
+    const { t, setLanguage: setAppLanguage } = useAppTranslation();
     const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('app-theme');
@@ -35,14 +37,14 @@ export default function SettingsPage() {
         }
         return 'classic';
     });
-    const [language, setLanguage] = useState<'en' | 'es'>(() => {
+    const [selectedLang, setSelectedLang] = useState<'en' | 'es'>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('app-language');
             if (saved && ['en', 'es'].includes(saved)) {
                 return saved as 'en' | 'es';
             }
         }
-        return 'es';
+        return 'en';
     });
     const [cardLimit, setCardLimit] = useState(4);
     const [checklistAlertDays, setChecklistAlertDays] = useState(3);
@@ -76,7 +78,7 @@ export default function SettingsPage() {
                         setVisualTheme(data.user.visualTheme as 'classic' | 'retrofuturista');
                     }
                     if (data.user.language) {
-                        setLanguage(data.user.language as 'en' | 'es');
+                        setSelectedLang(data.user.language as 'en' | 'es');
                     }
                 } else {
                     window.location.href = '/login';
@@ -117,21 +119,21 @@ export default function SettingsPage() {
             setNewCategoryColor(CATEGORY_COLORS[0].value);
             setShowCategoryForm(false);
             fetchCategories();
-            setToast({ message: 'Category created!', type: 'success' });
+            setToast({ message: t('settings.toast.categoryCreated'), type: 'success' });
         } catch (err) {
-            setToast({ message: 'Failed to create category', type: 'error' });
+            setToast({ message: t('settings.toast.categoryCreateFailed'), type: 'error' });
         }
     };
 
     const handleDeleteCategory = async (id: number) => {
-        if (!confirm('Delete this category? Todos will be moved to General.')) return;
+        if (!confirm(t('settings.confirmDeleteCategory'))) return;
         try {
             const res = await fetch(`/api/todo-categories/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed to delete category');
             fetchCategories();
-            setToast({ message: 'Category deleted', type: 'success' });
+            setToast({ message: t('settings.toast.categoryDeleted'), type: 'success' });
         } catch (err) {
-            setToast({ message: 'Failed to delete category', type: 'error' });
+            setToast({ message: t('settings.toast.categoryDeleteFailed'), type: 'error' });
         }
     };
 
@@ -164,8 +166,8 @@ export default function SettingsPage() {
     };
 
     const changeLanguage = (newLang: 'en' | 'es') => {
-        setLanguage(newLang);
-        localStorage.setItem('app-language', newLang);
+        setSelectedLang(newLang);
+        setAppLanguage(newLang);
         setIsDirty(true);
     };
 
@@ -173,7 +175,7 @@ export default function SettingsPage() {
         try {
             localStorage.setItem('app-theme', theme);
             localStorage.setItem('app-visual-theme', visualTheme);
-            localStorage.setItem('app-language', language);
+            localStorage.setItem('app-language', selectedLang);
             localStorage.setItem('dashboard-card-limit', cardLimit.toString());
 
             if (user) {
@@ -186,7 +188,7 @@ export default function SettingsPage() {
                         tagline: user.tagline,
                         theme: theme,
                         visualTheme: visualTheme,
-                        language: language,
+                        language: selectedLang,
                         checklistAlertDays: checklistAlertDays,
                     }),
                 });
@@ -198,10 +200,10 @@ export default function SettingsPage() {
             }
 
             setIsDirty(false);
-            setToast({ message: 'Settings saved successfully!', type: 'success' });
+            setToast({ message: t('settings.toast.settingsSaved'), type: 'success' });
         } catch (error: any) {
             console.error('Save failed', error);
-            setToast({ message: error.message || 'Failed to save settings', type: 'error' });
+            setToast({ message: error.message || t('settings.toast.settingsSaveFailed'), type: 'error' });
         }
     };
 
@@ -224,8 +226,8 @@ export default function SettingsPage() {
 
                 <header className="p-6 lg:px-10 flex justify-between items-center bg-transparent">
                     <div>
-                        <h1 className="text-2xl font-bold">Settings</h1>
-                        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Manage your account preferences and app appearance.</p>
+                        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
+                        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('settings.subtitle')}</p>
                     </div>
                 </header>
 
@@ -235,7 +237,7 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-6">
                                 <span className="material-symbols-outlined text-primary">person</span>
-                                <h2 className="text-lg font-semibold">Account Profile</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.accountProfile')}</h2>
                             </div>
                             <div className="flex flex-col md:flex-row gap-8 items-start">
                                 <div className="relative group">
@@ -250,7 +252,7 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Full Name</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.fullName')}</label>
                                         <input
                                             className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                             style={{ background: 'var(--color-bg-input)' }}
@@ -263,7 +265,7 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Email Address</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.emailAddress')}</label>
                                         <input
                                             className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                             style={{ background: 'var(--color-bg-input)' }}
@@ -276,7 +278,7 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="md:col-span-2 space-y-2">
-                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bio / Tagline</label>
+                                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.bioTagline')}</label>
                                         <textarea
                                             className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none"
                                             style={{ background: 'var(--color-bg-input)' }}
@@ -296,13 +298,13 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-6">
                                 <span className="material-symbols-outlined text-primary">dashboard_customize</span>
-                                <h2 className="text-lg font-semibold">Dashboard Configuration</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.dashboardConfig')}</h2>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                     <div>
-                                        <h3 className="font-medium">Cards to display</h3>
-                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Number of habit cards to show in the central hub.</p>
+                                        <h3 className="font-medium">{t('settings.cardsToDisplay')}</h3>
+                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.cardsToDisplayDesc')}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {[2, 4, 6, 8].map(num => (
@@ -319,8 +321,8 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                     <div>
-                                        <h3 className="font-medium">Checklist expiration alert</h3>
-                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Days before expiration to show badge in sidebar. Set to 0 to disable.</p>
+                                        <h3 className="font-medium">{t('settings.checklistAlert')}</h3>
+                                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.checklistAlertDesc')}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {[0, 1, 2, 3, 4, 5].map(num => (
@@ -342,11 +344,11 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-6">
                                 <span className="material-symbols-outlined text-primary">label</span>
-                                <h2 className="text-lg font-semibold">Todo Categories</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.todoCategories')}</h2>
                             </div>
                             <div className="space-y-4">
                                 {categories.length === 0 ? (
-                                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>No categories yet.</p>
+                                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('settings.noCategories')}</p>
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
                                         {categories.map((cat) => (
@@ -380,7 +382,7 @@ export default function SettingsPage() {
                                             type="text"
                                             value={newCategoryName}
                                             onChange={(e) => setNewCategoryName(e.target.value)}
-                                            placeholder="Category name..."
+                                            placeholder={t('settings.categoryNamePlaceholder')}
                                             className="w-full px-4 py-2 rounded-lg border"
                                             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}
                                             autoFocus
@@ -406,14 +408,14 @@ export default function SettingsPage() {
                                                 className="px-4 py-2 settings-cancel-btn text-sm"
                                                 style={{ color: 'var(--color-text-muted)' }}
                                             >
-                                                Cancel
+                                                {t('common.cancel')}
                                             </button>
                                             <button
                                                 type="submit"
                                                 disabled={!newCategoryName.trim()}
                                                 className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 disabled:opacity-50"
                                             >
-                                                Create
+                                                {t('common.create')}
                                             </button>
                                         </div>
                                     </form>
@@ -422,7 +424,7 @@ export default function SettingsPage() {
                                         onClick={() => setShowCategoryForm(true)}
                                         className="px-4 py-2 border border-primary/30 text-primary rounded-lg hover:bg-primary/5 text-sm font-medium transition-colors"
                                     >
-                                        + New Category
+                                        {t('settings.newCategory')}
                                     </button>
                                 )}
                             </div>
@@ -432,13 +434,13 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-6">
                                 <span className="material-symbols-outlined text-primary">notifications</span>
-                                <h2 className="text-lg font-semibold">Notification Preferences</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.notifications')}</h2>
                             </div>
                             <div className="space-y-4">
                                 {[
-                                    { title: 'Daily Reminders', desc: 'Get a nudge to complete your habits every morning.' },
-                                    { title: 'Weekly Summary', desc: 'A detailed report of your progress every Sunday.' },
-                                    { title: 'Sound Effects', desc: 'Play a sound when you complete a habit.' }
+                                    { title: t('settings.dailyReminders'), desc: t('settings.dailyRemindersDesc') },
+                                    { title: t('settings.weeklySummary'), desc: t('settings.weeklySummaryDesc') },
+                                    { title: t('settings.soundEffects'), desc: t('settings.soundEffectsDesc') }
                                 ].map((pref, i) => (
                                     <div key={i} className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
                                         <div>
@@ -458,11 +460,11 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-6">
                                 <span className="material-symbols-outlined text-primary">palette</span>
-                                <h2 className="text-lg font-semibold">Theme &amp; Appearance</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.themeAppearance')}</h2>
                             </div>
                             <div className="space-y-6">
                                 <div>
-                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Visual Style</label>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.visualStyle')}</label>
                                     <div className="grid grid-cols-2 gap-4">
                                         {(['classic', 'retrofuturista'] as const).map((v) => (
                                             <button
@@ -477,7 +479,7 @@ export default function SettingsPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Language</label>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.language')}</label>
                                     <div className="grid grid-cols-2 gap-4">
                                         {([
                                             { code: 'es' as const, label: 'Español', flag: '🇪🇸' },
@@ -486,7 +488,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={l.code}
                                                 onClick={() => changeLanguage(l.code)}
-                                                className={`flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${language === l.code ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
+                                                className={`flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${selectedLang === l.code ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
                                                 <span className="text-2xl">{l.flag}</span>
                                                 <span className="text-sm font-medium">{l.label}</span>
@@ -495,7 +497,7 @@ export default function SettingsPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>Display Mode</label>
+                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.displayMode')}</label>
                                     <div className="grid grid-cols-3 gap-4">
                                         {(['light', 'dark', 'system'] as const).map((m) => (
                                             <button
@@ -518,14 +520,14 @@ export default function SettingsPage() {
                         <SettingCard>
                             <div className="flex items-center gap-2 mb-4 text-red-500">
                                 <span className="material-symbols-outlined">report_problem</span>
-                                <h2 className="text-lg font-semibold">Danger Zone</h2>
+                                <h2 className="text-lg font-semibold">{t('settings.dangerZone')}</h2>
                             </div>
                             <div className="flex items-center justify-between gap-4">
                                 <div>
-                                    <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Reset All Data</h3>
-                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Permanently delete all your habit history and preferences. This cannot be undone.</p>
+                                    <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{t('settings.resetAllData')}</h3>
+                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.resetAllDataDesc')}</p>
                                 </div>
-                                <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg font-medium transition-all">Reset Account</button>
+                                <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg font-medium transition-all">{t('settings.resetAccount')}</button>
                             </div>
                         </SettingCard>
                     </div>
@@ -533,21 +535,21 @@ export default function SettingsPage() {
 
                 {/* Sticky Footer */}
                 <footer className="fixed bottom-0 left-0 lg:left-64 right-0 backdrop-blur-md border-t border-primary/10 p-4 lg:px-10 flex items-center justify-between z-10" style={{ background: 'color-mix(in srgb, var(--color-bg-surface) 80%, transparent)' }}>
-                    <p className={`text-sm italic ${isDirty ? 'opacity-100' : 'opacity-0'}`} style={{ color: 'var(--color-text-muted)' }}>You have unsaved changes</p>
+                    <p className={`text-sm italic ${isDirty ? 'opacity-100' : 'opacity-0'}`} style={{ color: 'var(--color-text-muted)' }}>{t('settings.unsavedChanges')}</p>
                     <div className="flex gap-3 ml-auto">
                         <button
                             onClick={handleDiscard}
                             className="px-6 py-2 border rounded-lg font-medium transition-colors settings-discard-btn"
                             style={{ borderColor: 'var(--color-border)' }}
                         >
-                            Discard
+                            {t('settings.discard')}
                         </button>
                         <button
                             onClick={handleSave}
                             className="px-8 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg font-semibold shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                         >
                             <span className="material-symbols-outlined text-sm">save</span>
-                            Save Changes
+                            {t('settings.saveChanges')}
                         </button>
                     </div>
                 </footer>

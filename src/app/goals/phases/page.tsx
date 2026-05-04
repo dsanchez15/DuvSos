@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
 import { Phase } from '@/types/goal'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 export default function PhasesPage() {
+  const { t, language } = useAppTranslation()
   const router = useRouter()
   const [phases, setPhases] = useState<Phase[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,7 +62,7 @@ export default function PhasesPage() {
   }
 
   const deletePhase = async (id: string) => {
-    if (!confirm('¿Eliminar esta fase? Los objetivos asociados quedarán sin fase.')) return
+    if (!confirm(t('phases.confirmDelete'))) return
     try {
       const res = await fetch(`/api/phases/${id}`, { method: 'DELETE' })
       if (res.ok) {
@@ -81,10 +83,10 @@ export default function PhasesPage() {
             </a>
             <div>
               <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                Fases del plan
+                {t('phases.title')}
               </h1>
               <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                Organiza tus objetivos en fases temporizadas
+                {t('phases.subtitle')}
               </p>
             </div>
           </div>
@@ -92,20 +94,20 @@ export default function PhasesPage() {
             onClick={() => setShowForm(!showForm)}
             className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
           >
-            {showForm ? 'Cancelar' : '+ Nueva fase'}
+            {showForm ? t('common.cancel') : `+ ${t('phases.newPhase')}`}
           </button>
         </header>
 
         {showForm && (
           <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
-              Nueva fase
+              {t('phases.newPhase')}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Número de fase *
+                    {t('phases.phaseNumber')}
                   </label>
                   <input
                     type="number"
@@ -119,7 +121,7 @@ export default function PhasesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Título *
+                    {t('phases.phaseTitle')}
                   </label>
                   <input
                     type="text"
@@ -134,12 +136,12 @@ export default function PhasesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  Descripción
+                  {t('phases.description')}
                 </label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="Descripción de la fase..."
+                  placeholder={t('phases.descriptionPlaceholder')}
                   rows={2}
                   className="w-full px-4 py-2 rounded-lg border resize-none"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -148,7 +150,7 @@ export default function PhasesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Fecha inicio
+                    {t('phases.startDate')}
                   </label>
                   <input
                     type="date"
@@ -160,7 +162,7 @@ export default function PhasesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                    Fecha fin
+                    {t('phases.endDate')}
                   </label>
                   <input
                     type="date"
@@ -176,18 +178,18 @@ export default function PhasesPage() {
                 disabled={saving}
                 className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
-                {saving ? 'Guardando...' : 'Crear fase'}
+                {saving ? t('progress.saving') : t('phases.createPhase')}
               </button>
             </form>
           </div>
         )}
 
         {loading ? (
-          <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>Cargando...</p>
+          <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>{t('common.loading')}</p>
         ) : phases.length === 0 ? (
           <div className="text-center py-12 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
-            <p className="text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>Sin fases</p>
-            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Crea fases para organizar tus objetivos</p>
+            <p className="text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>{t('phases.noPhases')}</p>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('phases.createPhaseHint')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -218,13 +220,13 @@ export default function PhasesPage() {
                 )}
                 {(phase.startDate || phase.endDate) && (
                   <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    {phase.startDate && new Date(phase.startDate).toLocaleDateString('es')}
+                    {phase.startDate && new Date(phase.startDate).toLocaleDateString(language === 'es' ? 'es' : 'en')}
                     {phase.startDate && phase.endDate && ' - '}
-                    {phase.endDate && new Date(phase.endDate).toLocaleDateString('es')}
+                    {phase.endDate && new Date(phase.endDate).toLocaleDateString(language === 'es' ? 'es' : 'en')}
                   </p>
                 )}
                 <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                  {phase._count?.goals || 0} objetivos
+                  {phase._count?.goals || 0} {t('goals.title').toLowerCase()}
                 </p>
               </div>
             ))}

@@ -2,16 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { t, getLanguage } from '@/lib/i18n'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 type Language = 'en' | 'es';
 
 export default function LoginPage() {
+    const { t, language } = useAppTranslation()
     const router = useRouter()
     const [isLogin, setIsLogin] = useState(true)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const [lang] = useState<Language>(getLanguage())
+    const [lang] = useState<Language>(language as Language)
     const [formData, setFormData] = useState({
         email: '',
         password: '',

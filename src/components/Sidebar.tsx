@@ -4,9 +4,10 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSidebar } from '@/components/SidebarContext';
-import { t } from '@/lib/i18n';
+import { useAppTranslation } from '@/components/LanguageProvider';
 
 export default function Sidebar() {
+    const { t } = useAppTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const [user, setUser] = React.useState<any>(null);

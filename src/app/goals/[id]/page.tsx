@@ -7,11 +7,11 @@ import MilestoneItem from '@/components/MilestoneItem'
 import ProgressRing from '@/components/ProgressRing'
 import PriorityBadge from '@/components/PriorityBadge'
 import { Goal } from '@/types/goal'
-import { t, setLanguage, getLanguage } from '@/lib/i18n'
-
-type Language = 'en' | 'es';
+import { useAppTranslation } from '@/components/LanguageProvider'
+import { Language } from '@/lib/i18n'
 
 export default function GoalDetailPage() {
+  const { t, language: lang, setLanguage } = useAppTranslation()
   const params = useParams()
   const router = useRouter()
   const goalId = params.id as string
@@ -24,13 +24,12 @@ export default function GoalDetailPage() {
   const [editMilestones, setEditMilestones] = useState<{ title: string; targetDate: string; id?: string }[]>([])
   const [milestoneErrors, setMilestoneErrors] = useState<Record<number, string>>({})
   const [phases, setPhases] = useState<any[]>([])
-  const [lang, setLang] = useState<Language>(getLanguage())
 
   const fetchGoal = useCallback(async () => {
     try {
       setLoading(true)
       const res = await fetch(`/api/goals/${goalId}`)
-      if (!res.ok) throw new Error('Error al cargar objetivo')
+      if (!res.ok) throw new Error(t('goals.errors.loadGoal'))
 
       const data = await res.json()
       setGoal(data.goal)
@@ -42,7 +41,7 @@ export default function GoalDetailPage() {
       })) || [])
       setError('')
     } catch (err) {
-      setError('Error al cargar el objetivo')
+      setError(t('goals.errors.loadGoal'))
       console.error(err)
     } finally {
       setLoading(false)
@@ -53,11 +52,6 @@ export default function GoalDetailPage() {
     fetchGoal()
     fetch('/api/phases').then(r => r.ok && r.json()).then(d => d?.phases && setPhases(d.phases)).catch(() => {})
   }, [fetchGoal])
-
-  const handleLanguageChange = (newLang: Language) => {
-    setLanguage(newLang)
-    setLang(newLang)
-  }
 
   const handleMilestoneToggle = async (milestoneId: string, completed: boolean) => {
     if (!goal || goal.status !== 'ACTIVE') return
@@ -234,7 +228,7 @@ export default function GoalDetailPage() {
       <AppLayout>
         <div className="text-center py-12">
           <p className="text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>
-            Objetivo no encontrado
+            {t('goals.notFound')}
           </p>
           <a href="/goals" className="text-primary hover:underline">
             {t('common.back')}
@@ -254,14 +248,14 @@ export default function GoalDetailPage() {
         {/* Language toggle */}
         <div className="flex justify-end gap-2">
           <button
-            onClick={() => handleLanguageChange('es')}
+            onClick={() => setLanguage('es')}
             className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${lang === 'es' ? 'bg-primary text-white' : 'border'}`}
             style={lang === 'es' ? {} : { borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
             ES
           </button>
           <button
-            onClick={() => handleLanguageChange('en')}
+            onClick={() => setLanguage('en')}
             className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'border'}`}
             style={lang === 'en' ? {} : { borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
@@ -354,7 +348,7 @@ export default function GoalDetailPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>
-                      Sin hitos definidos
+                      {t('goals.noMilestones')}
                     </p>
                   )}
                   {!canCheckMilestones && goal.milestones && goal.milestones.length > 0 && (
@@ -397,8 +391,8 @@ export default function GoalDetailPage() {
                       className="w-full px-4 py-2 rounded-lg border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     >
-                      <option value="PERSONAL">Personal</option>
-                      <option value="PROFESIONAL">Professional</option>
+                      <option value="PERSONAL">{t('goals.categoryPersonal')}</option>
+                      <option value="PROFESIONAL">{t('goals.categoryProfessional')}</option>
                     </select>
                   </div>
                   <div>
@@ -409,9 +403,9 @@ export default function GoalDetailPage() {
                       className="w-full px-4 py-2 rounded-lg border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     >
-                      <option value="BAJA">{t('goals.status.pending') === 'Pendiente' ? 'Baja' : 'Low'}</option>
-                      <option value="MEDIA">{t('goals.status.pending') === 'Pendiente' ? 'Media' : 'Medium'}</option>
-                      <option value="ALTA">{t('goals.status.pending') === 'Pendiente' ? 'Alta' : 'High'}</option>
+                      <option value="BAJA">{t('goals.priorityLow')}</option>
+                      <option value="MEDIA">{t('goals.priorityMedium')}</option>
+                      <option value="ALTA">{t('goals.priorityHigh')}</option>
                     </select>
                   </div>
                 </div>
@@ -469,7 +463,7 @@ export default function GoalDetailPage() {
                     </button>
                   </div>
                   {editMilestones.length === 0 ? (
-                    <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>Sin hitos definidos</p>
+                    <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>{t('goals.noMilestones')}</p>
                   ) : (
                     <div className="space-y-3">
                       {editMilestones.map((m, i) => (
@@ -532,7 +526,7 @@ export default function GoalDetailPage() {
           <div className="space-y-6">
             <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
-                {t('goals.status.pending') === 'Pendiente' ? 'Estado' : 'Status'}
+                {t('goals.statusLabel')}
               </h3>
               <div className="space-y-2">
                 <span

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Goal } from '@/types/goal'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 interface DailyProgressForm {
   date: string
@@ -21,6 +22,7 @@ interface DayTrackerProps {
 }
 
 export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
+  const { t } = useAppTranslation()
   const [goals, setGoals] = useState<Goal[]>([])
   const [form, setForm] = useState<DailyProgressForm>({
     date: initialData?.date || new Date().toISOString().split('T')[0],
@@ -51,7 +53,7 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
       await onSubmit(form)
       setForm(f => ({ ...f, plannedTime: null, actualTime: null, notes: '' }))
     } catch (err: any) {
-      setError(err.message || 'Error al guardar')
+      setError(err.message || t('progress.saveError'))
     } finally {
       setLoading(false)
     }
@@ -67,7 +69,7 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Fecha
+          {t('progress.dateLabel')}
         </label>
         <input
           type="date"
@@ -82,15 +84,15 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
       {goals.length > 0 && (
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Objetivo
-          </label>
+{t('progress.goalLabel')}
+           </label>
           <select
             value={form.goalId}
             onChange={e => setForm(f => ({ ...f, goalId: e.target.value }))}
             className="w-full px-3 py-2 rounded-lg border"
             style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
           >
-            <option value="">General</option>
+            <option value="">{t('progress.generalGoal')}</option>
             {goals.map(g => (
               <option key={g.id} value={g.id}>{g.title}</option>
             ))}
@@ -101,8 +103,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Hora planeada
-          </label>
+{t('progress.plannedTimeLabel')}
+           </label>
           <input
             type="time"
             value={form.plannedTime ?? ''}
@@ -113,8 +115,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Hora real
-          </label>
+{t('progress.actualTimeLabel')}
+           </label>
           <input
             type="time"
             value={form.actualTime ?? ''}
@@ -128,8 +130,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Horas de sueño
-          </label>
+{t('progress.sleepHours')}
+           </label>
           <input
             type="number"
             step="0.5"
@@ -145,8 +147,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
 
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Horas de estudio
-          </label>
+{t('progress.studyHours')}
+           </label>
           <input
             type="number"
             step="0.5"
@@ -161,8 +163,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
 
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Horas de trabajo
-          </label>
+{t('progress.workHours')}
+           </label>
           <input
             type="number"
             step="0.5"
@@ -186,25 +188,25 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
             }`}
             style={form.gymCompleted ? {} : { background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
-            {form.gymCompleted ? '✓ Gym completado' : 'Gym'}
+            {form.gymCompleted ? `✓ ${t('dashboard.gymDone')}` : t('dashboard.gym')}
           </button>
         </div>
       </div>
 
       {form.gymCompleted && form.sleepHours !== null && form.sleepHours < 7 && (
         <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-sm">
-          ⚠️ Gimnasio requiere al menos 7 horas de sueño
+          {t('dashboard.gymSleepWarning')}
         </div>
       )}
 
       <div>
         <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-          Notas
+          {t('progress.notesLabel')}
         </label>
         <textarea
           value={form.notes}
           onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-          placeholder="Notas sobre el día..."
+          placeholder={t('progress.notesPlaceholder')}
           rows={2}
           className="w-full px-3 py-2 rounded-lg border resize-none"
           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -216,7 +218,7 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
         disabled={loading}
         className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
-        {loading ? 'Guardando...' : 'Guardar progreso'}
+        {loading ? t('progress.saving') : t('progress.saveProgress')}
       </button>
     </form>
   )

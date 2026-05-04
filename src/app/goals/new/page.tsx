@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
 import { Phase } from '@/types/goal'
-import { t, getLanguage } from '@/lib/i18n'
+import { useAppTranslation } from '@/components/LanguageProvider'
 
 type Language = 'en' | 'es';
 
 export default function NewGoalPage() {
+  const { t, language } = useAppTranslation()
   const router = useRouter()
   const [phases, setPhases] = useState<Phase[]>([])
   const [form, setForm] = useState({
@@ -24,7 +25,7 @@ export default function NewGoalPage() {
   const [milestoneErrors, setMilestoneErrors] = useState<Record<number, string>>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [lang] = useState<Language>(getLanguage())
+  const [lang] = useState<Language>(language as Language)
 
   useEffect(() => {
     fetch('/api/phases').then(res => res.ok && res.json()).then(data => {
@@ -104,10 +105,9 @@ export default function NewGoalPage() {
   }
 
   const priorityLabel = (p: string) => {
-    if (lang === 'en') {
-      return p === 'ALTA' ? 'High' : p === 'MEDIA' ? 'Medium' : 'Low'
-    }
-    return p === 'ALTA' ? 'Alta' : p === 'MEDIA' ? 'Media' : 'Baja'
+    if (p === 'ALTA') return t('goals.priorityHigh')
+    if (p === 'MEDIA') return t('goals.priorityMedium')
+    return t('goals.priorityLow')
   }
 
   return (
@@ -118,7 +118,7 @@ export default function NewGoalPage() {
             {t('goals.newGoal')}
           </h1>
           <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-            {lang === 'es' ? 'Define tu meta, fase e hitos' : 'Define your goal, phase and milestones'}
+            {t('goals.newPageSubtitle')}
           </p>
         </header>
 
@@ -139,7 +139,7 @@ export default function NewGoalPage() {
                   type="text"
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  placeholder={lang === 'es' ? 'Aprender TypeScript' : 'Learn TypeScript'}
+                  placeholder={t('goals.titlePlaceholder')}
                   className="w-full px-4 py-2 rounded-lg border"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   required
@@ -153,7 +153,7 @@ export default function NewGoalPage() {
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder={lang === 'es' ? 'Objetivo general...' : 'General objective...'}
+                  placeholder={t('goals.descriptionPlaceholder')}
                   rows={3}
                   className="w-full px-4 py-2 rounded-lg border resize-none"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
@@ -171,8 +171,8 @@ export default function NewGoalPage() {
                     className="w-full px-4 py-2 rounded-lg border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
-                    <option value="PERSONAL">{lang === 'es' ? 'Personal' : 'Personal'}</option>
-                    <option value="PROFESIONAL">{lang === 'es' ? 'Profesional' : 'Professional'}</option>
+                    <option value="PERSONAL">{t('goals.categoryPersonal')}</option>
+                    <option value="PROFESIONAL">{t('goals.categoryProfessional')}</option>
                   </select>
                 </div>
 
@@ -262,7 +262,7 @@ export default function NewGoalPage() {
 
             {milestones.length === 0 ? (
               <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>
-                {lang === 'es' ? 'Sin hitos definidos' : 'No milestones defined'}
+                {t('goals.noMilestones')}
               </p>
             ) : (
               <div className="space-y-3">
