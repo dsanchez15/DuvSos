@@ -560,6 +560,7 @@ export const translations = {
         cancel: 'Cancel',
         undo: 'Undo',
         deleted: '"{{title}}" deleted',
+        reorderFailed: 'Failed to save reorder',
       },
     },
     reminders: {
@@ -1304,6 +1305,7 @@ const es: Translations = {
       cancel: 'Cancelar',
       undo: 'Deshacer',
       deleted: '"{{title}}" eliminado',
+      reorderFailed: 'Error al guardar el reorden',
     },
   },
   reminders: {

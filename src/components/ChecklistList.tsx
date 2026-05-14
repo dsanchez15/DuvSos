@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { t } from '@/lib/i18n'
+import { isExpired, daysRemaining, getSubtaskProgress, isParentAutoCompleted, reorderItems, getValidDropTargets, buildOrderedTree, computeBlockerPayload } from '@/lib/checklist-utils'
 import { useAppTranslation } from '@/components/LanguageProvider'
 import { Checklist, ChecklistCategory, ChecklistFilter, ChecklistItem, ChecklistTab, Priority } from '@/types/checklist'
 
@@ -24,9 +25,9 @@ export function getStatus(c: Checklist): { key: string; label: string; style: Re
   const now = new Date()
   const end = c.endDate ? new Date(c.endDate) : null
   const start = c.startDate ? new Date(c.startDate) : null
-  if (end && end < now) return { key: 'expired', label: t('checklists.status.expired'), style: dangerStyle }
+  if (end && isExpired(end)) return { key: 'expired', label: t('checklists.status.expired'), style: dangerStyle }
   if (end) {
-    const days = Math.ceil((end.getTime() - now.getTime()) / 86400000)
+    const days = daysRemaining(end)
     if (days <= 3) return { key: 'days-left', label: t('checklists.status.daysLeft', { count: days }), style: warningStyle }
   }
   if (start && start > now) return { key: 'upcoming', label: t('checklists.status.upcoming'), style: infoStyle }
@@ -78,7 +79,7 @@ interface Props {
   onAddItem: (checklistId: number, title: string, priority: Priority, parentId?: number | null) => void
   onUpdateItem: (checklistId: number, item: ChecklistItem, data: Partial<ChecklistItem>) => void
   onDeleteItem: (checklistId: number, itemId: number) => void
-  onReorder: (checklistId: number, items: ChecklistItem[]) => void
+  onReorder: (checklistId: number, items: ChecklistItem[]) => Promise<void>
   onCreateReminder: (checklistId: number, item: ChecklistItem) => void
 }
 
@@ -208,7 +209,7 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
   onUpdateItem: (checklistId: number, item: ChecklistItem, data: Partial<ChecklistItem>) => void
   onDeleteItem: (checklistId: number, itemId: number) => void
   onAddItem: (checklistId: number, title: string, priority: Priority, parentId?: number | null) => void
-  onReorder: (checklistId: number, items: ChecklistItem[]) => void
+  onReorder: (checklistId: number, items: ChecklistItem[]) => Promise<void>
   onCreateReminder: (checklistId: number, item: ChecklistItem) => void
   mode: 'active' | 'template' | 'history'
 }) {
@@ -221,33 +222,202 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
   const [notesValue, setNotesValue] = useState('')
   const [hideCompleted, setHideCompleted] = useState(false)
   const [undoItem, setUndoItem] = useState<{ item: ChecklistItem; timer: NodeJS.Timeout } | null>(null)
-  const dragItem = useRef<number | null>(null)
-  const dragOver = useRef<number | null>(null)
+
+  // Drag-and-drop state for hierarchy-aware reordering
+  const [draggedId, setDraggedId] = useState<number | null>(null)
+  const [dropIndicatorIndex, setDropIndicatorIndex] = useState<number | null>(null)
+  const [validDropTargets, setValidDropTargets] = useState<number[]>([])
+  const [dragError, setDragError] = useState<string | null>(null)
 
   const itemsList = Array.isArray(c.items) ? c.items : []
+
+  // Collapse/expand state: track which parents are collapsed (default: all collapsed)
+  const [collapsedParents, setCollapsedParents] = useState<Set<number>>(() => {
+    const parents = itemsList
+      .filter(i => !i.parentId || i.parentId === null)
+      .filter(parent => itemsList.some(child => child.parentId === parent.id))
+      .map(p => p.id)
+    return new Set(parents)
+  })
+
+  // Determine which parents have children
+  const parentsWithChildren = new Set(
+    itemsList
+      .filter(i => i.parentId != null)
+      .map(i => i.parentId as number)
+  )
+
+  const toggleCollapse = (parentId: number) => {
+    setCollapsedParents(prev => {
+      const next = new Set(prev)
+      if (next.has(parentId)) {
+        next.delete(parentId)
+      } else {
+        next.add(parentId)
+      }
+      return next
+    })
+  }
 
   const buildTree = (items: ChecklistItem[], parentId: number | null = null, depth = 0): Array<{ item: ChecklistItem; depth: number }> => {
     const result: Array<{ item: ChecklistItem; depth: number }> = []
     items.filter(i => i.parentId === parentId).forEach(item => {
       result.push({ item, depth })
-      result.push(...buildTree(items, item.id, depth + 1))
+      // Only include children if the parent is expanded (not collapsed)
+      if (!collapsedParents.has(item.id)) {
+        result.push(...buildTree(items, item.id, depth + 1))
+      }
     })
     return result
   }
 
   const treeItems = buildTree(itemsList)
 
-  const handleDragEnd = () => {
-    if (dragItem.current === null || dragOver.current === null || dragItem.current === dragOver.current) {
-      dragItem.current = null; dragOver.current = null; return
+  const handleDragStart = (itemId: number) => {
+    setDraggedId(itemId)
+    const targets = getValidDropTargets(itemsList, itemId)
+    setValidDropTargets(targets)
+  }
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault()
+    // Map the visible index to the ordered tree index
+    const orderedTree = buildOrderedTree(itemsList)
+    const visibleItem = visibleItems[idx]
+    if (!visibleItem) return
+
+    const treeIdx = orderedTree.findIndex(i => i.id === visibleItem.id)
+    if (treeIdx < 0) return
+
+    // Find the closest valid drop target
+    const closestValid = findClosestValidTarget(treeIdx, validDropTargets)
+    setDropIndicatorIndex(closestValid)
+  }
+
+  const handleDragEnd = async () => {
+    if (draggedId === null || dropIndicatorIndex === null) {
+      resetDragState()
+      return
     }
-    const visible = getVisibleItems()
-    const [moved] = visible.splice(dragItem.current, 1)
-    visible.splice(dragOver.current, 0, moved)
-    const hidden = hideCompleted ? itemsList.filter(i => i.completed) : []
-    const all = [...visible, ...hidden].map((item, i) => ({ ...item, position: i }))
-    onReorder(c.id, all)
-    dragItem.current = null; dragOver.current = null
+
+    const orderedTree = buildOrderedTree(itemsList)
+    const draggedItem = itemsList.find(i => i.id === draggedId)
+    if (!draggedItem) {
+      resetDragState()
+      return
+    }
+
+    // Determine the new parentId based on drop position
+    const newParentId = determineNewParentId(orderedTree, dropIndicatorIndex, draggedItem)
+
+    // Compute the drop index within the target group for child moves
+    const dropIdx = computeDropIndex(orderedTree, dropIndicatorIndex, newParentId, draggedItem)
+
+    // Compute reorder result
+    const result = reorderItems(itemsList, draggedId, dropIdx, newParentId)
+
+    if (result.changedIds.length === 0) {
+      resetDragState()
+      return
+    }
+
+    // Snapshot pre-drag state for rollback on API failure
+    const preDragItems = [...itemsList]
+
+    resetDragState()
+
+    // Optimistically apply the reorder, then persist via API
+    try {
+      await onReorder(c.id, result.items)
+    } catch {
+      // Revert to pre-drag state on failure
+      try { await onReorder(c.id, preDragItems) } catch { /* best effort revert */ }
+      setDragError(t('checklists.expandedItems.reorderFailed') ?? 'Failed to save reorder')
+      setTimeout(() => setDragError(null), 4000)
+    }
+  }
+
+  const resetDragState = () => {
+    setDraggedId(null)
+    setDropIndicatorIndex(null)
+    setValidDropTargets([])
+  }
+
+  /** Find the closest valid drop target to the given tree index */
+  const findClosestValidTarget = (treeIdx: number, targets: number[]): number | null => {
+    if (targets.length === 0) return null
+    // Find the target that is closest to treeIdx or treeIdx+1
+    let closest = targets[0]
+    let minDist = Math.abs(targets[0] - treeIdx)
+    for (const t of targets) {
+      const dist = Math.min(Math.abs(t - treeIdx), Math.abs(t - (treeIdx + 1)))
+      if (dist < minDist) {
+        minDist = dist
+        closest = t
+      }
+    }
+    return closest
+  }
+
+  /** Determine the new parentId based on where the item is being dropped */
+  const determineNewParentId = (
+    orderedTree: ChecklistItem[],
+    dropIdx: number,
+    draggedItem: ChecklistItem
+  ): number | null => {
+    const isParent = draggedItem.parentId == null
+
+    if (isParent) {
+      // Parents always stay at top level
+      return null
+    }
+
+    // For children: determine which parent group the drop position belongs to
+    if (dropIdx === 0) {
+      // Dropping before everything — belongs to the first parent
+      const firstParent = orderedTree.find(i => i.parentId == null)
+      return firstParent?.id ?? null
+    }
+
+    // Look at the item just before the drop position
+    const itemBefore = orderedTree[dropIdx - 1]
+    if (!itemBefore) return null
+
+    if (itemBefore.parentId == null) {
+      // Dropping right after a parent — becomes child of that parent
+      return itemBefore.id
+    } else {
+      // Dropping after a child — becomes sibling (same parent)
+      return itemBefore.parentId
+    }
+  }
+
+  /** Compute the drop index within the target group */
+  const computeDropIndex = (
+    orderedTree: ChecklistItem[],
+    dropIdx: number,
+    newParentId: number | null,
+    draggedItem: ChecklistItem
+  ): number => {
+    const isParent = draggedItem.parentId == null
+
+    if (isParent) {
+      // For parent moves, dropIdx is the position in the flat tree
+      return dropIdx
+    }
+
+    // For child moves, compute position within the target parent's children
+    const targetChildren = orderedTree.filter(i => i.parentId === newParentId && i.id !== draggedItem.id)
+
+    // Count how many children of the target parent come before the drop position
+    let childPosition = 0
+    for (const child of targetChildren) {
+      const childIdx = orderedTree.findIndex(i => i.id === child.id)
+      if (childIdx < dropIdx) {
+        childPosition++
+      }
+    }
+    return childPosition
   }
 
   const startEdit = (item: ChecklistItem) => {
@@ -260,7 +430,9 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
     const updates: Partial<ChecklistItem> = {}
     if (editTitle.trim() && editTitle !== item.title) updates.title = editTitle.trim()
     if (editEffort !== '') updates.effortEstimate = Number(editEffort)
-    if (editBlockedBy !== '') updates.blockedByItemId = Number(editBlockedBy)
+    // Blocker clearing logic via extracted utility
+    const blockerPayload = computeBlockerPayload(item.blockedByItemId ?? null, editBlockedBy)
+    Object.assign(updates, blockerPayload)
     if (Object.keys(updates).length > 0) onUpdateItem(c.id, item, updates)
     setEditingId(null)
   }
@@ -320,24 +492,60 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
         </p>
       ) : (
         <div className="space-y-1">
-          {visibleItems.map((item, idx) => {
+          {(() => {
+            const orderedTree = buildOrderedTree(itemsList)
+            return visibleItems.map((item, idx) => {
             const prio = priorityConfig[item.priority as Priority] || priorityConfig.normal
             const depth = treeItems.find(t => t.item.id === item.id)?.depth || 0
             const blocked = isBlocked(item)
+            // Compute the ordered tree index for this item (for drop indicator)
+            const treeIdx = orderedTree.findIndex(i => i.id === item.id)
+            const showDropBefore = draggedId !== null && dropIndicatorIndex === treeIdx
+            const showDropAfter = draggedId !== null && idx === visibleItems.length - 1 && dropIndicatorIndex === orderedTree.length
             return (
               <div key={item.id}>
-                <div draggable={mode !== 'history'} onDragStart={() => { dragItem.current = idx }}
-                  onDragEnter={() => { dragOver.current = idx }} onDragEnd={handleDragEnd} onDragOver={e => e.preventDefault()}
-                  className={`checklist-item-row flex items-center gap-2.5 py-1.5 group/item ${item.completed ? 'opacity-60' : ''} ${blocked ? 'opacity-50' : ''}`}
+                {/* Drop indicator line before this item */}
+                {showDropBefore && (
+                  <div className="h-0.5 rounded-full my-0.5 transition-all" style={{ background: 'var(--color-primary)', marginLeft: `${depth * 20}px` }} />
+                )}
+                <div draggable={mode !== 'history'}
+                  onDragStart={() => handleDragStart(item.id)}
+                  onDragOver={e => handleDragOver(e, idx)}
+                  onDragEnd={handleDragEnd}
+                  onDragLeave={() => {}}
+                  className={`checklist-item-row flex items-center gap-2.5 py-1.5 group/item ${parentsWithChildren.has(item.id) && isParentAutoCompleted(itemsList, item.id) ? 'opacity-60' : item.completed ? 'opacity-60' : ''} ${blocked ? 'opacity-50' : ''} ${draggedId === item.id ? 'opacity-40' : ''}`}
                   style={{ paddingLeft: `${depth * 20}px` }}>
                   {mode !== 'history' && (
                     <span className="material-symbols-outlined cursor-grab text-xs" style={{ color: 'var(--color-text-muted)' }}>drag_indicator</span>
                   )}
-                  <button onClick={() => mode === 'active' && !blocked && onToggleItem(c.id, item)}
-                    className={`checklist-item-checkbox w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'checklist-item-checkbox-checked bg-primary border-primary' : (blocked || mode !== 'active') ? 'cursor-not-allowed' : 'checklist-checkbox-unchecked'}`}
-                    style={!item.completed ? { borderColor: 'var(--color-border-strong)' } : undefined}>
-                    {item.completed && <span className="material-symbols-outlined text-white text-xs">check</span>}
-                  </button>
+                  {/* Chevron toggle for parents with children */}
+                  {parentsWithChildren.has(item.id) ? (
+                    <button
+                      onClick={e => { e.stopPropagation(); toggleCollapse(item.id) }}
+                      className="flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform"
+                      style={{ color: 'var(--color-text-muted)' }}
+                      aria-label={collapsedParents.has(item.id) ? 'Expand children' : 'Collapse children'}
+                    >
+                      <span
+                        className="material-symbols-outlined text-sm transition-transform"
+                        style={{ transform: collapsedParents.has(item.id) ? 'rotate(0deg)' : 'rotate(90deg)' }}
+                      >
+                        chevron_right
+                      </span>
+                    </button>
+                  ) : depth === 0 ? (
+                    <span className="w-5 flex-shrink-0" />
+                  ) : null}
+                  {/* Checkbox: hidden for parents with children; shown for all others */}
+                  {parentsWithChildren.has(item.id) ? (
+                    <span className="w-5 h-5 flex-shrink-0" />
+                  ) : (
+                    <button onClick={() => mode === 'active' && !blocked && onToggleItem(c.id, item)}
+                      className={`checklist-item-checkbox w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.completed ? 'checklist-item-checkbox-checked bg-primary border-primary' : (blocked || mode !== 'active') ? 'cursor-not-allowed' : 'checklist-checkbox-unchecked'}`}
+                      style={!item.completed ? { borderColor: 'var(--color-border-strong)' } : undefined}>
+                      {item.completed && <span className="material-symbols-outlined text-white text-xs">check</span>}
+                    </button>
+                  )}
                   {editingId === item.id && mode !== 'history' ? (
                     <div className="flex-1 flex gap-2">
                       <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} autoFocus
@@ -357,9 +565,10 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                       </select>
                     </div>
                   ) : (
+                    <>
                     <span onDoubleClick={() => mode !== 'history' && startEdit(item)}
-                      className={`flex-1 text-sm ${item.completed ? 'checklist-item-completed line-through' : blocked ? 'checklist-item-blocked' : ''}`}
-                      style={{ color: item.completed || blocked ? 'var(--color-text-muted)' : 'var(--color-text-primary)' }}>
+                      className={`flex-1 text-sm ${parentsWithChildren.has(item.id) && isParentAutoCompleted(itemsList, item.id) ? 'checklist-item-completed line-through' : item.completed ? 'checklist-item-completed line-through' : blocked ? 'checklist-item-blocked' : ''}`}
+                      style={{ color: (parentsWithChildren.has(item.id) && isParentAutoCompleted(itemsList, item.id)) || item.completed || blocked ? 'var(--color-text-muted)' : 'var(--color-text-primary)' }}>
                       {item.title}
                       {blocked && (
                         <span className="checklist-item-blocked-badge ml-2 text-xs inline-flex items-center gap-0.5" style={{ color: 'var(--color-warning)' }}>
@@ -371,6 +580,16 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                         <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>({item.effortEstimate}m)</span>
                       )}
                     </span>
+                    {/* Subtask progress counter for parents with children */}
+                    {parentsWithChildren.has(item.id) && (() => {
+                      const progress = getSubtaskProgress(itemsList, item.id)
+                      return (
+                        <span className="text-xs font-medium flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>
+                          {progress.completed}/{progress.total}
+                        </span>
+                      )
+                    })()}
+                    </>
                   )}
                   {mode !== 'history' && (
                     <>
@@ -418,12 +637,28 @@ function ExpandedItems({ checklist: c, onToggleItem, onUpdateItem, onDeleteItem,
                     </div>
                   </div>
                 )}
+                {/* Drop indicator line after this item (for last item or trailing position) */}
+                {showDropAfter && (
+                  <div className="h-0.5 rounded-full my-0.5 transition-all" style={{ background: 'var(--color-primary)' }} />
+                )}
               </div>
             )
-          })}
+          })
+          })()}
         </div>
       )}
       {mode !== 'history' && <InlineItemInput onAdd={(title, priority, parentId) => onAddItem(c.id, title, priority, parentId)} checklistItems={itemsList} />}
+
+      {dragError && (
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg text-sm"
+          style={{ background: 'var(--color-danger)', color: 'white' }}>
+          <span className="material-symbols-outlined text-sm">error</span>
+          {dragError}
+          <button onClick={() => setDragError(null)} className="ml-2 hover:opacity-80">
+            <span className="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+      )}
 
       {undoItem && <UndoToast message={t('checklists.expandedItems.deleted', { title: undoItem.item.title })} onUndo={handleUndo} onClose={dismissUndo} />}
     </div>
