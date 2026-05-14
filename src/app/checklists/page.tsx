@@ -153,7 +153,13 @@ export default function ChecklistsPage() {
 
   const handleReorder = async (checklistId: number, items: ChecklistItem[]) => {
     updateChecklistItems(checklistId, () => items)
-    await Promise.all(items.map(item => api(`/api/checklists/${checklistId}/items/${item.id}`, 'PUT', { position: item.position })))
+    const results = await Promise.allSettled(
+      items.map(item => api(`/api/checklists/${checklistId}/items/${item.id}`, 'PUT', { position: item.position, parentId: item.parentId ?? null }))
+    )
+    const failed = results.filter(r => r.status === 'rejected')
+    if (failed.length > 0) {
+      throw new Error('One or more reorder requests failed')
+    }
   }
 
   const handleCreateReminder = async (checklistId: number, item: ChecklistItem) => {

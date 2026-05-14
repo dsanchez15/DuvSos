@@ -68,6 +68,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         blockedByItemId: blockedByItemId || null,
       },
     })
+
+    // Parent sync: if the new child is incomplete and its parent is completed, uncomplete the parent
+    if (parentId && !item.completed) {
+      const parentItem = await prisma.checklistItem.findUnique({
+        where: { id: parentId },
+        select: { completed: true },
+      })
+      if (parentItem?.completed) {
+        await prisma.checklistItem.update({
+          where: { id: parentId },
+          data: { completed: false },
+        })
+      }
+    }
+
     return NextResponse.json(item, { status: 201 })
   } catch (error) {
     console.error('Error creating item:', error)

@@ -35,11 +35,25 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (body.effortEstimate !== undefined) updateData.effortEstimate = body.effortEstimate || null
 
     if (body.completed !== undefined) {
+      const currentItem = await prisma.checklistItem.findUnique({
+        where: { id: parseInt(itemId) },
+      })
+
+      // Reject manual completion on parent items that have children
+      if (body.completed) {
+        const children = await prisma.checklistItem.findMany({
+          where: { checklistId, parentId: parseInt(itemId) },
+        })
+        if (children.length > 0) {
+          return NextResponse.json(
+            { error: 'Parent items with children cannot be manually completed' },
+            { status: 400 }
+          )
+        }
+      }
+
       // Dependency blocking logic
       if (body.completed) {
-        const currentItem = await prisma.checklistItem.findUnique({
-          where: { id: parseInt(itemId) },
-        })
         if (currentItem?.blockedByItemId) {
           const blocker = await prisma.checklistItem.findUnique({
             where: { id: currentItem.blockedByItemId },
@@ -60,7 +74,35 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data: updateData,
     })
 
-    // Auto-complete logic: check if all items are done
+    // Parent auto-completion logic
+    if (body.completed !== undefined && item.parentId) {
+      if (body.completed) {
+        // Child was completed: check if all siblings are now completed → auto-complete parent
+        const siblings = await prisma.checklistItem.findMany({
+          where: { checklistId, parentId: item.parentId },
+        })
+        const allSiblingsCompleted = siblings.every((s: any) => s.completed)
+        if (allSiblingsCompleted) {
+          await prisma.checklistItem.update({
+            where: { id: item.parentId },
+            data: { completed: true },
+          })
+        }
+      } else {
+        // Child was unchecked: if parent is completed → set parent.completed = false
+        const parent = await prisma.checklistItem.findUnique({
+          where: { id: item.parentId },
+        })
+        if (parent?.completed) {
+          await prisma.checklistItem.update({
+            where: { id: item.parentId },
+            data: { completed: false },
+          })
+        }
+      }
+    }
+
+    // Lifecycle auto-complete logic: check if all items are done
     if (body.completed !== undefined) {
       const allItems = await prisma.checklistItem.findMany({
         where: { checklistId },
@@ -94,10 +136,31 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { id, itemId } = await params
-    const checklist = await prisma.checklist.findFirst({ where: { id: parseInt(id), userId } })
+    const checklistId = parseInt(id)
+    const checklist = await prisma.checklist.findFirst({ where: { id: checklistId, userId } })
     if (!checklist) return NextResponse.json({ error: 'Checklist not found' }, { status: 404 })
 
+    // Fetch the item before deletion to check if it has a parent
+    const itemToDelete = await prisma.checklistItem.findUnique({
+      where: { id: parseInt(itemId) },
+    })
+
     await prisma.checklistItem.delete({ where: { id: parseInt(itemId) } })
+
+    // Parent sync on delete: if the deleted item had a parentId,
+    // check if all remaining siblings are completed → auto-complete parent
+    if (itemToDelete?.parentId) {
+      const remainingSiblings = await prisma.checklistItem.findMany({
+        where: { checklistId, parentId: itemToDelete.parentId },
+      })
+      if (remainingSiblings.length > 0 && remainingSiblings.every((s: any) => s.completed)) {
+        await prisma.checklistItem.update({
+          where: { id: itemToDelete.parentId },
+          data: { completed: true },
+        })
+      }
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting item:', error)
