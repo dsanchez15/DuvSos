@@ -124,12 +124,12 @@ export default function NewGoalPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+            <div className="p-4 rounded-[8px] bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
 
-          <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
@@ -140,7 +140,7 @@ export default function NewGoalPage() {
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   placeholder={t('goals.titlePlaceholder')}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full px-4 py-2 rounded-[8px] border"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   required
                 />
@@ -155,7 +155,7 @@ export default function NewGoalPage() {
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder={t('goals.descriptionPlaceholder')}
                   rows={3}
-                  className="w-full px-4 py-2 rounded-lg border resize-none"
+                  className="w-full px-4 py-2 rounded-[8px] border resize-none"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                 />
               </div>
@@ -168,7 +168,7 @@ export default function NewGoalPage() {
                   <select
                     value={form.category}
                     onChange={e => setForm(f => ({ ...f, category: e.target.value as 'PROFESIONAL' | 'PERSONAL' }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="PERSONAL">{t('goals.categoryPersonal')}</option>
@@ -183,7 +183,7 @@ export default function NewGoalPage() {
                   <select
                     value={form.priority}
                     onChange={e => setForm(f => ({ ...f, priority: e.target.value as 'ALTA' | 'MEDIA' | 'BAJA' }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="BAJA">{priorityLabel('BAJA')}</option>
@@ -201,7 +201,7 @@ export default function NewGoalPage() {
                   <select
                     value={form.phaseId}
                     onChange={e => setForm(f => ({ ...f, phaseId: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="">{t('goals.noPhase')}</option>
@@ -221,7 +221,7 @@ export default function NewGoalPage() {
                     type="date"
                     value={form.deadline}
                     onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -237,7 +237,7 @@ export default function NewGoalPage() {
                     value={form.estimatedHours}
                     onChange={e => setForm(f => ({ ...f, estimatedHours: e.target.value }))}
                     placeholder="40"
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -245,7 +245,7 @@ export default function NewGoalPage() {
             </div>
           </div>
 
-          <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 {t('goals.milestones')}
@@ -253,7 +253,7 @@ export default function NewGoalPage() {
               <button
                 type="button"
                 onClick={addMilestone}
-                className="text-sm px-3 py-1 rounded-lg border border-dashed"
+                className="text-sm px-3 py-1 rounded-[8px] border border-dashed"
                 style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
               >
                 {t('goals.addMilestone')}
@@ -274,7 +274,7 @@ export default function NewGoalPage() {
                         value={m.title}
                         onChange={e => updateMilestone(i, 'title', e.target.value)}
                         placeholder={t('goals.milestoneTitlePlaceholder')}
-                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        className="w-full px-3 py-2 rounded-[8px] border text-sm"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
                       <div>
@@ -282,7 +282,7 @@ export default function NewGoalPage() {
                           type="date"
                           value={m.targetDate}
                           onChange={e => updateMilestone(i, 'targetDate', e.target.value)}
-                          className={`w-full px-3 py-2 rounded-lg border text-sm ${milestoneErrors[i] ? 'border-red-500' : ''}`}
+                          className={`w-full px-3 py-2 rounded-[8px] border text-sm ${milestoneErrors[i] ? 'border-red-500' : ''}`}
                           style={{ background: 'var(--color-bg-input)', borderColor: milestoneErrors[i] ? '#ef4444' : 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         />
                         {milestoneErrors[i] && (
@@ -293,7 +293,7 @@ export default function NewGoalPage() {
                     <button
                       type="button"
                       onClick={() => removeMilestone(i)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-[8px]"
                     >
                       ✕
                     </button>
@@ -306,7 +306,7 @@ export default function NewGoalPage() {
           <div className="flex gap-3">
             <a
               href="/goals"
-              className="flex-1 px-4 py-2 rounded-lg border font-medium text-center"
+              className="flex-1 px-4 py-2 rounded-[8px] border font-medium text-center"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
               {t('common.cancel')}
@@ -314,7 +314,7 @@ export default function NewGoalPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
               {loading ? t('common.loading') : t('common.create')}
             </button>
