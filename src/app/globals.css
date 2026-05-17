@@ -116,7 +116,9 @@ body {
 }
 
 .dashboard-card:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
 }
 
 /* Todo component token-based hover states */
