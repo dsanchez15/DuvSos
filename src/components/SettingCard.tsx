@@ -1,7 +1,7 @@
 export default function SettingCard({ children }: { children: React.ReactNode }) {
     return (
         <section
-            className="border rounded-xl p-6"
+            className="border rounded-[8px] p-6"
             style={{
                 background: 'var(--color-bg-surface)',
                 borderColor: 'var(--color-border)',

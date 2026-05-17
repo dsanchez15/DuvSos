@@ -254,7 +254,7 @@ export default function SettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.fullName')}</label>
                                         <input
-                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            className="w-full border border-primary/20 rounded-[8px] px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                             style={{ background: 'var(--color-bg-input)' }}
                                             type="text"
                                             value={user?.name || ''}
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.emailAddress')}</label>
                                         <input
-                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                            className="w-full border border-primary/20 rounded-[8px] px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                             style={{ background: 'var(--color-bg-input)' }}
                                             type="email"
                                             value={user?.email || ''}
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                                     <div className="md:col-span-2 space-y-2">
                                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.bioTagline')}</label>
                                         <textarea
-                                            className="w-full border border-primary/20 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none"
+                                            className="w-full border border-primary/20 rounded-[8px] px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none"
                                             style={{ background: 'var(--color-bg-input)' }}
                                             rows={3}
                                             value={user?.tagline || ''}
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                                 <h2 className="text-lg font-semibold">{t('settings.dashboardConfig')}</h2>
                             </div>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
+                                <div className="flex items-center justify-between p-3 rounded-[8px] settings-row-hover transition-colors">
                                     <div>
                                         <h3 className="font-medium">{t('settings.cardsToDisplay')}</h3>
                                         <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.cardsToDisplayDesc')}</p>
@@ -311,7 +311,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={num}
                                                 onClick={() => { setCardLimit(num); setIsDirty(true); }}
-                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${cardLimit === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
+                                                className={`w-10 h-10 rounded-[8px] border-2 transition-all font-bold ${cardLimit === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
                                                 style={cardLimit !== num ? { borderColor: 'var(--color-border)' } : undefined}
                                             >
                                                 {num}
@@ -319,7 +319,7 @@ export default function SettingsPage() {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
+                                <div className="flex items-center justify-between p-3 rounded-[8px] settings-row-hover transition-colors">
                                     <div>
                                         <h3 className="font-medium">{t('settings.checklistAlert')}</h3>
                                         <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.checklistAlertDesc')}</p>
@@ -329,7 +329,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={num}
                                                 onClick={() => { setChecklistAlertDays(num); setIsDirty(true); }}
-                                                className={`w-10 h-10 rounded-lg border-2 transition-all font-bold ${checklistAlertDays === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
+                                                className={`w-10 h-10 rounded-[8px] border-2 transition-all font-bold ${checklistAlertDays === num ? 'border-primary bg-primary/10 text-primary' : 'settings-num-btn-inactive'}`}
                                                 style={checklistAlertDays !== num ? { borderColor: 'var(--color-border)' } : undefined}
                                             >
                                                 {num}
@@ -354,7 +354,7 @@ export default function SettingsPage() {
                                         {categories.map((cat) => (
                                             <div
                                                 key={cat.id}
-                                                className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-[8px] border"
                                                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}
                                             >
                                                 <span
@@ -377,13 +377,13 @@ export default function SettingsPage() {
                                 )}
 
                                 {showCategoryForm ? (
-                                    <form onSubmit={handleCreateCategory} className="space-y-3 p-4 rounded-xl" style={{ background: 'var(--color-bg-surface-hover)' }}>
+                                    <form onSubmit={handleCreateCategory} className="space-y-3 p-4 rounded-[8px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
                                         <input
                                             type="text"
                                             value={newCategoryName}
                                             onChange={(e) => setNewCategoryName(e.target.value)}
                                             placeholder={t('settings.categoryNamePlaceholder')}
-                                            className="w-full px-4 py-2 rounded-lg border"
+                                            className="w-full px-4 py-2 rounded-[8px] border"
                                             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}
                                             autoFocus
                                         />
@@ -413,7 +413,7 @@ export default function SettingsPage() {
                                             <button
                                                 type="submit"
                                                 disabled={!newCategoryName.trim()}
-                                                className="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 disabled:opacity-50"
+                                                className="px-4 py-2 bg-primary text-white rounded-[8px] text-sm hover:bg-primary/90 disabled:opacity-50"
                                             >
                                                 {t('common.create')}
                                             </button>
@@ -422,7 +422,7 @@ export default function SettingsPage() {
                                 ) : (
                                     <button
                                         onClick={() => setShowCategoryForm(true)}
-                                        className="px-4 py-2 border border-primary/30 text-primary rounded-lg hover:bg-primary/5 text-sm font-medium transition-colors"
+                                        className="px-4 py-2 border border-primary/30 text-primary rounded-[8px] hover:bg-primary/5 text-sm font-medium transition-colors"
                                     >
                                         {t('settings.newCategory')}
                                     </button>
@@ -442,7 +442,7 @@ export default function SettingsPage() {
                                     { title: t('settings.weeklySummary'), desc: t('settings.weeklySummaryDesc') },
                                     { title: t('settings.soundEffects'), desc: t('settings.soundEffectsDesc') }
                                 ].map((pref, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 rounded-lg settings-row-hover transition-colors">
+                                    <div key={i} className="flex items-center justify-between p-3 rounded-[8px] settings-row-hover transition-colors">
                                         <div>
                                             <h3 className="font-medium">{pref.title}</h3>
                                             <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{pref.desc}</p>
@@ -470,7 +470,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={v}
                                                 onClick={() => changeVisualTheme(v)}
-                                                className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all ${visualTheme === v ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
+                                                className={`flex flex-col items-center gap-2 p-4 border-2 rounded-[8px] transition-all ${visualTheme === v ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
                                                 <ThemePreview theme={v} isDark={isDark} />
                                                 <span className="text-sm font-medium capitalize">{v === 'retrofuturista' ? 'Retrofuturista' : 'Classic'}</span>
@@ -488,7 +488,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={l.code}
                                                 onClick={() => changeLanguage(l.code)}
-                                                className={`flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${selectedLang === l.code ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
+                                                className={`flex items-center gap-3 p-4 border-2 rounded-[8px] transition-all ${selectedLang === l.code ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
                                                 <span className="text-2xl">{l.flag}</span>
                                                 <span className="text-sm font-medium">{l.label}</span>
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                                             <button
                                                 key={m}
                                                 onClick={() => changeTheme(m)}
-                                                className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all ${theme === m ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
+                                                className={`flex flex-col items-center gap-2 p-4 border-2 rounded-[8px] transition-all ${theme === m ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
                                             >
                                                 <span className={`material-symbols-outlined ${theme === m ? 'text-primary' : ''}`} style={theme !== m ? { color: 'var(--color-text-muted)' } : undefined}>
                                                     {m === 'light' ? 'light_mode' : m === 'dark' ? 'dark_mode' : 'settings_brightness'}
@@ -527,7 +527,7 @@ export default function SettingsPage() {
                                     <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{t('settings.resetAllData')}</h3>
                                     <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.resetAllDataDesc')}</p>
                                 </div>
-                                <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg font-medium transition-all">{t('settings.resetAccount')}</button>
+                                <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-[8px] font-medium transition-all">{t('settings.resetAccount')}</button>
                             </div>
                         </SettingCard>
                     </div>
@@ -539,14 +539,14 @@ export default function SettingsPage() {
                     <div className="flex gap-3 ml-auto">
                         <button
                             onClick={handleDiscard}
-                            className="px-6 py-2 border rounded-lg font-medium transition-colors settings-discard-btn"
+                            className="px-6 py-2 border rounded-[8px] font-medium transition-colors settings-discard-btn"
                             style={{ borderColor: 'var(--color-border)' }}
                         >
                             {t('settings.discard')}
                         </button>
                         <button
                             onClick={handleSave}
-                            className="px-8 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg font-semibold shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
+                            className="px-8 py-2 bg-primary text-white hover:bg-primary/90 rounded-[8px] font-semibold shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                         >
                             <span className="material-symbols-outlined text-sm">save</span>
                             {t('settings.saveChanges')}
