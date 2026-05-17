@@ -101,7 +101,7 @@ export default function Sidebar() {
 
     const getLinkClass = (path: string) => {
         const isActive = pathname === path;
-        const baseClass = "flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap";
+        const baseClass = "flex items-center gap-4 px-4 py-3 rounded-[8px] transition-all group whitespace-nowrap";
         return isActive ? `${baseClass} active` : `${baseClass} text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]`;
     };
 
@@ -207,7 +207,7 @@ export default function Sidebar() {
                 {/* Logo */}
                 <div className="px-6 mb-10 flex items-center gap-3">
                     <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0"
+                        className="w-10 h-10 rounded-[8px] flex items-center justify-center text-white shadow-lg shrink-0"
                         style={{ background: 'var(--deco-logo-bg)', boxShadow: 'var(--deco-logo-shadow)' }}
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -271,7 +271,7 @@ export default function Sidebar() {
                     {/* Plan Section */}
                     <button
                         onClick={() => setPlanExpanded(!planExpanded)}
-                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all group whitespace-nowrap relative ${
+                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-[8px] transition-all group whitespace-nowrap relative ${
                             pathname.startsWith('/goals') || pathname.startsWith('/progress')
                                 ? 'active'
                                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
@@ -318,7 +318,7 @@ export default function Sidebar() {
                         aria-expanded={profileMenuOpen}
                         aria-haspopup="menu"
                         aria-controls="profile-menu"
-                        className="flex items-center gap-3 w-full p-2 rounded-xl transition-colors text-left sidebar-profile-btn"
+                        className="flex items-center gap-3 w-full p-2 rounded-[8px] transition-colors text-left sidebar-profile-btn"
                     >
                         <img
                             src={user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=random"}
@@ -347,7 +347,7 @@ export default function Sidebar() {
                             ref={profileMenuRef}
                             id="profile-menu"
                             role="menu"
-                            className="absolute left-4 right-4 bottom-full mb-2 rounded-xl shadow-lg border py-1 z-50"
+                            className="absolute left-4 right-4 bottom-full mb-2 rounded-[8px] shadow-lg border py-1 z-50"
                             style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
                         >
                             <Link
@@ -391,7 +391,7 @@ export default function Sidebar() {
                 aria-expanded={isMobileOverlayOpen}
                 aria-controls="main-sidebar"
                 aria-label={isMobileOverlayOpen ? 'Close sidebar' : 'Open sidebar'}
-                className="fixed top-4 left-4 z-50 p-2 border border-primary/10 rounded-lg shadow-sm lg:hidden"
+                className="fixed top-4 left-4 z-50 p-2 border border-primary/10 rounded-[8px] shadow-sm lg:hidden"
                 style={{ background: 'var(--color-bg-surface)' }}
             >
                 <span className="material-symbols-outlined">{isMobileOverlayOpen ? 'close' : 'menu'}</span>

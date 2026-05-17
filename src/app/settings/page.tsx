@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import SettingCard from '@/components/SettingCard';
 import AppLayout from '@/components/AppLayout';
 import Toast from '@/components/Toast';
-import ThemePreview from '@/components/ThemePreview';
 import { useAppTranslation } from '@/components/LanguageProvider';
 
 const CATEGORY_COLORS = [
@@ -28,15 +27,7 @@ export default function SettingsPage() {
         }
         return 'system';
     });
-    const [visualTheme, setVisualTheme] = useState<'classic' | 'retrofuturista'>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('app-visual-theme');
-            if (saved && ['classic', 'retrofuturista'].includes(saved)) {
-                return saved as 'classic' | 'retrofuturista';
-            }
-        }
-        return 'classic';
-    });
+
     const [selectedLang, setSelectedLang] = useState<'en' | 'es'>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('app-language');
@@ -74,9 +65,7 @@ export default function SettingsPage() {
                     if (data.user.checklistAlertDays !== undefined) {
                         setChecklistAlertDays(data.user.checklistAlertDays);
                     }
-                    if (data.user.visualTheme) {
-                        setVisualTheme(data.user.visualTheme as 'classic' | 'retrofuturista');
-                    }
+
                     if (data.user.language) {
                         setSelectedLang(data.user.language as 'en' | 'es');
                     }
@@ -154,16 +143,7 @@ export default function SettingsPage() {
         setIsDirty(true);
     };
 
-    const applyVisualTheme = (vt: 'classic' | 'retrofuturista') => {
-        const root = document.documentElement;
-        root.setAttribute('data-visual-theme', vt);
-    };
 
-    const changeVisualTheme = (newVisual: 'classic' | 'retrofuturista') => {
-        setVisualTheme(newVisual);
-        applyVisualTheme(newVisual);
-        setIsDirty(true);
-    };
 
     const changeLanguage = (newLang: 'en' | 'es') => {
         setSelectedLang(newLang);
@@ -174,7 +154,7 @@ export default function SettingsPage() {
     const handleSave = async () => {
         try {
             localStorage.setItem('app-theme', theme);
-            localStorage.setItem('app-visual-theme', visualTheme);
+            localStorage.setItem('app-visual-theme', 'classic');
             localStorage.setItem('app-language', selectedLang);
             localStorage.setItem('dashboard-card-limit', cardLimit.toString());
 
@@ -187,7 +167,7 @@ export default function SettingsPage() {
                         email: user.email,
                         tagline: user.tagline,
                         theme: theme,
-                        visualTheme: visualTheme,
+
                         language: selectedLang,
                         checklistAlertDays: checklistAlertDays,
                     }),
@@ -463,21 +443,6 @@ export default function SettingsPage() {
                                 <h2 className="text-lg font-semibold">{t('settings.themeAppearance')}</h2>
                             </div>
                             <div className="space-y-6">
-                                <div>
-                                    <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.visualStyle')}</label>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {(['classic', 'retrofuturista'] as const).map((v) => (
-                                            <button
-                                                key={v}
-                                                onClick={() => changeVisualTheme(v)}
-                                                className={`flex flex-col items-center gap-2 p-4 border-2 rounded-[8px] transition-all ${visualTheme === v ? 'border-primary bg-primary/5' : 'border-primary/10 hover:border-primary/30'}`}
-                                            >
-                                                <ThemePreview theme={v} isDark={isDark} />
-                                                <span className="text-sm font-medium capitalize">{v === 'retrofuturista' ? 'Retrofuturista' : 'Classic'}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
                                 <div>
                                     <label className="text-sm font-medium block mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('settings.language')}</label>
                                     <div className="grid grid-cols-2 gap-4">

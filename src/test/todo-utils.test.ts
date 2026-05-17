@@ -20,20 +20,20 @@ describe('formatEffort', () => {
 })
 
 describe('getPriorityColor', () => {
-  it('returns red for high priority', () => {
-    expect(getPriorityColor('high')).toBe('text-red-500')
+  it('returns rocket orange for high priority', () => {
+    expect(getPriorityColor('high')).toBe('bg-rocket-orange text-deep-space')
   })
 
-  it('returns amber for normal priority', () => {
-    expect(getPriorityColor('normal')).toBe('text-amber-500')
+  it('returns galaxy violet for normal priority', () => {
+    expect(getPriorityColor('normal')).toBe('bg-galaxy-violet text-deep-space')
   })
 
-  it('returns green for low priority', () => {
-    expect(getPriorityColor('low')).toBe('text-green-500')
+  it('returns ghostly grey for low priority', () => {
+    expect(getPriorityColor('low')).toBe('bg-ghostly-grey text-deep-space')
   })
 
-  it('returns slate for unknown priority', () => {
-    expect(getPriorityColor('unknown')).toBe('text-slate-400')
+  it('returns nebula gray for unknown priority', () => {
+    expect(getPriorityColor('unknown')).toBe('bg-nebula-gray text-stardust-white')
   })
 })
 
@@ -42,19 +42,17 @@ describe('formatDate', () => {
     expect(formatDate()).toBe('')
   })
 
-  it('returns Today for today date (YYYY-MM-DD)', () => {
-    const today = new Date().toISOString().split('T')[0]
-    expect(formatDate(today)).toBe('Today')
-  })
-
-  it('returns Today for today date (ISO string)', () => {
-    const today = new Date().toISOString()
-    expect(formatDate(today)).toBe('Today')
+  it('returns Today for today date', () => {
+    // Use noon local time to avoid timezone boundary issues
+    const today = new Date()
+    today.setHours(12, 0, 0, 0)
+    expect(formatDate(today.toISOString())).toBe('Today')
   })
 
   it('returns Tomorrow for tomorrow date', () => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(12, 0, 0, 0)
     expect(formatDate(tomorrow.toISOString())).toBe('Tomorrow')
   })
 

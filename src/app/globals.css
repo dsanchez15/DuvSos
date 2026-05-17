@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens-base.css";
 @import "../styles/tokens-classic.css";
-@import "../styles/tokens-retrofuturista.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
