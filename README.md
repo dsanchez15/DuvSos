@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Habit Tracker
 
-## Getting Started
+Aplicación de seguimiento de hábitos, metas y productividad personal construida con Next.js.
 
-First, run the development server:
+## Características
+
+- **Hábitos**: Seguimiento diario de hábitos personales
+- **Metas (Goals)**: Definición de objetivos con fases y milestones
+- **Checklists**: Listas de verificación para tareas específicas
+- **Todos**: Gestión de tareas pendientes
+- **Progreso**: Visualización del avance en el tiempo
+- **Recordatorios**: Sistema de reminders para mantener el foco
+- **Check-in**: Registro diario de estado y actividades
+- **Dashboard**: Vista general de toda la actividad
+
+## Tecnologías
+
+- [Next.js](https://nextjs.org) 16
+- [React](https://react.dev) 19
+- [TypeScript](https://www.typescriptlang.org)
+- [Tailwind CSS](https://tailwindcss.com) 4
+- [Prisma](https://www.prisma.io) + PostgreSQL (Neon)
+- [Vitest](https://vitest.dev) + Testing Library
+- [pnpm](https://pnpm.io) 11
+
+## Requisitos
+
+- Node.js 20+
+- pnpm 11+
+
+## Empezar
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Instalar dependencias
+pnpm install
+
+# Iniciar servidor de desarrollo
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts disponibles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Descripción |
+|--------|-------------|
+| `pnpm dev` | Servidor de desarrollo |
+| `pnpm build` | Build de producción |
+| `pnpm start` | Servidor de producción |
+| `pnpm test` | Ejecutar tests (Vitest) |
+| `pnpm lint` | Ejecutar ESLint |
+| `pnpm db:sync` | Sincronizar schema de Prisma con la base de datos |
+| `pnpm db:migrate` | Crear y aplicar migraciones de Prisma |
 
-## Learn More
+## Variables de entorno
 
-To learn more about Next.js, take a look at the following resources:
+Crea un archivo `.env.local` basado en `.env.example`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+DATABASE_URL="postgresql://..."
+# otras variables necesarias
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura del proyecto
 
-## Deploy on Vercel
+```
+├── prisma/           # Schema y migraciones de Prisma
+├── src/
+│   ├── app/          # Rutas y páginas de Next.js (App Router)
+│   ├── components/   # Componentes React reutilizables
+│   └── lib/          # Utilidades, hooks y lógica compartida
+├── scripts/          # Scripts de automatización
+└── tests/            # Tests unitarios y de integración
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Despliegue
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este proyecto está optimizado para desplegar en [Vercel](https://vercel.com).
+
+---
+
+*Proyecto privado - Habit Tracker*

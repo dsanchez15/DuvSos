@@ -55,7 +55,7 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
 
   return (
     <div className="delete-modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onCancel}>
-      <div className="checklist-form-modal rounded-2xl w-full max-w-lg shadow-xl" onClick={e => e.stopPropagation()}
+      <div className="checklist-form-modal rounded-[8px] w-full max-w-lg shadow-xl" onClick={e => e.stopPropagation()}
         style={{ background: 'var(--color-bg-surface)' }}>
         <div className="p-6">
           <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>
@@ -65,13 +65,13 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
             <div>
               <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('checklists.form.title')}</label>
               <input type="text" value={title} onChange={e => setTitle(e.target.value)} autoFocus required
-                className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                className="form-input w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
             </div>
             <div>
               <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('checklists.form.description')}</label>
               <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
-                className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                className="form-input w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
             </div>
             <div>
@@ -88,13 +88,13 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
               <div>
                 <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('checklists.form.startDate')}</label>
                 <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                  className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-input w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
               </div>
               <div>
                 <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('checklists.form.endDate')}</label>
                 <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                  className="form-input w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-input w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }} />
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
                 <button type="button" onClick={onManageCategories} className="text-xs text-primary hover:underline">{t('checklists.form.manageCategories')}</button>
               </div>
               <select value={categoryId ?? ''} onChange={e => setCategoryId(e.target.value ? parseInt(e.target.value) : null)}
-                className="form-select w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                className="form-select w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}>
                 <option value="">{t('checklists.form.noCategory')}</option>
                 {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
@@ -121,7 +121,7 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
               <div>
                 <label className="rf-label block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('checklists.form.recurrence')}</label>
                 <select value={recurrencePattern} onChange={e => setRecurrencePattern(e.target.value)}
-                  className="form-select w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-select w-full px-4 py-2.5 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}>
                   <option value="">{t('checklists.form.none')}</option>
                   <option value="EVERY_MONDAY">{t('checklists.form.everyMonday')}</option>
@@ -133,12 +133,12 @@ export default function ChecklistForm({ checklist, categories, onSave, onCancel,
             )}
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onCancel}
-                className="btn-outline checklist-form-cancel flex-1 px-4 py-2.5 rounded-xl border font-medium"
+                className="btn-outline checklist-form-cancel flex-1 px-4 py-2.5 rounded-[8px] border font-medium"
                 style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
                 {t('common.cancel')}
               </button>
               <button type="submit" disabled={!title.trim()}
-                className="btn-neon flex-1 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 font-medium disabled:opacity-50">
+                className="btn-neon flex-1 px-4 py-2.5 bg-primary text-white rounded-[8px] hover:bg-primary/90 font-medium disabled:opacity-50">
                 {checklist ? t('common.save') : t('common.create')}
               </button>
             </div>

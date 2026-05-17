@@ -71,14 +71,14 @@ export default function GoalsPage() {
           <div className="flex gap-2">
             <a
               href="/goals/phases"
-              className="px-4 py-2 border rounded-lg font-medium hover:bg-primary/5 transition-colors"
+              className="px-4 py-2 border rounded-[8px] font-medium hover:bg-primary/5 transition-colors"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
               {t('goals.phases')}
             </a>
             <a
               href="/goals/new"
-              className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors"
             >
               + {t('goals.newGoal')}
             </a>
@@ -101,7 +101,7 @@ export default function GoalsPage() {
           <select
             value={categoryFilter}
             onChange={e => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border"
+            className="px-3 py-2 rounded-[8px] border"
             style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
           >
             <option value="">{t('goals.allCategories')}</option>
@@ -117,7 +117,7 @@ export default function GoalsPage() {
         ) : error ? (
           <p className="text-center py-8 text-red-500">{error}</p>
         ) : goals.length === 0 ? (
-          <div className="text-center py-12 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
+          <div className="text-center py-12 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
             <p className="text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>
               {t('goals.noGoals')}
             </p>
@@ -126,7 +126,7 @@ export default function GoalsPage() {
             </p>
             <a
               href="/goals/new"
-              className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block"
+              className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors inline-block"
             >
               {t('goals.newGoal')}
             </a>
@@ -145,7 +145,7 @@ export default function GoalsPage() {
                       e.stopPropagation()
                       deleteGoal(goal.id)
                     }}
-                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors"
+                    className="absolute top-2 right-2 p-2 rounded-[8px] bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors"
                     title={t('goals.actions.deleteGoal')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

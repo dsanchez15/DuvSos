@@ -628,7 +628,7 @@ export default function TodoList() {
     return (
       <div className="text-center py-12">
         <p style={{ color: 'var(--color-danger)' }}>{error}</p>
-        <button onClick={fetchTodos} className="btn-neon mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+        <button onClick={fetchTodos} className="btn-neon mt-4 px-4 py-2 bg-primary text-white rounded-[8px] hover:bg-primary/90">
           {t('todos.retry')}
         </button>
       </div>
@@ -649,21 +649,21 @@ export default function TodoList() {
         {metrics && (
           <div className="flex gap-3 text-sm flex-wrap">
             <div
-              className="todo-metric-card px-3 py-2 rounded-lg"
+              className="todo-metric-card px-3 py-2 rounded-[8px]"
               style={{ background: 'color-mix(in srgb, var(--color-info) 10%, transparent)' }}
             >
               <span className="metric-value font-bold" style={{ color: 'var(--color-info)' }}>{metrics.today.pending}</span>
               <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{t('todos.today')}</span>
             </div>
             <div
-              className="todo-metric-card px-3 py-2 rounded-lg"
+              className="todo-metric-card px-3 py-2 rounded-[8px]"
               style={{ background: 'color-mix(in srgb, var(--color-warning) 10%, transparent)' }}
             >
               <span className="metric-value font-bold" style={{ color: 'var(--color-warning)' }}>{metrics.overdue}</span>
               <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{t('todos.overdue')}</span>
             </div>
             <div
-              className="todo-metric-card px-3 py-2 rounded-lg"
+              className="todo-metric-card px-3 py-2 rounded-[8px]"
               style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}
             >
               <span className="metric-value font-bold" style={{ color: 'var(--color-primary)' }}>{formatEffort(metrics.totalEffortMinutes)}</span>
@@ -676,7 +676,7 @@ export default function TodoList() {
       {/* API Error Banner */}
       {apiError && (
         <div
-          className="todo-error-banner flex items-center gap-3 p-4 border rounded-xl"
+          className="todo-error-banner flex items-center gap-3 p-4 border rounded-[8px]"
           style={{
             background: 'color-mix(in srgb, var(--color-danger) 8%, transparent)',
             borderColor: 'color-mix(in srgb, var(--color-danger) 30%, transparent)',
@@ -698,7 +698,7 @@ export default function TodoList() {
       <div className="flex flex-wrap gap-2 items-center">
         {/* View Mode */}
         <div
-          className="todo-view-tabs flex rounded-lg p-1"
+          className="todo-view-tabs flex rounded-[8px] p-1"
           style={{ background: 'var(--color-bg-surface-hover)' }}
         >
               {(['all', 'today', 'week'] as ViewMode[]).map((mode) => (
@@ -723,7 +723,7 @@ export default function TodoList() {
         <select
           value={groupBy}
           onChange={(e) => setGroupBy(e.target.value as GroupBy)}
-          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          className="todo-select px-3 py-2 rounded-[8px] border text-sm"
           style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="none">{t('todos.groupBy.none')}</option>
@@ -741,7 +741,7 @@ export default function TodoList() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('todos.searchPlaceholder')}
-            className="todo-search w-full pl-9 pr-9 py-2 rounded-lg border text-sm"
+            className="todo-search w-full pl-9 pr-9 py-2 rounded-[8px] border text-sm"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
           {searchQuery && (
@@ -759,7 +759,7 @@ export default function TodoList() {
         <select
           value={filterPriority}
           onChange={(e) => setFilterPriority(e.target.value)}
-          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          className="todo-select px-3 py-2 rounded-[8px] border text-sm"
           style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">{t('todos.priorities.all')}</option>
@@ -772,7 +772,7 @@ export default function TodoList() {
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          className="todo-select px-3 py-2 rounded-[8px] border text-sm"
           style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">{t('common.all')}</option>
@@ -785,7 +785,7 @@ export default function TodoList() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-          className="todo-select px-3 py-2 rounded-lg border text-sm"
+          className="todo-select px-3 py-2 rounded-[8px] border text-sm"
           style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
         >
           <option value="">{t('todos.statuses.all')}</option>
@@ -797,7 +797,7 @@ export default function TodoList() {
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="todo-clear-filters px-3 py-2 text-sm rounded-lg transition-colors"
+            className="todo-clear-filters px-3 py-2 text-sm rounded-[8px] transition-colors"
             style={{ color: 'var(--color-danger)' }}
           >
             {t('todos.clearFilters')}
@@ -814,20 +814,20 @@ export default function TodoList() {
             value={newTodoTitle}
             onChange={(e) => setNewTodoTitle(e.target.value)}
             placeholder={t('todos.addPlaceholder')}
-            className="todo-add-input flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
+            className="todo-add-input flex-1 px-4 py-3 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
           <button
             type="submit"
             disabled={!newTodoTitle.trim()}
-            className="btn-neon px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-neon px-6 py-3 bg-primary text-white rounded-[8px] hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('todos.add')}
           </button>
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="btn-outline px-3 py-3 border rounded-xl todo-advanced-toggle"
+            className="btn-outline px-3 py-3 border rounded-[8px] todo-advanced-toggle"
             style={{ borderColor: 'var(--color-border)' }}
             title={t('todos.advancedOptions')}
           >
@@ -839,7 +839,7 @@ export default function TodoList() {
 
         {showAdvanced && (
           <div
-            className="todo-advanced-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-xl"
+            className="todo-advanced-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-[8px]"
             style={{ background: 'var(--color-bg-surface-hover)' }}
           >
             <input
@@ -847,13 +847,13 @@ export default function TodoList() {
               value={newTodoDescription}
               onChange={(e) => setNewTodoDescription(e.target.value)}
               placeholder={t('todos.form.description')}
-              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <select
               value={newTodoPriority}
               onChange={(e) => setNewTodoPriority(e.target.value)}
-              className="todo-select px-3 py-2 rounded-lg border text-sm"
+              className="todo-select px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             >
               <option value="low">{t('todos.lowPriority')}</option>
@@ -864,14 +864,14 @@ export default function TodoList() {
               type="date"
               value={newTodoDueDate}
               onChange={(e) => setNewTodoDueDate(e.target.value)}
-              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <input
               type="time"
               value={newTodoDueTime}
               onChange={(e) => setNewTodoDueTime(e.target.value)}
-              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <input
@@ -881,13 +881,13 @@ export default function TodoList() {
               placeholder={t('todos.effortPlaceholder')}
               min="0"
               step="0.5"
-              className="rf-input px-3 py-2 rounded-lg border text-sm"
+              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             />
             <select
               value={newTodoCategory}
               onChange={(e) => setNewTodoCategory(e.target.value)}
-              className="todo-select sm:col-span-2 lg:col-span-5 px-3 py-2 rounded-lg border text-sm"
+              className="todo-select sm:col-span-2 lg:col-span-5 px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             >
                     <option value="">{t('todos.form.noCategory')}</option>
@@ -918,7 +918,7 @@ export default function TodoList() {
         </div>
       ) : todos.length === 0 ? (
         <div
-          className="empty-state text-center py-16 rounded-xl border border-dashed"
+          className="empty-state text-center py-16 rounded-[8px] border border-dashed"
           style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}
         >
           <span
@@ -936,7 +936,7 @@ export default function TodoList() {
       {editingTodo && (
         <div className="delete-modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div
-            className="todo-edit-modal rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto"
+            className="todo-edit-modal rounded-[8px] p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }}
           >
             <h3 className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('todos.editTitle')}</h3>
@@ -947,7 +947,7 @@ export default function TodoList() {
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="modal-input w-full px-4 py-2 rounded-lg border"
+                  className="modal-input w-full px-4 py-2 rounded-[8px] border"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
@@ -957,7 +957,7 @@ export default function TodoList() {
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   rows={2}
-                  className="modal-input w-full px-4 py-2 rounded-lg border"
+                  className="modal-input w-full px-4 py-2 rounded-[8px] border"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
@@ -967,7 +967,7 @@ export default function TodoList() {
                   <select
                     value={editPriority}
                     onChange={(e) => setEditPriority(e.target.value)}
-                    className="modal-select w-full px-3 py-2 rounded-lg border"
+                    className="modal-select w-full px-3 py-2 rounded-[8px] border"
                     style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   >
                     <option value="low">Low</option>
@@ -980,7 +980,7 @@ export default function TodoList() {
                   <select
                     value={editCategory}
                     onChange={(e) => setEditCategory(e.target.value)}
-                    className="modal-select w-full px-3 py-2 rounded-lg border"
+                    className="modal-select w-full px-3 py-2 rounded-[8px] border"
                     style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   >
               <option value="">{t('todos.noCategory')}</option>
@@ -997,7 +997,7 @@ export default function TodoList() {
                     type="date"
                     value={editDueDate}
                     onChange={(e) => setEditDueDate(e.target.value)}
-                    className="modal-input w-full px-3 py-2 rounded-lg border"
+                    className="modal-input w-full px-3 py-2 rounded-[8px] border"
                     style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -1007,7 +1007,7 @@ export default function TodoList() {
                     type="time"
                     value={editDueTime}
                     onChange={(e) => setEditDueTime(e.target.value)}
-                    className="modal-input w-full px-3 py-2 rounded-lg border"
+                    className="modal-input w-full px-3 py-2 rounded-[8px] border"
                     style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -1020,7 +1020,7 @@ export default function TodoList() {
                   onChange={(e) => setEditEffort(e.target.value)}
                   min="0"
                   step="0.5"
-                  className="modal-input w-full px-3 py-2 rounded-lg border"
+                  className="modal-input w-full px-3 py-2 rounded-[8px] border"
                   style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                 />
               </div>
@@ -1036,7 +1036,7 @@ export default function TodoList() {
               <button
                 onClick={handleEditSave}
                 disabled={!editTitle.trim()}
-                className="btn-neon px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                className="btn-neon px-4 py-2 bg-primary text-white rounded-[8px] hover:bg-primary/90 disabled:opacity-50"
               >
                 {t('common.save')}
               </button>

@@ -249,14 +249,14 @@ export default function GoalDetailPage() {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => setLanguage('es')}
-            className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${lang === 'es' ? 'bg-primary text-white' : 'border'}`}
+            className={`px-3 py-1 rounded-[8px] text-xs font-medium transition-colors ${lang === 'es' ? 'bg-primary text-white' : 'border'}`}
             style={lang === 'es' ? {} : { borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
             ES
           </button>
           <button
             onClick={() => setLanguage('en')}
-            className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'border'}`}
+            className={`px-3 py-1 rounded-[8px] text-xs font-medium transition-colors ${lang === 'en' ? 'bg-primary text-white' : 'border'}`}
             style={lang === 'en' ? {} : { borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
             EN
@@ -265,7 +265,7 @@ export default function GoalDetailPage() {
 
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/goals" className="p-2 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+            <a href="/goals" className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
               ←
             </a>
             <div>
@@ -283,7 +283,7 @@ export default function GoalDetailPage() {
         </header>
 
         {error && (
-          <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+          <div className="p-4 rounded-[8px] bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
             {error}
           </div>
         )}
@@ -292,7 +292,7 @@ export default function GoalDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {!isEditing ? (
               <>
-                <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                     {t('goals.progress.title')}
                   </h3>
@@ -331,7 +331,7 @@ export default function GoalDetailPage() {
                   </div>
                 </div>
 
-                <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                     {t('goals.milestones')} ({goal.milestones?.filter(m => m.completed).length}/{goal.milestones?.length || 0})
                   </h3>
@@ -361,14 +361,14 @@ export default function GoalDetailPage() {
                 </div>
               </>
             ) : (
-              <div className="dashboard-card rounded-xl p-6 border space-y-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="dashboard-card rounded-[8px] p-6 border space-y-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>{t('goals.titleLabel')}</label>
                   <input
                     type="text"
                     value={editForm.title || ''}
                     onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -378,7 +378,7 @@ export default function GoalDetailPage() {
                     value={editForm.description || ''}
                     onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
                     rows={3}
-                    className="w-full px-4 py-2 rounded-lg border resize-none"
+                    className="w-full px-4 py-2 rounded-[8px] border resize-none"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -388,7 +388,7 @@ export default function GoalDetailPage() {
                     <select
                       value={editForm.category || 'PERSONAL'}
                       onChange={e => setEditForm(f => ({ ...f, category: e.target.value as 'PROFESIONAL' | 'PERSONAL' }))}
-                      className="w-full px-4 py-2 rounded-lg border"
+                      className="w-full px-4 py-2 rounded-[8px] border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     >
                       <option value="PERSONAL">{t('goals.categoryPersonal')}</option>
@@ -400,7 +400,7 @@ export default function GoalDetailPage() {
                     <select
                       value={editForm.priority || 'MEDIA'}
                       onChange={e => setEditForm(f => ({ ...f, priority: e.target.value as 'ALTA' | 'MEDIA' | 'BAJA' }))}
-                      className="w-full px-4 py-2 rounded-lg border"
+                      className="w-full px-4 py-2 rounded-[8px] border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     >
                       <option value="BAJA">{t('goals.priorityLow')}</option>
@@ -416,7 +416,7 @@ export default function GoalDetailPage() {
                       type="date"
                       value={editForm.deadline ? new Date(editForm.deadline).toISOString().split('T')[0] : ''}
                       onChange={e => setEditForm(f => ({ ...f, deadline: e.target.value || null }))}
-                      className="w-full px-4 py-2 rounded-lg border"
+                      className="w-full px-4 py-2 rounded-[8px] border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     />
                   </div>
@@ -428,7 +428,7 @@ export default function GoalDetailPage() {
                       min="0"
                       value={editForm.estimatedHours || ''}
                       onChange={e => setEditForm(f => ({ ...f, estimatedHours: e.target.value ? parseFloat(e.target.value) : null }))}
-                      className="w-full px-4 py-2 rounded-lg border"
+                      className="w-full px-4 py-2 rounded-[8px] border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     />
                   </div>
@@ -439,7 +439,7 @@ export default function GoalDetailPage() {
                     <select
                       value={editForm.phaseId || ''}
                       onChange={e => setEditForm(f => ({ ...f, phaseId: e.target.value || null }))}
-                      className="w-full px-4 py-2 rounded-lg border"
+                      className="w-full px-4 py-2 rounded-[8px] border"
                       style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     >
                       <option value="">{t('goals.noPhase')}</option>
@@ -456,7 +456,7 @@ export default function GoalDetailPage() {
                     <button
                       type="button"
                       onClick={addEditMilestone}
-                      className="text-sm px-3 py-1 rounded-lg border border-dashed"
+                      className="text-sm px-3 py-1 rounded-[8px] border border-dashed"
                       style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
                     >
                       {t('goals.addMilestone')}
@@ -474,7 +474,7 @@ export default function GoalDetailPage() {
                               value={m.title}
                               onChange={e => updateEditMilestone(i, 'title', e.target.value)}
                               placeholder={t('goals.milestoneTitlePlaceholder')}
-                              className="w-full px-3 py-2 rounded-lg border text-sm"
+                              className="w-full px-3 py-2 rounded-[8px] border text-sm"
                               style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                             />
                             <div>
@@ -482,7 +482,7 @@ export default function GoalDetailPage() {
                                 type="date"
                                 value={m.targetDate}
                                 onChange={e => updateEditMilestone(i, 'targetDate', e.target.value)}
-                                className={`w-full px-3 py-2 rounded-lg border text-sm ${milestoneErrors[i] ? 'border-red-500' : ''}`}
+                                className={`w-full px-3 py-2 rounded-[8px] border text-sm ${milestoneErrors[i] ? 'border-red-500' : ''}`}
                                 style={{ background: 'var(--color-bg-input)', borderColor: milestoneErrors[i] ? '#ef4444' : 'var(--color-border)', color: 'var(--color-text-primary)' }}
                               />
                               {milestoneErrors[i] && (
@@ -493,7 +493,7 @@ export default function GoalDetailPage() {
                           <button
                             type="button"
                             onClick={() => removeEditMilestone(i)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-[8px]"
                           >
                             ✕
                           </button>
@@ -506,7 +506,7 @@ export default function GoalDetailPage() {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => { setIsEditing(false); setMilestoneErrors({}); setError(''); }}
-                    className="flex-1 px-4 py-2 rounded-lg border font-medium"
+                    className="flex-1 px-4 py-2 rounded-[8px] border font-medium"
                     style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
                   >
                     {t('common.cancel')}
@@ -514,7 +514,7 @@ export default function GoalDetailPage() {
                   <button
                     onClick={handleSaveEdit}
                     disabled={saving}
-                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
                     {saving ? t('common.loading') : t('common.save')}
                   </button>
@@ -524,7 +524,7 @@ export default function GoalDetailPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                 {t('goals.statusLabel')}
               </h3>
@@ -541,7 +541,7 @@ export default function GoalDetailPage() {
               </div>
 
               {canEdit && !isEditing && (
-                <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs">
+                <div className="mt-4 p-3 rounded-[8px] bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs">
                   {t('goals.alerts.noProgress')}
                 </div>
               )}
@@ -552,7 +552,7 @@ export default function GoalDetailPage() {
                     <button
                       onClick={() => handleStatusChange('ACTIVE')}
                       disabled={saving}
-                      className="w-full px-3 py-2 rounded-lg border text-sm hover:bg-primary/5 transition-colors"
+                      className="w-full px-3 py-2 rounded-[8px] border text-sm hover:bg-primary/5 transition-colors"
                       style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
                     >
                       {t('goals.actions.activate')}
@@ -562,7 +562,7 @@ export default function GoalDetailPage() {
                     <button
                       onClick={() => handleStatusChange('PAUSED')}
                       disabled={saving}
-                      className="w-full px-3 py-2 rounded-lg border text-sm hover:bg-primary/5 transition-colors"
+                      className="w-full px-3 py-2 rounded-[8px] border text-sm hover:bg-primary/5 transition-colors"
                       style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
                     >
                       {t('goals.actions.pause')}
@@ -572,7 +572,7 @@ export default function GoalDetailPage() {
                     <button
                       onClick={() => handleStatusChange('COMPLETED')}
                       disabled={saving}
-                      className="w-full px-3 py-2 rounded-lg border text-sm text-emerald-500 hover:bg-emerald-50 transition-colors"
+                      className="w-full px-3 py-2 rounded-[8px] border text-sm text-emerald-500 hover:bg-emerald-50 transition-colors"
                       style={{ borderColor: 'var(--color-border)' }}
                     >
                       {t('goals.actions.complete')}
@@ -586,7 +586,7 @@ export default function GoalDetailPage() {
                   {canEdit && (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="w-full px-3 py-2 rounded-lg text-sm hover:bg-primary/5 transition-colors"
+                      className="w-full px-3 py-2 rounded-[8px] text-sm hover:bg-primary/5 transition-colors"
                       style={{ color: 'var(--color-text-secondary)' }}
                     >
                       {t('goals.actions.editGoal')}
@@ -595,7 +595,7 @@ export default function GoalDetailPage() {
                   {canDelete && (
                     <button
                       onClick={handleDelete}
-                      className="w-full px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition-colors"
+                      className="w-full px-3 py-2 rounded-[8px] text-sm text-red-500 hover:bg-red-50 transition-colors"
                     >
                       {t('goals.actions.deleteGoal')}
                     </button>

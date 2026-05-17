@@ -78,7 +78,7 @@ export default function PhasesPage() {
       <div className="space-y-6">
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <a href="/goals" className="p-2 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+            <a href="/goals" className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
               ←
             </a>
             <div>
@@ -92,14 +92,14 @@ export default function PhasesPage() {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors"
           >
             {showForm ? t('common.cancel') : `+ ${t('phases.newPhase')}`}
           </button>
         </header>
 
         {showForm && (
-          <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
               {t('phases.newPhase')}
             </h3>
@@ -114,7 +114,7 @@ export default function PhasesPage() {
                     min="1"
                     value={form.number}
                     onChange={e => setForm(f => ({ ...f, number: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     required
                   />
@@ -128,7 +128,7 @@ export default function PhasesPage() {
                     value={form.title}
                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                     placeholder="Fundamentos"
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     required
                   />
@@ -143,7 +143,7 @@ export default function PhasesPage() {
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder={t('phases.descriptionPlaceholder')}
                   rows={2}
-                  className="w-full px-4 py-2 rounded-lg border resize-none"
+                  className="w-full px-4 py-2 rounded-[8px] border resize-none"
                   style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                 />
               </div>
@@ -156,7 +156,7 @@ export default function PhasesPage() {
                     type="date"
                     value={form.startDate}
                     onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -168,7 +168,7 @@ export default function PhasesPage() {
                     type="date"
                     value={form.endDate}
                     onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border"
+                    className="w-full px-4 py-2 rounded-[8px] border"
                     style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function PhasesPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {saving ? t('progress.saving') : t('phases.createPhase')}
               </button>
@@ -187,7 +187,7 @@ export default function PhasesPage() {
         {loading ? (
           <p className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>{t('common.loading')}</p>
         ) : phases.length === 0 ? (
-          <div className="text-center py-12 rounded-xl border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
+          <div className="text-center py-12 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
             <p className="text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>{t('phases.noPhases')}</p>
             <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('phases.createPhaseHint')}</p>
           </div>
@@ -196,7 +196,7 @@ export default function PhasesPage() {
             {phases.sort((a, b) => a.number - b.number).map(phase => (
               <div
                 key={phase.id}
-                className="dashboard-card rounded-xl p-6 border relative"
+                className="dashboard-card rounded-[8px] p-6 border relative"
                 style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
               >
                 <div className="flex items-start justify-between">

@@ -61,7 +61,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md p-6">
                 {/* Logo and Title */}
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl mb-4" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' }}>
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-[8px] mb-4" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' }}>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-white">
                             <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" fill="currentColor" fillOpacity="0.3"/>
                             <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
@@ -82,7 +82,7 @@ export default function LoginPage() {
 
                 {/* Main Card */}
                 <div
-                    className="border rounded-xl p-8"
+                    className="border rounded-[8px] p-8"
                     style={{
                         background: 'var(--color-bg-surface)',
                         borderColor: 'var(--color-border)',
@@ -115,7 +115,7 @@ export default function LoginPage() {
                                     style={{ color: 'var(--color-text-muted)' }}
                                 >mail_outline</span>
                                 <input
-                                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 border rounded-[8px] focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                     style={{
                                         background: 'var(--color-bg-input)',
                                         borderColor: 'var(--color-border)',
@@ -144,7 +144,7 @@ export default function LoginPage() {
                                         style={{ color: 'var(--color-text-muted)' }}
                                     >person_outline</span>
                                     <input
-                                        className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                        className="w-full pl-10 pr-4 py-2.5 border rounded-[8px] focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                         style={{
                                             background: 'var(--color-bg-input)',
                                             borderColor: 'var(--color-border)',
@@ -173,7 +173,7 @@ export default function LoginPage() {
                                     style={{ color: 'var(--color-text-muted)' }}
                                 >lock_open</span>
                                 <input
-                                    className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 border rounded-[8px] focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                     style={{
                                         background: 'var(--color-bg-input)',
                                         borderColor: 'var(--color-border)',
@@ -210,7 +210,7 @@ export default function LoginPage() {
                         </div>
 
                         <button
-                            className="w-full flex justify-center items-center py-3 px-4 rounded-lg text-sm font-semibold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full flex justify-center items-center py-3 px-4 rounded-[8px] text-sm font-semibold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             type="submit"
                             disabled={loading}
                         >
@@ -239,14 +239,14 @@ export default function LoginPage() {
             {/* Decorative Elements */}
             <div className="hidden lg:block fixed top-0 right-0 p-12 opacity-20 pointer-events-none">
                 <div className="grid grid-cols-4 gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/30"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/10"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/20"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/40"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/10"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/30"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/10"></div>
-                    <div className="w-12 h-12 rounded-lg bg-primary/20"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/30"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/10"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/20"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/40"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/10"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/30"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/10"></div>
+                    <div className="w-12 h-12 rounded-[8px] bg-primary/20"></div>
                 </div>
             </div>
         </div>

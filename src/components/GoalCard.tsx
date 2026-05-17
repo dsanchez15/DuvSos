@@ -17,7 +17,7 @@ export default function GoalCard({ goal, onClick }: GoalCardProps) {
   return (
     <div
       onClick={onClick}
-      className="dashboard-card rounded-xl p-5 border-l-4 cursor-pointer transition-all hover:shadow-md"
+      className="dashboard-card rounded-[8px] p-5 border-l-4 cursor-pointer transition-all hover:shadow-md"
       style={{
         background: 'var(--color-bg-surface)',
         borderColor: 'var(--color-border)',

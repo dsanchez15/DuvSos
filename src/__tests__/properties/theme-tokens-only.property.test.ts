@@ -3,7 +3,7 @@
  *
  * **Validates: Requirements 1.2, 5.1**
  *
- * Parses `tokens-base.css`, `tokens-classic.css`, `tokens-retrofuturista.css` and
+ * Parses `tokens-base.css`, `tokens-classic.css` and
  * verifies that within theme selectors only custom property declarations (`--*: value`)
  * exist — no rules targeting component class selectors.
  */
@@ -15,7 +15,6 @@ import * as path from 'path'
 const THEME_FILES = [
   'src/styles/tokens-base.css',
   'src/styles/tokens-classic.css',
-  'src/styles/tokens-retrofuturista.css',
 ] as const
 
 /**

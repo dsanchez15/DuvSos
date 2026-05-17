@@ -369,7 +369,7 @@ export default function DashboardPage() {
         <button
           key={day}
           onClick={() => setSelectedDate(new Date(year, month - 1, day))}
-          className={`relative h-20 sm:h-24 rounded-xl border p-1.5 sm:p-2 text-left transition-all overflow-hidden ${
+          className={`relative h-20 sm:h-24 rounded-[8px] border p-1.5 sm:p-2 text-left transition-all overflow-hidden ${
             isSelected
               ? 'border-primary/40 shadow-sm bg-primary/5'
               : ''
@@ -446,7 +446,7 @@ export default function DashboardPage() {
 
             {/* Overload Warning */}
           {isOverloaded && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[8px] p-4 flex items-start gap-3">
               <span className="material-symbols-outlined text-red-500">warning</span>
               <div>
                 <p className="text-sm font-medium text-red-800 dark:text-red-300">{t('dashboard.overloadWarning.title')}</p>
@@ -462,14 +462,14 @@ export default function DashboardPage() {
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.habitTrackers')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {habits.length === 0 && (
-                <div className="col-span-full dashboard-card rounded-2xl border p-8 text-center" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="col-span-full dashboard-card rounded-[8px] border p-8 text-center" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noHabits')}</p>
                 </div>
               )}
               {habits.slice(0, 5).map((habit) => (
                 <div
                   key={habit.id}
-                  className={`dashboard-card rounded-2xl border p-4 transition-all ${
+                  className={`dashboard-card rounded-[8px] border p-4 transition-all ${
                     habit.completedToday
                       ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30'
                       : ''
@@ -518,7 +518,7 @@ export default function DashboardPage() {
                 </a>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-500 flex items-center justify-center">
                       <span className="material-symbols-outlined text-sm">local_fire_department</span>
@@ -529,7 +529,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-500 flex items-center justify-center">
                       <span className="material-symbols-outlined text-sm">schedule</span>
@@ -540,7 +540,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
                       <span className="material-symbols-outlined text-sm">track_changes</span>
@@ -553,7 +553,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               {performanceStats?.nextMilestones && performanceStats.nextMilestones.length > 0 && (
-                <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+                <div className="mt-4 dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                   <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.upcomingMilestones')}</h4>
                   <div className="space-y-2">
                     {performanceStats.nextMilestones.slice(0, 3).map((m: any) => (
@@ -574,7 +574,7 @@ export default function DashboardPage() {
             </section>
 
             {/* Weekly Compliance — part of Habit Trackers section */}
-            <div className="mt-4 dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="mt-4 dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex items-center justify-between mb-2">
                 <h4 className="card-title font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.weeklyCompliance')}</h4>
                 {metrics && (
@@ -608,7 +608,7 @@ export default function DashboardPage() {
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.checklistsAndTodos')}</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Checklists */}
-              <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <div className="flex items-center justify-between mb-3">
                     <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
                       <span className="w-2 h-2 rounded-full bg-amber-500" />
@@ -621,7 +621,7 @@ export default function DashboardPage() {
                     <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noPendingChecklists')}</p>
                   )}
                   {checklists.map((item) => (
-                    <div key={`cl-${item.id}`} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
+                    <div key={`cl-${item.id}`} className="flex items-center gap-3 p-3 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.checklistColor }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{item.title}</p>
@@ -639,7 +639,7 @@ export default function DashboardPage() {
               </div>
 
               {/* ToDos */}
-              <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <div className="flex items-center justify-between mb-3">
                     <h4 className="card-title font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
                       <span className="w-2 h-2 rounded-full bg-red-500" />
@@ -652,7 +652,7 @@ export default function DashboardPage() {
                     <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noPendingTodos')}</p>
                   )}
                   {todos.map((todo) => (
-                    <div key={`td-${todo.id}`} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
+                    <div key={`td-${todo.id}`} className="flex items-center gap-3 p-3 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                       <span className="w-2 h-2 rounded-full flex-shrink-0 bg-red-500" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{todo.title}</p>
@@ -677,7 +677,7 @@ export default function DashboardPage() {
           {/* ═══ QUICK REGISTER ═══ */}
           <section>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.quickRegister')}</h3>
-            <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <form onSubmit={handleQuickProgressSubmit} className="space-y-3">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
@@ -749,7 +749,7 @@ export default function DashboardPage() {
           {/* ═══ PLANNING (Calendar) ═══ */}
           <section>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-secondary)' }}>{t('dashboard.planning')}</h3>
-            <div className="dashboard-card rounded-2xl border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] border p-4" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               {/* Legend */}
               <div className="flex flex-wrap gap-3 mb-4">
                 {Object.entries(MODULE_COLORS).map(([mod, color]) => (
@@ -776,26 +776,26 @@ export default function DashboardPage() {
         {/* ═══ RIGHT SIDEBAR ═══ */}
         <aside className="w-full lg:w-80 space-y-6">
           {/* Scorecard */}
-          <div className="dashboard-card rounded-2xl border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <div className="dashboard-card rounded-[8px] border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <h4 className="card-title font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.scorecard')}</h4>
             {metrics ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
+                  <div className="rounded-[8px] p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-primary">{metrics.overallStreak}</p>
                     <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.dayStreak')}</p>
                   </div>
-                  <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
+                  <div className="rounded-[8px] p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-emerald-500">{metrics.activeProjects}</p>
                     <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.activeProjects')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
+                  <div className="rounded-[8px] p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-amber-500">{metrics.pendingTasks}</p>
                     <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.pendingTasks')}</p>
                   </div>
-                  <div className="rounded-xl p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
+                  <div className="rounded-[8px] p-3 text-center flex-1" style={{ background: 'var(--color-bg-input)' }}>
                     <p className="text-2xl font-bold text-blue-500">{metrics.weeklyCompliance}%</p>
                     <p className="text-[10px] uppercase mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.complianceLabel')}</p>
                   </div>
@@ -807,7 +807,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Upcoming Reminders */}
-          <div className="dashboard-card rounded-2xl border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+          <div className="dashboard-card rounded-[8px] border p-5" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-between mb-4">
               <h4 className="card-title font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('dashboard.upcomingReminders')}</h4>
               <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.next14Days')}</span>
@@ -817,7 +817,7 @@ export default function DashboardPage() {
                 <p className="text-sm py-4 text-center" style={{ color: 'var(--color-text-muted)' }}>{t('dashboard.noUpcomingReminders')}</p>
               )}
               {upcomingReminders.map((r) => (
-                <div key={String(r.id)} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: 'var(--color-border)' }}>
+                <div key={String(r.id)} className="flex items-center gap-3 p-3 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                   <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-sm">schedule</span>
                   </div>

@@ -213,13 +213,13 @@ export default function ProgressPage() {
           <div className="flex gap-2">
             <button
               onClick={() => { setEntryType('activity'); setFormError(''); }}
-              className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors"
             >
               {t('progress.activityLog')}
             </button>
             <button
               onClick={() => { setEntryType('checkin'); setFormError(''); }}
-              className="px-4 py-2 border rounded-lg font-medium hover:bg-primary/5 transition-colors"
+              className="px-4 py-2 border rounded-[8px] font-medium hover:bg-primary/5 transition-colors"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
               {t('progress.weeklyCheckIn')}
@@ -230,7 +230,7 @@ export default function ProgressPage() {
         {/* Modal */}
         {entryType && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-[var(--color-bg-surface)] rounded-xl border w-full max-w-lg max-h-[90vh] overflow-y-auto" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="bg-[var(--color-bg-surface)] rounded-[8px] border w-full max-w-lg max-h-[90vh] overflow-y-auto" style={{ borderColor: 'var(--color-border)' }}>
               <div className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
@@ -238,7 +238,7 @@ export default function ProgressPage() {
                   </h3>
                   <button
                     onClick={() => setEntryType(null)}
-                    className="p-1 rounded-lg hover:bg-primary/10"
+                    className="p-1 rounded-[8px] hover:bg-primary/10"
                     style={{ color: 'var(--color-text-muted)' }}
                   >
                     ✕
@@ -246,7 +246,7 @@ export default function ProgressPage() {
                 </div>
 
                 {formError && (
-                  <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+                  <div className="p-3 rounded-[8px] bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
                     {formError}
                   </div>
                 )}
@@ -260,7 +260,7 @@ export default function ProgressPage() {
                           type="date"
                           value={activityForm.date}
                           onChange={e => setActivityForm(f => ({ ...f, date: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg border"
+                          className="w-full px-3 py-2 rounded-[8px] border"
                           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                           required
                         />
@@ -271,7 +271,7 @@ export default function ProgressPage() {
                           type="time"
                           value={activityForm.startTime}
                           onChange={e => setActivityForm(f => ({ ...f, startTime: e.target.value }))}
-                          className="w-full px-3 py-2 rounded-lg border"
+                          className="w-full px-3 py-2 rounded-[8px] border"
                           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         />
                       </div>
@@ -282,7 +282,7 @@ export default function ProgressPage() {
                       <select
                         value={activityForm.phaseId}
                         onChange={e => setActivityForm(f => ({ ...f, phaseId: e.target.value, goalId: '' }))}
-                        className="w-full px-3 py-2 rounded-lg border"
+                        className="w-full px-3 py-2 rounded-[8px] border"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         required
                       >
@@ -298,7 +298,7 @@ export default function ProgressPage() {
                       <select
                         value={activityForm.goalId}
                         onChange={e => setActivityForm(f => ({ ...f, goalId: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg border"
+                        className="w-full px-3 py-2 rounded-[8px] border"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         required
                         disabled={!activityForm.phaseId}
@@ -322,7 +322,7 @@ export default function ProgressPage() {
                             placeholder="Hrs"
                             value={activityForm.durationHours}
                             onChange={e => setActivityForm(f => ({ ...f, durationHours: e.target.value }))}
-                            className="w-full px-3 py-2 rounded-lg border"
+                            className="w-full px-3 py-2 rounded-[8px] border"
                             style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                           />
                           <input
@@ -332,7 +332,7 @@ export default function ProgressPage() {
                             placeholder="Min"
                             value={activityForm.durationMinutes}
                             onChange={e => setActivityForm(f => ({ ...f, durationMinutes: e.target.value }))}
-                            className="w-full px-3 py-2 rounded-lg border"
+                            className="w-full px-3 py-2 rounded-[8px] border"
                             style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                           />
                         </div>
@@ -345,7 +345,7 @@ export default function ProgressPage() {
                         value={activityForm.notes}
                         onChange={e => setActivityForm(f => ({ ...f, notes: e.target.value }))}
                         rows={2}
-                        className="w-full px-3 py-2 rounded-lg border resize-none"
+                        className="w-full px-3 py-2 rounded-[8px] border resize-none"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
                     </div>
@@ -353,7 +353,7 @@ export default function ProgressPage() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      className="w-full px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
                     >
                       {saving ? t('common.loading') : t('progress.saveProgress')}
                     </button>
@@ -366,7 +366,7 @@ export default function ProgressPage() {
                         type="date"
                         value={checkinForm.weekStartDate}
                         onChange={e => setCheckinForm(f => ({ ...f, weekStartDate: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg border"
+                        className="w-full px-3 py-2 rounded-[8px] border"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         required
                       />
@@ -397,7 +397,7 @@ export default function ProgressPage() {
                         onChange={e => setCheckinForm(f => ({ ...f, deviations: e.target.value }))}
                         placeholder={lang === 'es' ? '¿Qué se desvió del plan?' : 'What deviated from the plan?'}
                         rows={2}
-                        className="w-full px-3 py-2 rounded-lg border resize-none"
+                        className="w-full px-3 py-2 rounded-[8px] border resize-none"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
                     </div>
@@ -409,7 +409,7 @@ export default function ProgressPage() {
                         onChange={e => setCheckinForm(f => ({ ...f, adjustmentNotes: e.target.value }))}
                         placeholder={lang === 'es' ? '¿Qué ajustes propone?' : 'What adjustments do you propose?'}
                         rows={2}
-                        className="w-full px-3 py-2 rounded-lg border resize-none"
+                        className="w-full px-3 py-2 rounded-[8px] border resize-none"
                         style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
                     </div>
@@ -417,7 +417,7 @@ export default function ProgressPage() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      className="w-full px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
                     >
                       {saving ? t('common.loading') : t('progress.saveCheckIn')}
                     </button>
@@ -431,15 +431,15 @@ export default function ProgressPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar - 2/3 */}
           <div className="lg:col-span-2">
-            <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <div className="flex items-center justify-between mb-4">
-                <button onClick={prevWeek} className="p-2 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+                <button onClick={prevWeek} className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
                   ←
                 </button>
                 <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                   {weekLabel}
                 </span>
-                <button onClick={nextWeek} className="p-2 rounded-lg hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+                <button onClick={nextWeek} className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
                   →
                 </button>
               </div>
@@ -456,7 +456,7 @@ export default function ProgressPage() {
                       const entryDate = typeof entry.date === 'string' ? new Date(entry.date) : entry.date
                       const goal = goals.find(g => g.id === entry.goalId)
                       return (
-                        <div key={entry.id} className="flex items-center justify-between p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+                        <div key={entry.id} className="flex items-center justify-between p-3 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                           <div className="flex items-center gap-3">
                             <span className="text-xs font-mono" style={{ color: 'var(--color-text-muted)' }}>
                               {entryDate.toLocaleDateString(lang === 'es' ? 'es' : 'en', { weekday: 'short', day: 'numeric' })}
@@ -490,7 +490,7 @@ export default function ProgressPage() {
 
           {/* Weekly check-in history - 1/3 */}
           <div>
-            <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                 {t('progress.history')}
               </h3>
@@ -502,7 +502,7 @@ export default function ProgressPage() {
               ) : (
                 <div className="space-y-4">
                   {checkins.slice(0, 8).map(checkin => (
-                    <div key={checkin.id} className="p-4 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+                    <div key={checkin.id} className="p-4 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                           {t('progress.weekOf')} {new Date(checkin.weekStartDate).toLocaleDateString(lang === 'es' ? 'es' : 'en')}

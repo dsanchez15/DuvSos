@@ -4,8 +4,7 @@
  * **Validates: Requirements 1.4, 3.1**
  *
  * For every design token defined in `:root` (tokens-base.css), verifies that the
- * same token is defined in `.dark`, `[data-visual-theme="retrofuturista"]`, and
- * `[data-visual-theme="retrofuturista"].dark`.
+ * same token is defined in `.dark`.
  */
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
@@ -62,22 +61,7 @@ const variants: VariantTokens[] = [
     selector: '.dark',
     tokens: extractTokenNames('src/styles/tokens-classic.css', '.dark'),
   },
-  {
-    selector: '[data-visual-theme="retrofuturista"]',
-    tokens: extractTokenNames('src/styles/tokens-retrofuturista.css', '[data-visual-theme="retrofuturista"]'),
-  },
 ]
-
-// For retro dark, combine both selector patterns
-const retroDarkFile = 'src/styles/tokens-retrofuturista.css'
-const retroDarkTokens = new Set<string>([
-  ...extractTokenNames(retroDarkFile, '[data-visual-theme="retrofuturista"].dark'),
-  ...extractTokenNames(retroDarkFile, '.dark[data-visual-theme="retrofuturista"]'),
-])
-variants.push({
-  selector: '[data-visual-theme="retrofuturista"].dark',
-  tokens: retroDarkTokens,
-})
 
 describe('Property 3: Completeness of tokens across all theme variants', () => {
   /**

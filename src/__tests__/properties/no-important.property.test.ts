@@ -3,7 +3,7 @@
  *
  * **Validates: Requirement 1.3**
  *
- * Verifies that no declaration in the 3 theme token files contains `!important`.
+ * Verifies that no declaration in the theme token files contains `!important`.
  */
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
@@ -13,7 +13,6 @@ import * as path from 'path'
 const THEME_FILES = [
   'src/styles/tokens-base.css',
   'src/styles/tokens-classic.css',
-  'src/styles/tokens-retrofuturista.css',
 ] as const
 
 /**

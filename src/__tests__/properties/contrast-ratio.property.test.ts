@@ -90,14 +90,7 @@ interface VariantData {
 const variantsData: VariantData[] = [
   { name: 'Classic Light', tokens: extractTokenValues('src/styles/tokens-base.css', ':root') },
   { name: 'Classic Dark', tokens: extractTokenValues('src/styles/tokens-classic.css', '.dark') },
-  { name: 'Retro Light', tokens: extractTokenValues('src/styles/tokens-retrofuturista.css', '[data-visual-theme="retrofuturista"]') },
 ]
-
-// Retro dark: merge both selector patterns
-const retroDarkFile = 'src/styles/tokens-retrofuturista.css'
-const rd1 = extractTokenValues(retroDarkFile, '[data-visual-theme="retrofuturista"].dark')
-const rd2 = extractTokenValues(retroDarkFile, '.dark[data-visual-theme="retrofuturista"]')
-variantsData.push({ name: 'Retro Dark', tokens: { ...rd1, ...rd2 } })
 
 // Text/background pairs to check
 const TEXT_BG_PAIRS = [

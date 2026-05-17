@@ -11,14 +11,15 @@ export function formatEffort(minutes: number): string {
 }
 
 /**
- * Get Tailwind color class for priority level
+ * Get Tailwind color classes for priority badge (background + text)
+ * Aure palette: Rocket Orange for high, Galaxy Violet for normal, Comet Tail Violet for low
  */
 export function getPriorityColor(priority: string): string {
   switch (priority) {
-    case 'high': return 'text-red-500'
-    case 'normal': return 'text-amber-500'
-    case 'low': return 'text-green-500'
-    default: return 'text-slate-400'
+    case 'high': return 'bg-rocket-orange text-deep-space'
+    case 'normal': return 'bg-galaxy-violet text-deep-space'
+    case 'low': return 'bg-ghostly-grey text-deep-space'
+    default: return 'bg-nebula-gray text-stardust-white'
   }
 }
 
