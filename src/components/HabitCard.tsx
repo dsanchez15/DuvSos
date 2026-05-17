@@ -63,7 +63,7 @@ export default function HabitCard({
   const goalTypeLabel = habit.goalType === 'Daily' ? t('habits.goalTypes.daily') : habit.goalType === 'Weekly' ? t('habits.goalTypes.weekly') : habit.goalType === 'Monthly' ? t('habits.goalTypes.monthly') : t('habits.goalTypes.ratio')
 
   return (
-    <div className="dashboard-card rounded-xl p-6 border-l-4 transition-all" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-md)', borderLeftColor: habit.color }}>
+    <div className="dashboard-card rounded-[8px] p-6 border-l-4 transition-all" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-md)', borderLeftColor: habit.color }}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -109,7 +109,7 @@ export default function HabitCard({
           {onEdit && (
             <button
               onClick={onEdit}
-              className="p-2 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+              className="p-2 hover:text-primary hover:bg-primary/10 rounded-[8px] transition-colors"
               style={{ color: 'var(--color-text-muted)' }}
               title={t('habits.card.edit')}
             >
@@ -120,7 +120,7 @@ export default function HabitCard({
           )}
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="p-2 habit-delete-btn rounded-lg transition-colors"
+            className="p-2 habit-delete-btn rounded-[8px] transition-colors"
             style={{ color: 'var(--color-text-muted)' }}
             title={t('habits.card.deleteTitle')}
           >
@@ -136,7 +136,7 @@ export default function HabitCard({
         {onToggleCompletion && mode === 'planning' && (
           <button
             onClick={() => onToggleCompletion(habit.id, today, !isCompletedToday)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${isCompletedToday
+            className={`flex items-center gap-2 px-4 py-2 rounded-[8px] font-medium transition-all ${isCompletedToday
                 ? 'habit-completion-done'
                 : 'habit-completion-pending'
               }`}
@@ -178,7 +178,7 @@ export default function HabitCard({
             key={action.state}
             onClick={() => handleStateChange(action.state)}
             disabled={stateLoading}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${action.hoverClass}`}
+            className={`px-3 py-1.5 rounded-[8px] text-sm font-medium transition-colors ${action.hoverClass}`}
             style={{ color: action.colorToken }}
           >
             {stateLoading ? '...' : action.label}
@@ -195,7 +195,7 @@ export default function HabitCard({
           return (
             <div
               key={date}
-              className={`day-cell w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium ${isCompleted
+              className={`day-cell w-8 h-8 rounded-[8px] flex items-center justify-center text-xs font-medium ${isCompleted
                   ? 'day-cell-completed'
                   : ''
                 }`}
@@ -221,7 +221,7 @@ export default function HabitCard({
 
       {showDeleteConfirm && (
         <div className="delete-modal-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="delete-modal rounded-xl p-6 max-w-sm w-full" style={{ background: 'var(--color-bg-surface)' }}>
+          <div className="delete-modal rounded-[8px] p-6 max-w-sm w-full" style={{ background: 'var(--color-bg-surface)' }}>
             <h4 className="text-lg font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>{t('habits.card.deleteConfirmTitle')}</h4>
             <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               {t('habits.card.deleteConfirmMessage', { title: habit.title })}
@@ -229,7 +229,7 @@ export default function HabitCard({
             <div className="flex gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="btn-outline flex-1 px-4 py-2 rounded-lg habit-cancel-btn transition-colors font-medium"
+                className="btn-outline flex-1 px-4 py-2 rounded-[8px] habit-cancel-btn transition-colors font-medium"
                 style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
               >
                 {t('common.cancel')}
@@ -239,7 +239,7 @@ export default function HabitCard({
                   onDelete(habit.id)
                   setShowDeleteConfirm(false)
                 }}
-                className="btn-danger flex-1 px-4 py-2 rounded-lg transition-colors font-medium"
+                className="btn-danger flex-1 px-4 py-2 rounded-[8px] transition-colors font-medium"
                 style={{ background: 'var(--color-danger)', color: 'var(--color-text-inverse)' }}
               >
                 {t('common.delete')}

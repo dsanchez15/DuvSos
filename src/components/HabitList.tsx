@@ -137,7 +137,7 @@ export default function HabitList() {
         <p style={{ color: 'var(--color-danger)' }}>{error}</p>
         <button
           onClick={fetchHabits}
-          className="mt-4 px-4 py-2 rounded-lg hover:bg-primary/90"
+          className="mt-4 px-4 py-2 rounded-[8px] hover:bg-primary/90"
           style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
 >
             {t('common.retry')}
@@ -159,7 +159,7 @@ export default function HabitList() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 rounded-[8px] hover:bg-primary/90 transition-colors font-medium"
           style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
         >
           {showForm ? (
@@ -181,14 +181,14 @@ export default function HabitList() {
       </div>
 
       {showForm && (
-        <div className="rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}>
+        <div className="rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}>
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>{t('habits.createHabit')}</h3>
           <HabitForm onSubmit={handleCreateHabit} onCancel={() => setShowForm(false)} />
         </div>
       )}
 
       {habits.length === 0 ? (
-        <div className="text-center py-16 rounded-xl border border-dashed" style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}>
+        <div className="text-center py-16 rounded-[8px] border border-dashed" style={{ background: 'var(--color-bg-surface-hover)', borderColor: 'var(--color-border)' }}>
           <svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
