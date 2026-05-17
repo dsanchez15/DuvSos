@@ -18,6 +18,20 @@
   --color-background-dark: var(--color-bg-base);
   --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
+  /* Aure palette */
+  --color-deep-space: #181824;
+  --color-charcoal-surface: #26253b;
+  --color-surface-hover: #2f2e4a;
+  --color-border-default: #35354d;
+  --color-border-strong: #535676;
+  --color-stardust-white: #f7f7ff;
+  --color-ghostly-grey: #9ca0b0;
+  --color-nebula-gray: #696f81;
+  --color-rocket-orange: #ff4a36;
+  --color-flare-orange: #ff3a26;
+  --color-galaxy-violet: #9087ff;
+  --color-plasma-green: #22c55e;
+  --color-electric-blue: #2590f1;
 }
 
 body {
@@ -107,7 +121,9 @@ body {
 
 /* Todo component token-based hover states */
 .todo-item-hover:hover {
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
 }
 
 .todo-checkbox-unchecked:hover {
