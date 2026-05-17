@@ -71,7 +71,7 @@ function TodoItem({
   return (
     <div className="space-y-2">
       <div
-        className={`todo-item-card flex items-start gap-3 p-4 rounded-xl transition-all ${
+        className={`todo-item-card flex items-start gap-3 p-4 rounded-[8px] transition-all ${
           todo.completed ? 'todo-item-card-completed' : ''
         } border group todo-item-hover`}
         style={{
@@ -99,38 +99,38 @@ function TodoItem({
           )}
         </button>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0 space-y-2">
-          {/* Title row */}
-          <div className="flex items-start justify-between gap-2">
+        {/* Main content area */}
+        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-start gap-2">
+          {/* Left: Title + Description */}
+          <div className="flex-1 min-w-0 space-y-1">
+            {/* Title row */}
             <span
               onDoubleClick={() => onEdit(todo)}
               className={`text-base font-medium break-words ${
                 todo.completed ? 'line-through' : ''
-              } cursor-pointer`}
+              } cursor-pointer block`}
               style={{
                 color: todo.completed ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
               }}
             >
               {todo.title}
             </span>
+
+            {/* Description */}
+            {todo.description && (
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                {todo.description}
+              </p>
+            )}
           </div>
 
-          {/* Description */}
-          {todo.description && (
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              {todo.description}
-            </p>
-          )}
-
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Right: Meta info */}
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end text-xs">
             {/* Priority badge */}
             <span
               className={`badge-priority-${todo.priority} px-2 py-0.5 rounded-full font-medium ${getPriorityColor(todo.priority)}`}
-              style={{ background: 'var(--color-bg-surface-hover)' }}
             >
-              {todo.priority}
+              {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
             </span>
 
             {/* Due date */}
@@ -205,7 +205,7 @@ function TodoItem({
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           <button
             onClick={() => setShowAddSubtask(!showAddSubtask)}
-            className="todo-action-btn todo-action-btn-info p-2 rounded-lg transition-colors"
+            className="todo-action-btn todo-action-btn-info p-2 rounded-[8px] transition-colors"
             title="Add subtask"
             style={{ color: 'var(--color-text-muted)' }}
           >
@@ -213,7 +213,7 @@ function TodoItem({
           </button>
           <button
             onClick={() => onEdit(todo)}
-            className="todo-action-btn todo-action-btn-primary p-2 rounded-lg transition-colors"
+            className="todo-action-btn todo-action-btn-primary p-2 rounded-[8px] transition-colors"
             title="Edit"
             style={{ color: 'var(--color-text-muted)' }}
           >
@@ -221,7 +221,7 @@ function TodoItem({
           </button>
           <button
             onClick={() => onDelete(todo.id)}
-            className="todo-action-btn todo-action-btn-danger p-2 rounded-lg transition-colors"
+            className="todo-action-btn todo-action-btn-danger p-2 rounded-[8px] transition-colors"
             title="Delete"
             style={{ color: 'var(--color-text-muted)' }}
           >
@@ -239,14 +239,14 @@ function TodoItem({
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
               placeholder="Subtask title..."
-              className="rf-input flex-1 px-3 py-2 rounded-lg border text-sm"
+              className="rf-input flex-1 px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               autoFocus
             />
             <button
               type="submit"
               disabled={!newSubtaskTitle.trim()}
-              className="btn-neon px-3 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 disabled:opacity-50"
+              className="btn-neon px-3 py-2 bg-primary text-white rounded-[8px] text-sm hover:bg-primary/90 disabled:opacity-50"
             >
               Add
             </button>
@@ -268,7 +268,7 @@ function TodoItem({
           {todo.subTasks.map((subtask) => (
             <div
               key={subtask.id}
-              className={`subtask-card group flex items-center gap-3 p-3 rounded-lg ${
+              className={`subtask-card group flex items-center gap-3 p-3 rounded-[8px] ${
                 subtask.completed ? 'subtask-card-completed' : ''
               } border`}
               style={{
