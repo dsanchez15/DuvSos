@@ -103,7 +103,7 @@ function UndoToast({ message, onUndo, onClose }: { message: string; onUndo: () =
   useEffect(() => { const timer = setTimeout(onClose, 5000); return () => clearTimeout(timer) }, [onClose])
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-slide-in">
-      <div className="checklist-undo-toast flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border"
+      <div className="checklist-undo-toast flex items-center gap-3 px-5 py-3 rounded-lg shadow-lg border"
         style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
         <span className="material-symbols-outlined text-lg" style={{ color: 'var(--color-warning)' }}>delete</span>
         <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{message}</span>
@@ -735,7 +735,7 @@ export default function ChecklistList({
           <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('checklists.title')}</h2>
           <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>{t('checklists.checklistCount', { count: checklists.length })}</p>
         </div>
-        <button onClick={onNew} className="btn-neon flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium">
+        <button onClick={onNew} className="btn-neon flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
           <span className="material-symbols-outlined text-sm">add</span>
           {t('checklists.newChecklist')}
         </button>
@@ -757,7 +757,7 @@ export default function ChecklistList({
       <div className="relative">
         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--color-text-muted)' }}>search</span>
         <input type="text" value={search} onChange={e => onSearchChange(e.target.value)} placeholder={t('checklists.searchPlaceholder')}
-          className="checklist-search w-full pl-10 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          className="checklist-search w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary text-sm"
           style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)', color: 'var(--color-text-primary)' }} />
       </div>
 
@@ -792,7 +792,7 @@ export default function ChecklistList({
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="empty-state text-center py-16 rounded-xl border border-dashed"
+        <div className="empty-state text-center py-16 rounded-[8px] border border-dashed"
           style={{ background: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}>
           <span className="material-symbols-outlined text-5xl mb-4 block" style={{ color: 'var(--color-text-muted)' }}>fact_check</span>
           <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{search ? t('checklists.noResults') : tab === 'templates' ? t('checklists.noTemplates') : tab === 'history' ? t('checklists.noHistory') : t('checklists.noChecklists')}</p>
@@ -808,7 +808,7 @@ export default function ChecklistList({
             const isHistory = tab === 'history'
             return (
               <div key={c.id}
-                className={`checklist-card rounded-xl border transition-all ${isExpanded ? 'checklist-card-expanded border-primary/40 shadow-sm' : ''}`}
+                className={`checklist-card rounded-[8px] border transition-all ${isExpanded ? 'checklist-card-expanded border-primary/40 shadow-sm' : 'checklist-card-hover'}`}
                 style={{ background: 'var(--color-bg-surface)', borderColor: isExpanded ? undefined : 'var(--color-border)' }}>
                 <div className="p-4 cursor-pointer group" onClick={() => onToggleExpand(c.id)}>
                   <div className="flex items-start justify-between">

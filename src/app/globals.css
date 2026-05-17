@@ -225,6 +225,13 @@ body {
   background: var(--color-bg-surface-hover);
 }
 
+/* Checklist card hover elevation */
+.checklist-card-hover:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
 /* Energy selector token-based hover states */
 .energy-btn-idle:hover {
   background: var(--color-bg-surface-hover);
