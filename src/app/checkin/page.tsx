@@ -70,7 +70,7 @@ export default function CheckInPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className="dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
               <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                 {t('progress.newCheckIn')}
               </h3>
@@ -78,13 +78,13 @@ export default function CheckInPage() {
             </div>
 
             {checkins.length > 0 && (
-              <div className="mt-6 dashboard-card rounded-xl p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
+              <div className="mt-6 dashboard-card rounded-[8px] p-6 border" style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}>
                 <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                   {t('progress.historyLabel')}
                 </h3>
                 <div className="space-y-4">
                   {checkins.map(checkin => (
-                    <div key={checkin.id} className="p-4 rounded-lg border" style={{ borderColor: 'var(--color-border)' }}>
+                    <div key={checkin.id} className="p-4 rounded-[8px] border" style={{ borderColor: 'var(--color-border)' }}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                           {t('progress.weekOfDate', { date: new Date(checkin.weekStartDate).toLocaleDateString(language === 'es' ? 'es' : 'en') })}

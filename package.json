@@ -2,6 +2,7 @@
   "name": "habit-tracker",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -28,6 +29,14 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "ws": "^8.20.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

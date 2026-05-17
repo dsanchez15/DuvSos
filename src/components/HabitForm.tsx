@@ -104,7 +104,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="rf-input w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             placeholder={t('habits.form.titlePlaceholder')}
             required
@@ -119,7 +119,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+            className="rf-input w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
             rows={2}
             placeholder={t('habits.form.descriptionPlaceholder')}
@@ -153,7 +153,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <select
             value={state}
             onChange={(e) => setState(e.target.value as HabitState)}
-            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="Active">{t('habits.card.statusActive')}</option>
@@ -167,7 +167,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="">{t('habits.form.noCategory')}</option>
@@ -182,7 +182,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <select
             value={objectiveId}
             onChange={(e) => setObjectiveId(e.target.value)}
-            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             <option value="">{t('habits.form.noObjective')}</option>
@@ -212,7 +212,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rf-input w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               />
             </div>
@@ -222,7 +222,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="rf-input w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               />
             </div>
@@ -237,7 +237,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <select
             value={goalType}
             onChange={(e) => setGoalType(e.target.value as GoalType)}
-            className="rf-select w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-select w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           >
             {goalTypes.map((gt) => (
@@ -256,7 +256,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
             max={goalType === 'Ratio' ? 100 : 999}
             value={goalValue}
             onChange={(e) => setGoalValue(parseInt(e.target.value) || 1)}
-            className="rf-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rf-input w-full px-3 py-2 border rounded-[8px] focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
           />
         </div>
@@ -265,7 +265,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
       <div className="flex gap-2 pt-2">
         <button
           type="submit"
-          className="flex-1 px-4 py-2 btn-neon rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          className="flex-1 px-4 py-2 btn-neon rounded-[8px] hover:bg-primary/90 transition-colors font-medium"
           style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
         >
           {initialData ? t('habits.form.update') : t('habits.form.create')}
@@ -274,7 +274,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 btn-outline rounded-lg habit-cancel-btn transition-colors font-medium"
+            className="px-4 py-2 btn-outline rounded-[8px] habit-cancel-btn transition-colors font-medium"
             style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}
           >
             {t('common.cancel')}

@@ -124,15 +124,15 @@ export default function HabitsPage() {
     return (
         <AppLayout>
             <div className="max-w-4xl mx-auto">
-                <div className="rounded-2xl p-6" style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
+                <div className="rounded-[8px] p-6" style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
                     {/* Tabs */}
-                    <div className="habits-tabs flex gap-1 mb-6 p-1 rounded-xl" style={{ background: 'var(--color-bg-input)' }}>
+                    <div className="habits-tabs flex gap-1 mb-6 p-1 rounded-[8px]" style={{ background: 'var(--color-bg-input)' }}>
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 data-active={activeTab === tab.id}
-                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all`}
+                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-[8px] text-sm font-medium transition-all`}
                                 style={
                                     activeTab === tab.id
                                         ? { background: 'var(--color-bg-surface)', color: 'var(--color-primary)', boxShadow: 'var(--shadow-sm)' }
@@ -150,7 +150,7 @@ export default function HabitsPage() {
                                 <p className="text-red-500">{error}</p>
                             <button
                                 onClick={fetchHabits}
-                                className="mt-2 px-4 py-2 btn-neon bg-primary text-white rounded-lg hover:bg-primary/90"
+                                className="mt-2 px-4 py-2 btn-neon bg-primary text-white rounded-[8px] hover:bg-primary/90"
                             >
                                 {t('habits.retry')}
                             </button>

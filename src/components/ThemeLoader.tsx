@@ -12,8 +12,6 @@ export default function ThemeLoader({ children }: { children: React.ReactNode })
         const data = await res.json();
 
         const userTheme = data.user?.theme || 'system';
-        const userVisualTheme = data.user?.visualTheme || 'classic';
-
         if (['light', 'dark', 'system'].includes(userTheme)) {
           localStorage.setItem('app-theme', userTheme);
 
@@ -34,10 +32,10 @@ export default function ThemeLoader({ children }: { children: React.ReactNode })
           }
         }
 
-        // Apply visual theme (classic / retrofuturista)
-        localStorage.setItem('app-visual-theme', userVisualTheme);
+        // Always use classic (Aure) visual theme
+        localStorage.setItem('app-visual-theme', 'classic');
         const root = document.documentElement;
-        root.setAttribute('data-visual-theme', userVisualTheme);
+        root.setAttribute('data-visual-theme', 'classic');
       } catch (error) {
         console.error('Failed to load theme:', error);
       }
