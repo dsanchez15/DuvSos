@@ -16,6 +16,10 @@ import * as path from 'path'
 const COMPONENT_FILES = [
   'src/components/SettingCard.tsx',
   'src/components/Sidebar.tsx',
+  'src/components/SidebarGroup.tsx',
+  'src/components/SidebarItem.tsx',
+  'src/components/SidebarLogo.tsx',
+  'src/components/UserProfileMenu.tsx',
   'src/components/Toast.tsx',
 ] as const
 
