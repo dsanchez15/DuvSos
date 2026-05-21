@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 import Link from 'next/link';
 
 interface SidebarItemProps {
@@ -12,13 +12,33 @@ interface SidebarItemProps {
   badge?: React.ReactNode;
   className?: string;
   variant?: 'default' | 'sub';
+  isLastInGroup?: boolean;
+  iconClassName?: string;
 }
 
 const SidebarItem = forwardRef<HTMLAnchorElement, SidebarItemProps>(
-  ({ href, icon, label, isExpanded, isActive, badge, className = '', variant = 'default' }, ref) => {
+  ({ href, icon, label, isExpanded, isActive, badge, className = '', variant = 'default', iconClassName = '' }, ref) => {
     const isSub = variant === 'sub';
 
     if (isSub) {
+      // Collapsed: render like a top-level item so icons stay aligned
+      if (!isExpanded) {
+        const baseClass =
+          'flex items-center gap-4 px-4 py-3 rounded-[8px] transition-all group whitespace-nowrap';
+        const activeClass = isActive
+          ? 'active'
+          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]';
+        return (
+          <Link href={href} className={`${baseClass} ${activeClass} ${className}`} ref={ref}>
+            <span className={`material-symbols-outlined shrink-0 text-[16px] -ml-1.5 ${iconClassName}`}>{icon}</span>
+            <span className="font-medium overflow-hidden whitespace-nowrap transition-all duration-300 opacity-0 w-0">
+              {label}
+            </span>
+          </Link>
+        );
+      }
+
+      // Expanded: tree connector
       const baseClass =
         'relative flex items-center gap-2 py-2.5 rounded-[8px] transition-all group whitespace-nowrap text-sm';
       const stateClass = isActive
@@ -35,7 +55,7 @@ const SidebarItem = forwardRef<HTMLAnchorElement, SidebarItemProps>(
             />
           </span>
 
-          <span className="material-symbols-outlined shrink-0 text-[16px]">{icon}</span>
+          <span className={`material-symbols-outlined shrink-0 text-[16px] -ml-1.5 ${iconClassName}`}>{icon}</span>
           <span
             className={`font-medium overflow-hidden whitespace-nowrap transition-all duration-300 ${
               isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'
@@ -56,7 +76,7 @@ const SidebarItem = forwardRef<HTMLAnchorElement, SidebarItemProps>(
 
     return (
       <Link href={href} className={`${baseClass} ${activeClass} ${className}`} ref={ref}>
-        <span className="material-symbols-outlined shrink-0">{icon}</span>
+        <span className={`material-symbols-outlined shrink-0 -ml-1.5 ${iconClassName}`}>{icon}</span>
         <span
           className={`font-medium overflow-hidden whitespace-nowrap transition-all duration-300 ${
             isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'
@@ -71,4 +91,4 @@ const SidebarItem = forwardRef<HTMLAnchorElement, SidebarItemProps>(
 );
 SidebarItem.displayName = 'SidebarItem';
 
-export default SidebarItem;
+export default memo(SidebarItem);

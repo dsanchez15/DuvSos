@@ -6,15 +6,20 @@ export function useLocalStorageState<T>(
   key: string,
   defaultValue: T
 ): [T, (value: T | ((prev: T) => T)) => void] {
-  const [state, setState] = useState<T>(() => {
-    if (typeof window === 'undefined') return defaultValue;
+  const [state, setState] = useState<T>(defaultValue);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const stored = localStorage.getItem(key);
-      return stored ? (JSON.parse(stored) as T) : defaultValue;
+      if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setState(JSON.parse(stored) as T);
+      }
     } catch {
-      return defaultValue;
+      /* ignore */
     }
-  });
+  }, [key]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

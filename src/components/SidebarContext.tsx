@@ -19,7 +19,7 @@ interface SidebarContextValue {
 const SidebarContext = createContext<SidebarContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'sidebar-state';
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 1024;
 
 function getIsMobile(): boolean {
     if (typeof window === 'undefined') return false;
