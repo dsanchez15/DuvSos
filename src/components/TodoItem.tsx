@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, memo } from 'react'
-import { formatEffort, getPriorityColor, formatDate, isOverdue } from '@/lib/todo-utils'
+import { formatEffort } from '@/lib/todo-utils'
 
 interface Category {
   id: number
@@ -40,17 +40,21 @@ interface Todo {
 
 interface TodoItemProps {
   todo: Todo
+  selectedTodo: Todo | null
   onToggle: (id: number, completed: boolean) => void
   onDelete: (id: number) => void
   onEdit: (todo: Todo) => void
+  onSelect: (todo: Todo) => void
   onCreateSubtask: (parentId: number, title: string) => void
 }
 
 function TodoItem({
   todo,
+  selectedTodo,
   onToggle,
   onDelete,
   onEdit,
+  onSelect,
   onCreateSubtask,
 }: TodoItemProps) {
   const [showSubtasks, setShowSubtasks] = useState(false)
@@ -66,17 +70,15 @@ function TodoItem({
     setShowSubtasks(true)
   }
 
-  const todoIsOverdue = isOverdue(todo.dueDate, todo.completed)
-
   return (
     <div className="space-y-2">
       <div
         className={`todo-item-card flex items-start gap-3 p-4 rounded-[8px] transition-all ${
           todo.completed ? 'todo-item-card-completed' : ''
-        } border group todo-item-hover`}
+        } border-2 group todo-item-hover`}
         style={{
           background: todo.completed ? 'var(--color-bg-surface-hover)' : 'var(--color-bg-surface)',
-          borderColor: 'var(--color-border)',
+          borderColor: selectedTodo?.id === todo.id ? 'var(--color-primary)' : 'var(--color-border)',
         }}
       >
         {/* Checkbox */}
@@ -100,15 +102,21 @@ function TodoItem({
         </button>
 
         {/* Main content area */}
-        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-start gap-2">
+        <div 
+          className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-start gap-2 cursor-pointer"
+          onClick={() => onSelect(todo)}
+        >
           {/* Left: Title + Description */}
           <div className="flex-1 min-w-0 space-y-1">
             {/* Title row */}
             <span
-              onDoubleClick={() => onEdit(todo)}
+              onDoubleClick={(e) => {
+                e.stopPropagation()
+                onEdit(todo)
+              }}
               className={`text-base font-medium break-words ${
                 todo.completed ? 'line-through' : ''
-              } cursor-pointer block`}
+              } block`}
               style={{
                 color: todo.completed ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
               }}
@@ -122,58 +130,15 @@ function TodoItem({
                 {todo.description}
               </p>
             )}
-          </div>
 
-          {/* Right: Meta info */}
-          <div className="flex flex-wrap items-center gap-2 sm:justify-end text-xs">
-            {/* Priority badge */}
-            <span
-              className={`badge-priority-${todo.priority} px-2 py-0.5 rounded-full font-medium ${getPriorityColor(todo.priority)}`}
-            >
-              {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-            </span>
-
-            {/* Due date */}
-            {todo.dueDate && (
-              <span
-                className="badge-due flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{
-                  color: todoIsOverdue ? 'var(--color-danger)' : 'var(--color-text-secondary)',
-                  background: todoIsOverdue ? 'color-mix(in srgb, var(--color-danger) 10%, transparent)' : 'var(--color-bg-surface-hover)',
-                }}
-              >
-                <span className="material-symbols-outlined text-sm">event</span>
-                {formatDate(todo.dueDate)}
-                {todo.dueTime && ` ${todo.dueTime}`}
-              </span>
-            )}
-
-            {/* Effort */}
-            {todo.effortMinutes > 0 && (
-              <span
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{ color: 'var(--color-text-secondary)', background: 'var(--color-bg-surface-hover)' }}
-              >
-                <span className="material-symbols-outlined text-sm">schedule</span>
-                {formatEffort(todo.effortMinutes)}
-              </span>
-            )}
-
-            {/* Category */}
-            {todo.category && (
-              <span
-                className="badge-category px-2 py-0.5 rounded-full text-white text-xs font-medium"
-                style={{ backgroundColor: todo.category.color }}
-              >
-                {todo.category.name}
-              </span>
-            )}
-
-            {/* Subtasks indicator */}
+            {/* Subtasks toggle */}
             {(todo.subTasksCount || 0) > 0 && (
               <button
-                onClick={() => setShowSubtasks(!showSubtasks)}
-                className="todo-subtask-toggle flex items-center gap-1 px-2 py-0.5 rounded-full transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowSubtasks(!showSubtasks)
+                }}
+                className="todo-subtask-toggle flex items-center gap-1 px-2 py-0.5 rounded-full transition-colors mt-1"
                 style={{ color: 'var(--color-text-secondary)', background: 'var(--color-bg-surface-hover)' }}
               >
                 <span className={`material-symbols-outlined text-sm transition-transform ${showSubtasks ? 'rotate-180' : ''}`}>
@@ -183,20 +148,7 @@ function TodoItem({
                 <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   {todo.completedSubTasksCount}/{todo.subTasksCount}
                 </span>
-                {todo.progress !== undefined && (
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>({todo.progress}%)</span>
-                )}
               </button>
-            )}
-
-            {/* Overdue badge */}
-            {todoIsOverdue && (
-              <span
-                className="badge-overdue px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'color-mix(in srgb, var(--color-danger) 15%, transparent)', color: 'var(--color-danger)' }}
-              >
-                overdue
-              </span>
             )}
           </div>
         </div>

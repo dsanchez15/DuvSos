@@ -623,7 +623,7 @@ export const translations = {
       },
     },
     todos: {
-      title: 'My Todos',
+      title: 'To-Do',
       subtitle: '{{pending}} pending · {{completed}} completed · {{rate}}% rate',
       loading: 'Loading...',
       today: 'today',
@@ -688,6 +688,22 @@ export const translations = {
         networkError: 'Network error. Please try again.',
       },
       retry: 'Retry',
+      statistics: {
+        title: 'Statistics',
+        subtitle: 'Daily Progress Overview',
+        allTasks: 'All Tasks',
+        effort: 'Effort',
+        compliance: 'Compliance',
+      },
+      details: {
+        title: 'Task Details',
+        category: 'Category',
+        status: 'Status',
+        priority: 'Priority',
+        date: 'Date',
+        effort: 'Effort',
+        none: 'None',
+      },
     },
     settings: {
       title: 'Settings',
@@ -1368,7 +1384,7 @@ const es: Translations = {
     },
   },
   todos: {
-    title: 'Mis Tareas',
+    title: 'Tareas',
     subtitle: '{{pending}} pendientes · {{completed}} completados · {{rate}}% tasa',
     loading: 'Cargando...',
     today: 'hoy',
@@ -1433,6 +1449,22 @@ const es: Translations = {
       networkError: 'Error de red. Intenta de nuevo.',
     },
     retry: 'Reintentar',
+    statistics: {
+      title: 'Estadísticas',
+      subtitle: 'Resumen de Progreso Diario',
+      allTasks: 'Todas las Tareas',
+      effort: 'Esfuerzo',
+      compliance: 'Cumplimiento',
+    },
+    details: {
+      title: 'Detalles de la Tarea',
+      category: 'Categoría',
+      status: 'Estado',
+      priority: 'Prioridad',
+      date: 'Fecha',
+      effort: 'Esfuerzo',
+      none: 'Ninguno',
+    },
   },
   settings: {
     title: 'Configuración',
