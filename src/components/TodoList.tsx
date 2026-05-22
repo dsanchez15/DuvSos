@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import TodoItem from './TodoItem'
 import { useAppTranslation } from '@/components/LanguageProvider'
-import { formatEffort, getPriorityColor } from '@/lib/todo-utils'
+import { formatEffort, formatDate, isOverdue } from '@/lib/todo-utils'
 
 interface SubTask {
   id: number
@@ -81,6 +81,7 @@ export default function TodoList() {
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   // Filters
+  const [showFilters, setShowFilters] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('all')
   const [groupBy, setGroupBy] = useState<GroupBy>('none')
   const [searchQuery, setSearchQuery] = useState('')
@@ -88,6 +89,9 @@ export default function TodoList() {
   const [filterPriority, setFilterPriority] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('')
+
+  // Selected todo for details panel
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
 
   // Edit modal
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
@@ -274,9 +278,11 @@ export default function TodoList() {
       } else {
         fetchTodos()
       }
-      fetch('/api/todos/metrics')
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => data && setMetrics(data))
+      const metricsRes = await fetch('/api/todos/metrics')
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json()
+        setMetrics(metricsData)
+      }
     } catch (err) {
       console.error(err)
       setApiError(t('todos.errors.networkError'))
@@ -349,6 +355,22 @@ export default function TodoList() {
       } else {
         setTodos(replaceTemp(todos))
       }
+
+      // Update selectedTodo if subtask was added to it
+      if (selectedTodo?.id === parentId) {
+        const todoRes = await fetch(`/api/todos/${parentId}`)
+        if (todoRes.ok) {
+          const updatedTodo = await todoRes.json()
+          setSelectedTodo(updatedTodo)
+        }
+      }
+
+      // Update metrics
+      const metricsRes = await fetch('/api/todos/metrics')
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json()
+        setMetrics(metricsData)
+      }
     } catch (err) {
       console.error(err)
       // Remove temp on failure
@@ -373,7 +395,7 @@ export default function TodoList() {
         setTodos(removeTemp(todos))
       }
     }
-  }, [groupedTodos, todos])
+  }, [groupedTodos, todos, selectedTodo])
 
   const handleToggle = useCallback(async (id: number, completed: boolean) => {
     // Snapshot for revert
@@ -413,6 +435,11 @@ export default function TodoList() {
       setTodos(updateList(todos))
     }
 
+    // Update selectedTodo if it was toggled
+    if (selectedTodo?.id === id) {
+      setSelectedTodo((prev) => prev ? { ...prev, completed } : prev)
+    }
+
     try {
       const response = await fetch('/api/todos', {
         method: 'PUT',
@@ -420,17 +447,26 @@ export default function TodoList() {
         body: JSON.stringify({ id, completed }),
       })
       if (!response.ok) throw new Error(t('todos.errors.updateTodo'))
-      // Sync metrics in background without full reload
-      fetch('/api/todos/metrics')
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => data && setMetrics(data))
+      // Sync metrics and refresh selected todo data
+      const metricsRes = await fetch('/api/todos/metrics')
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json()
+        setMetrics(metricsData)
+      }
+      if (selectedTodo?.id === id) {
+        const todoRes = await fetch(`/api/todos/${id}`)
+        if (todoRes.ok) {
+          const updatedTodo = await todoRes.json()
+          setSelectedTodo(updatedTodo)
+        }
+      }
     } catch (err) {
       console.error(err)
       // Revert
       if (snapshotGrouped) setGroupedTodos(snapshotGrouped)
       if (snapshotTodos) setTodos(snapshotTodos)
     }
-  }, [groupedTodos, todos])
+  }, [groupedTodos, todos, selectedTodo])
 
   const handleDelete = useCallback(async (id: number) => {
     const snapshotTodos = groupedTodos ? null : [...todos]
@@ -459,18 +495,25 @@ export default function TodoList() {
       setTodos(removeFromList(todos))
     }
 
+    // Clear selectedTodo if it was deleted
+    if (selectedTodo?.id === id) {
+      setSelectedTodo(null)
+    }
+
     try {
       const response = await fetch(`/api/todos/${id}`, { method: 'DELETE' })
       if (!response.ok) throw new Error(t('todos.errors.deleteTodo'))
-      fetch('/api/todos/metrics')
-        .then((r) => r.ok ? r.json() : null)
-        .then((data) => data && setMetrics(data))
+      const metricsRes = await fetch('/api/todos/metrics')
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json()
+        setMetrics(metricsData)
+      }
     } catch (err) {
       console.error(err)
       if (snapshotGrouped) setGroupedTodos(snapshotGrouped)
       if (snapshotTodos) setTodos(snapshotTodos)
     }
-  }, [groupedTodos, todos])
+  }, [groupedTodos, todos, selectedTodo])
 
   const openEditModal = useCallback((todo: Todo) => {
     setEditingTodo(todo)
@@ -481,6 +524,10 @@ export default function TodoList() {
     setEditDueTime(todo.dueTime || '')
     setEditEffort(todo.effortMinutes ? (todo.effortMinutes / 60).toString() : '')
     setEditCategory(todo.categoryId ? todo.categoryId.toString() : '')
+  }, [])
+
+  const handleSelectTodo = useCallback((todo: Todo) => {
+    setSelectedTodo(todo)
   }, [])
 
   const handleEditSave = async () => {
@@ -545,6 +592,19 @@ export default function TodoList() {
         return
       }
 
+      // Update selectedTodo if it was edited
+      if (selectedTodo?.id === editingTodo.id) {
+        const updatedTodo = await response.json()
+        setSelectedTodo(updatedTodo)
+      }
+
+      // Update metrics
+      const metricsRes = await fetch('/api/todos/metrics')
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json()
+        setMetrics(metricsData)
+      }
+
       setEditingTodo(null)
     } catch (err) {
       console.error(err)
@@ -576,9 +636,11 @@ export default function TodoList() {
           <TodoItem
             key={todo.id}
             todo={todo}
+            selectedTodo={selectedTodo}
             onToggle={handleToggle}
             onDelete={handleDelete}
             onEdit={openEditModal}
+            onSelect={handleSelectTodo}
             onCreateSubtask={handleCreateSubtask}
           />
         ))}
@@ -602,9 +664,11 @@ export default function TodoList() {
                   <TodoItem
                     key={todo.id}
                     todo={todo}
+                    selectedTodo={selectedTodo}
                     onToggle={handleToggle}
                     onDelete={handleDelete}
                     onEdit={openEditModal}
+                    onSelect={handleSelectTodo}
                     onCreateSubtask={handleCreateSubtask}
                   />
                 ))}
@@ -637,43 +701,37 @@ export default function TodoList() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Metrics */}
-      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('todos.title')}</h2>
-          <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-            {metrics ? t('todos.subtitle', { pending: metrics.pending, completed: metrics.completed, rate: metrics.completionRate }) : t('common.loading')}
-          </p>
-        </div>
-
-        {metrics && (
-          <div className="flex gap-3 text-sm flex-wrap">
-            <div
-              className="todo-metric-card px-3 py-2 rounded-[8px]"
-              style={{ background: 'color-mix(in srgb, var(--color-info) 10%, transparent)' }}
-            >
-              <span className="metric-value font-bold" style={{ color: 'var(--color-info)' }}>{metrics.today.pending}</span>
-              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{t('todos.today')}</span>
-            </div>
-            <div
-              className="todo-metric-card px-3 py-2 rounded-[8px]"
-              style={{ background: 'color-mix(in srgb, var(--color-warning) 10%, transparent)' }}
-            >
-              <span className="metric-value font-bold" style={{ color: 'var(--color-warning)' }}>{metrics.overdue}</span>
-              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{t('todos.overdue')}</span>
-            </div>
-            <div
-              className="todo-metric-card px-3 py-2 rounded-[8px]"
-              style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}
-            >
-              <span className="metric-value font-bold" style={{ color: 'var(--color-primary)' }}>{formatEffort(metrics.totalEffortMinutes)}</span>
-              <span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{t('todos.effort')}</span>
-            </div>
-          </div>
-        )}
+      {/* Header */}
+      <div>
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{t('todos.title')}</h2>
       </div>
 
-      {/* API Error Banner */}
+      <div className="flex gap-6">
+        {/* Main content - 4/5 width */}
+        <div className="flex-1 min-w-0 space-y-6">
+          {/* Add Todo Form */}
+          <form onSubmit={handleCreateTodo} className="p-4 rounded-[16px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
+            <div className="flex gap-3 items-center">
+              <input
+                ref={inputRef}
+                type="text"
+                value={newTodoTitle}
+                onChange={(e) => setNewTodoTitle(e.target.value)}
+                placeholder={t('todos.addPlaceholder')}
+                className="todo-add-input flex-1 px-4 py-3 rounded-[12px] border-0 focus:outline-none focus:ring-2 focus:ring-primary"
+                style={{ background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
+              />
+              <button
+                type="submit"
+                disabled={!newTodoTitle.trim()}
+                className="btn-neon px-6 py-3 bg-primary text-white rounded-[12px] hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {t('todos.add')}
+              </button>
+            </div>
+          </form>
+
+          {/* API Error Banner */}
       {apiError && (
         <div
           className="todo-error-banner flex items-center gap-3 p-4 border rounded-[8px]"
@@ -694,7 +752,28 @@ export default function TodoList() {
         </div>
       )}
 
+      {/* Filters Toggle */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="flex items-center gap-2 px-3 py-2 rounded-[8px] text-sm font-medium transition-colors"
+        style={{ 
+          background: 'var(--color-bg-surface-hover)',
+          color: 'var(--color-text-secondary)',
+          borderColor: 'var(--color-border)'
+        }}
+      >
+        <span className="material-symbols-outlined text-sm">filter_list</span>
+        {t('common.filter')}
+        {(hasActiveFilters) && (
+          <span 
+            className="w-2 h-2 rounded-full"
+            style={{ background: 'var(--color-primary)' }}
+          />
+        )}
+      </button>
+
       {/* Filters Bar */}
+      {showFilters && (
       <div className="flex flex-wrap gap-2 items-center">
         {/* View Mode */}
         <div
@@ -804,100 +883,7 @@ export default function TodoList() {
           </button>
         )}
       </div>
-
-      {/* Add Todo Form */}
-      <form onSubmit={handleCreateTodo} className="space-y-3">
-        <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={newTodoTitle}
-            onChange={(e) => setNewTodoTitle(e.target.value)}
-            placeholder={t('todos.addPlaceholder')}
-            className="todo-add-input flex-1 px-4 py-3 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary"
-            style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-          />
-          <button
-            type="submit"
-            disabled={!newTodoTitle.trim()}
-            className="btn-neon px-6 py-3 bg-primary text-white rounded-[8px] hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {t('todos.add')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="btn-outline px-3 py-3 border rounded-[8px] todo-advanced-toggle"
-            style={{ borderColor: 'var(--color-border)' }}
-            title={t('todos.advancedOptions')}
-          >
-            <span className="material-symbols-outlined" style={{ color: 'var(--color-text-secondary)' }}>
-              {showAdvanced ? 'expand_less' : 'expand_more'}
-            </span>
-          </button>
-        </div>
-
-        {showAdvanced && (
-          <div
-            className="todo-advanced-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-[8px]"
-            style={{ background: 'var(--color-bg-surface-hover)' }}
-          >
-            <input
-              type="text"
-              value={newTodoDescription}
-              onChange={(e) => setNewTodoDescription(e.target.value)}
-              placeholder={t('todos.form.description')}
-              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            />
-            <select
-              value={newTodoPriority}
-              onChange={(e) => setNewTodoPriority(e.target.value)}
-              className="todo-select px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            >
-              <option value="low">{t('todos.lowPriority')}</option>
-              <option value="normal">{t('todos.normalPriority')}</option>
-              <option value="high">{t('todos.highPriority')}</option>
-            </select>
-            <input
-              type="date"
-              value={newTodoDueDate}
-              onChange={(e) => setNewTodoDueDate(e.target.value)}
-              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            />
-            <input
-              type="time"
-              value={newTodoDueTime}
-              onChange={(e) => setNewTodoDueTime(e.target.value)}
-              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            />
-            <input
-              type="number"
-              value={newTodoEffort}
-              onChange={(e) => setNewTodoEffort(e.target.value)}
-              placeholder={t('todos.effortPlaceholder')}
-              min="0"
-              step="0.5"
-              className="rf-input px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            />
-            <select
-              value={newTodoCategory}
-              onChange={(e) => setNewTodoCategory(e.target.value)}
-              className="todo-select sm:col-span-2 lg:col-span-5 px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
-            >
-                    <option value="">{t('todos.form.noCategory')}</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-      </form>
+      )}
 
       {/* Todo List */}
       {groupedTodos ? (
@@ -1044,6 +1030,177 @@ export default function TodoList() {
           </div>
         </div>
       )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="w-72 shrink-0">
+          <div className="sticky top-6 flex flex-col gap-4">
+            {/* Todo Details Card */}
+            <div
+              className="rounded-[8px] p-5 border"
+              style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
+            >
+              <h3 className="text-xl font-bold mb-5" style={{ color: 'var(--color-text-primary)' }}>
+                {t('todos.details.title')}
+              </h3>
+              <div className="grid grid-cols-2 gap-y-5 gap-x-4">
+                {/* Category */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {t('todos.details.category')}
+                  </p>
+                  {selectedTodo?.category ? (
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {selectedTodo.category.name}
+                    </p>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {t('todos.details.none')}
+                    </p>
+                  )}
+                </div>
+                {/* Status */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {t('todos.details.status')}
+                  </p>
+                  {selectedTodo ? (
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: selectedTodo.completed ? 'var(--color-success)' : 'var(--color-info)' }}
+                    >
+                      {selectedTodo.completed ? t('todos.statuses.completed') : t('todos.statuses.pending')}
+                    </p>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {t('todos.details.none')}
+                    </p>
+                  )}
+                </div>
+                {/* Priority */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {t('todos.details.priority')}
+                  </p>
+                  {selectedTodo?.priority ? (
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {t(`todos.priorities.${selectedTodo.priority}`)}
+                    </p>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {t('todos.details.none')}
+                    </p>
+                  )}
+                </div>
+                {/* Date */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {t('todos.details.date')}
+                  </p>
+                  {selectedTodo?.dueDate ? (
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {formatDate(selectedTodo.dueDate)}
+                      {selectedTodo.dueTime && ` ${selectedTodo.dueTime}`}
+                    </p>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {t('todos.details.none')}
+                    </p>
+                  )}
+                </div>
+                {/* Effort */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {t('todos.details.effort')}
+                  </p>
+                  {selectedTodo && selectedTodo.effortMinutes > 0 ? (
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {formatEffort(selectedTodo.effortMinutes)}
+                    </p>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {t('todos.details.none')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-[1px]"></div>
+
+            {/* Statistics Card */}
+            <div
+              className="rounded-[8px] p-5 border"
+              style={{ background: 'var(--color-bg-surface)', borderColor: 'var(--color-border)' }}
+            >
+              <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                {t('todos.statistics.title')}
+              </h3>
+              <p className="text-xs mb-6" style={{ color: 'var(--color-text-muted)' }}>
+                {t('todos.statistics.subtitle')}
+              </p>
+              {metrics && (
+                <div className="space-y-5">
+                  {/* All Tasks */}
+                  <div className="flex justify-between items-center">
+                    <span style={{ color: 'var(--color-text-secondary)' }}>{t('todos.statistics.allTasks')}</span>
+                    <span className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{metrics.total}</span>
+                  </div>
+
+                  {/* Pending */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ background: 'var(--color-info)' }}></span>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{t('todos.statuses.pending')}</span>
+                    </div>
+                    <span className="text-lg font-semibold" style={{ color: 'var(--color-info)' }}>{metrics.pending}</span>
+                  </div>
+
+                  {/* Completed */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ background: 'var(--color-success)' }}></span>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{t('todos.statuses.completed')}</span>
+                    </div>
+                    <span className="text-lg font-semibold" style={{ color: 'var(--color-success)' }}>{metrics.completed}</span>
+                  </div>
+
+                  {/* Overdue */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ background: 'var(--color-danger)' }}></span>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{t('todos.overdue')}</span>
+                    </div>
+                    <span className="text-lg font-semibold" style={{ color: 'var(--color-danger)' }}>{metrics.overdue}</span>
+                  </div>
+
+                  {/* Bottom boxes: Effort & Compliance */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div
+                      className="rounded-[8px] p-3"
+                      style={{ background: 'var(--color-bg-surface-hover)' }}
+                    >
+                      <p className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>{t('todos.statistics.effort')}</p>
+                      <p className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                        {formatEffort(metrics.totalEffortMinutes)}
+                      </p>
+                    </div>
+                    <div
+                      className="rounded-[8px] p-3"
+                      style={{ background: 'var(--color-bg-surface-hover)' }}
+                    >
+                      <p className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>{t('todos.statistics.compliance')}</p>
+                      <p className="text-xl font-bold" style={{ color: 'var(--color-danger)' }}>
+                        {metrics.completionRate}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
