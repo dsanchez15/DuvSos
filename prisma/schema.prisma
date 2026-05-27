@@ -74,10 +74,10 @@ model User {
   phases              Phase[]
   dailyProgress       DailyProgress[]
   weeklyCheckIns      WeeklyCheckIn[]
-  studyQuestions      StudyQuestion[]
-  studyTopics         StudyTopic[]
-  studySessions       StudySession[]
-  studySettings       StudySettings[]
+  questions           Question[]
+  topics              Topic[]
+  sessions            Session[]
+  studySetting        StudySetting?
 }
 
 model Category {
@@ -93,7 +93,7 @@ model Category {
   habits      Habit[]
   checklists  Checklist[]
   todos       Todo[]
-  studyQuestions StudyQuestion[]
+  questions      Question[]
 
   @@index([userId])
 }
@@ -516,12 +516,13 @@ model WeeklyCheckIn {
 
 // ─── Study / Spaced Repetition Models ──────────────────────────────────────
 
-model StudyQuestion {
+model Question {
   id                String      @id @default(cuid())
   question          String
   categoryId        Int?
   category          Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  topic             String
+  topicId           String
+  topic             Topic       @relation(fields: [topicId], references: [id], onDelete: Restrict)
   type              String      @default("direct")
   directAnswer      String
   options           String[]
@@ -533,24 +534,25 @@ model StudyQuestion {
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([userId, topic])
+  @@index([userId, topicId])
   @@index([categoryId])
   @@index([type])
 }
 
-model StudyTopic {
+model Topic {
   id            String   @id @default(cuid())
   name          String
   normalizedName String
   userId        Int
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
+  questions     Question[]
 
   @@index([userId])
   @@unique([userId, normalizedName])
 }
 
-model StudySession {
+model Session {
   id             String          @id @default(cuid())
   userId         Int
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -561,16 +563,16 @@ model StudySession {
   questionIds    String[]
   currentIndex   Int             @default(0)
   totalTimeSpent Int             @default(0)
-  answers        StudySessionAnswer[]
+  answers        SessionAnswer[]
 
   @@index([userId])
   @@index([userId, status])
 }
 
-model StudySessionAnswer {
+model SessionAnswer {
   id             String       @id @default(cuid())
   sessionId      String
-  session        StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session        Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   questionId     String
   questionText   String
   userAnswer     String
@@ -582,7 +584,7 @@ model StudySessionAnswer {
   @@index([sessionId])
 }
 
-model StudySettings {
+model StudySetting {
   id                  String   @id @default(cuid())
   userId              Int      @unique
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)

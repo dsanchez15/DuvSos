@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = parseInt(userIdHeader, 10)
 
-    const session = await prisma.studySession.findFirst({
+    const session = await prisma.session.findFirst({
       where: { userId, status: 'active' },
       include: { answers: true },
     })

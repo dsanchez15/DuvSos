@@ -12,12 +12,12 @@ export async function POST(request: NextRequest) {
     const userId = parseInt(userIdHeader, 10)
     const body = await request.json()
 
-    await prisma.studySession.updateMany({
+    await prisma.session.updateMany({
       where: { userId, status: 'active' },
       data: { status: 'abandoned' },
     })
 
-    const session = await prisma.studySession.create({
+    const session = await prisma.session.create({
       data: {
         userId,
         config: body.config,

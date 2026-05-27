@@ -16,7 +16,7 @@ export async function POST(
     const { id } = await params
     const body = await request.json()
 
-    const answer = await prisma.studySessionAnswer.create({
+    const answer = await prisma.sessionAnswer.create({
       data: {
         sessionId: id,
         questionId: body.questionId,
@@ -29,7 +29,7 @@ export async function POST(
       },
     })
 
-    await prisma.studySession.update({
+    await prisma.session.update({
       where: { id },
       data: {
         currentIndex: { increment: 1 },

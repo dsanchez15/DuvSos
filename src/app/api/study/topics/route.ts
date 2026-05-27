@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = parseInt(userIdHeader, 10)
 
-    const topics = await prisma.studyTopic.findMany({
+    const topics = await prisma.topic.findMany({
       where: { userId },
       orderBy: { name: 'asc' },
     })
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const normalizedName = name.toLowerCase()
 
-    const existing = await prisma.studyTopic.findUnique({
+    const existing = await prisma.topic.findUnique({
       where: { userId_normalizedName: { userId, normalizedName } },
     })
 
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Topic already exists' }, { status: 409 })
     }
 
-    const topic = await prisma.studyTopic.create({
+    const topic = await prisma.topic.create({
       data: {
         name,
         normalizedName,

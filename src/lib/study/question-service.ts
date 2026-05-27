@@ -1,6 +1,17 @@
-import type { Question, ImportSummary } from '@/types/study'
+import type { Question, ImportSummary, QuestionType } from '@/types/study'
 
 const API_BASE = '/api/study'
+
+export interface QuestionInput {
+  question: string;
+  categoryId: number | null;
+  topic: string;
+  type: QuestionType;
+  directAnswer: string;
+  options: string[];
+  correctOptionIndex: number | null;
+  supportsBothModes: boolean;
+}
 
 export const QuestionService = {
   async getAll(): Promise<Question[]> {
@@ -14,7 +25,7 @@ export const QuestionService = {
     return all.find((q) => q.id === id)
   },
 
-  async create(data: Omit<Question, 'id' | 'createdAt' | 'updatedAt'>): Promise<Question> {
+  async create(data: QuestionInput): Promise<Question> {
     const res = await fetch(`${API_BASE}/questions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,7 +35,7 @@ export const QuestionService = {
     return res.json()
   },
 
-  async update(id: string, data: Partial<Omit<Question, 'id' | 'createdAt'>>): Promise<Question | null> {
+  async update(id: string, data: Partial<QuestionInput>): Promise<Question | null> {
     const res = await fetch(`${API_BASE}/questions/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -39,12 +50,11 @@ export const QuestionService = {
     return res.ok
   },
 
-  async filter(filters: { categoryId?: number | null; topic?: string | null; type?: string | null; supportsBothModes?: boolean | null; searchText?: string | null }): Promise<Question[]> {
+  async filter(filters: { categoryId?: number | null; topic?: string | null; mode?: 'direct' | 'multiple-choice' | 'dual' | null; searchText?: string | null }): Promise<Question[]> {
     const params = new URLSearchParams()
     if (filters.categoryId !== undefined && filters.categoryId !== null) params.set('categoryId', String(filters.categoryId))
     if (filters.topic) params.set('topic', filters.topic)
-    if (filters.type) params.set('type', filters.type)
-    if (filters.supportsBothModes !== undefined && filters.supportsBothModes !== null) params.set('supportsBothModes', String(filters.supportsBothModes))
+    if (filters.mode) params.set('mode', filters.mode)
     if (filters.searchText) params.set('search', filters.searchText)
 
     const res = await fetch(`${API_BASE}/questions?${params.toString()}`)

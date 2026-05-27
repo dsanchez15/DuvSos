@@ -11,12 +11,12 @@ export async function GET(request: NextRequest) {
     }
     const userId = parseInt(userIdHeader, 10)
 
-    const settings = await prisma.studySettings.findUnique({
+    const settings = await prisma.studySetting.findUnique({
       where: { userId },
     })
 
     if (!settings) {
-      const defaults = await prisma.studySettings.create({
+      const defaults = await prisma.studySetting.create({
         data: { userId, showStudySection: true, maxQuestionsPerReview: 20 },
       })
       return NextResponse.json(defaults)
@@ -39,7 +39,7 @@ export async function PUT(request: NextRequest) {
     const userId = parseInt(userIdHeader, 10)
     const body = await request.json()
 
-    const settings = await prisma.studySettings.upsert({
+    const settings = await prisma.studySetting.upsert({
       where: { userId },
       create: { userId, ...body },
       update: body,

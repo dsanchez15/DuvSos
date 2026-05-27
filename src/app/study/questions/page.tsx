@@ -16,6 +16,7 @@ export default function QuestionsPage() {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [topics, setTopics] = useState<string[]>([]);
   const [filters, setFilters] = useState<QuestionFilter>({});
+  const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [importSummary, setImportSummary] = useState<{ imported: number; ignored: number; errors: string[] } | null>(null);
@@ -130,7 +131,7 @@ export default function QuestionsPage() {
     setEditingId(q.id);
     setQuestionText(q.question);
     setCategoryId(q.categoryId ?? '');
-    setTopic(q.topic);
+    setTopic(q.topic?.name || '');
     setType(q.type);
     setDirectAnswer(q.directAnswer);
     setOptions(q.options.length ? q.options : ['', '', '', '']);
@@ -169,16 +170,31 @@ export default function QuestionsPage() {
 
         {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-3 items-end">
-          <div className="flex-1 min-w-[200px]">
-            <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Buscar</label>
-            <input
-              type="text"
-              placeholder="Buscar pregunta..."
-              value={filters.searchText || ''}
-              onChange={(e) => setFilters((f) => ({ ...f, searchText: e.target.value || null }))}
-              className="w-full px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
-            />
+          <div className="flex-1 min-w-[200px] flex gap-2">
+            <div className="flex-1">
+              <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Buscar</label>
+              <input
+                type="text"
+                placeholder="Buscar pregunta..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setFilters((f) => ({ ...f, searchText: searchQuery.trim() || null }));
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-[8px] border text-sm"
+                style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+              />
+            </div>
+            <button
+              onClick={() => setFilters((f) => ({ ...f, searchText: searchQuery.trim() || null }))}
+              className="w-9 h-9 flex items-center justify-center text-sm border rounded-[8px] hover:bg-primary/5 self-end shrink-0"
+              style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+              title="Buscar"
+            >
+              <span className="material-symbols-outlined text-base">search</span>
+            </button>
           </div>
           <div>
             <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Categoría</label>
@@ -211,34 +227,19 @@ export default function QuestionsPage() {
           <div>
             <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Tipo</label>
             <select
-              value={filters.type ?? ''}
-              onChange={(e) => setFilters((f) => ({ ...f, type: (e.target.value as QuestionType) || null }))}
+              value={filters.mode ?? ''}
+              onChange={(e) => setFilters((f) => ({ ...f, mode: (e.target.value as 'direct' | 'multiple-choice' | 'dual') || null }))}
               className="px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
             >
               <option value="">Todos</option>
               <option value="direct">Directa</option>
               <option value="multiple-choice">Selección múltiple</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Dual</label>
-            <select
-              value={filters.supportsBothModes === true ? 'yes' : filters.supportsBothModes === false ? 'no' : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                setFilters((f) => ({ ...f, supportsBothModes: val === 'yes' ? true : val === 'no' ? false : null }));
-              }}
-              className="px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
-            >
-              <option value="">Todos</option>
-              <option value="yes">Sí</option>
-              <option value="no">No</option>
+              <option value="dual">Dual</option>
             </select>
           </div>
           <button
-            onClick={() => setFilters({})}
+            onClick={() => { setFilters({}); setSearchQuery(''); }}
             className="px-3 py-2 text-sm border rounded-[8px] hover:bg-primary/5"
             style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
           >
@@ -279,7 +280,7 @@ export default function QuestionsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm mb-1 truncate">{q.question}</p>
                   <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary">{q.topic}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary">{q.topic?.name || ''}</span>
                     {q.categoryId !== null && (
                       <span className="px-2 py-0.5 rounded-full" style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}>
                         {categories.find((c) => c.id === q.categoryId)?.name ?? 'General'}

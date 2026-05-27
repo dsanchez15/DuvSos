@@ -15,7 +15,7 @@ export async function DELETE(
     const userId = parseInt(userIdHeader, 10)
     const { id } = await params
 
-    const result = await prisma.studyTopic.deleteMany({
+    const result = await prisma.topic.deleteMany({
       where: { id, userId },
     })
 

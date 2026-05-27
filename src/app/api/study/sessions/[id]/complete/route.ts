@@ -16,7 +16,7 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    const session = await prisma.studySession.updateMany({
+    const session = await prisma.session.updateMany({
       where: { id, userId },
       data: {
         status: body.status,
@@ -28,7 +28,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    const updated = await prisma.studySession.findUnique({
+    const updated = await prisma.session.findUnique({
       where: { id },
       include: { answers: true },
     })

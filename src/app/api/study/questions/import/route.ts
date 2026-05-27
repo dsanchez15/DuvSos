@@ -22,12 +22,12 @@ export async function POST(request: NextRequest) {
       const item = items[i]
       const questionText = typeof item.question === 'string' ? item.question.trim() : ''
       const answer = typeof item.answer === 'string' ? item.answer.trim() : ''
-      const topic = typeof item.topic === 'string' ? item.topic.trim() : ''
+      const topicName = typeof item.topic === 'string' ? item.topic.trim() : ''
       const categoryId = typeof item.categoryId === 'number' ? item.categoryId : null
       const type = item.type === 'multiple-choice' || item.type === 'direct' ? item.type : null
       const supportsBothModes = typeof item.supportsBothModes === 'boolean' ? item.supportsBothModes : false
 
-      if (!questionText || !answer || !topic || !type) {
+      if (!questionText || !answer || !topicName || !type) {
         summary.ignored++
         summary.errors.push(`Item ${i + 1}: Missing required fields`)
         continue
@@ -59,11 +59,27 @@ export async function POST(request: NextRequest) {
         correctOptionIndex = idx
       }
 
-      await prisma.studyQuestion.create({
+      // Buscar o crear el topic
+      const normalizedName = topicName.toLowerCase()
+      let topic = await prisma.topic.findUnique({
+        where: { userId_normalizedName: { userId, normalizedName } },
+      })
+
+      if (!topic) {
+        topic = await prisma.topic.create({
+          data: {
+            name: topicName,
+            normalizedName,
+            userId,
+          },
+        })
+      }
+
+      await prisma.question.create({
         data: {
           question: questionText,
           categoryId,
-          topic,
+          topicId: topic.id,
           type: type === 'multiple-choice' ? 'multiple_choice' : 'direct',
           directAnswer: answer,
           options: options.length ? options : [],

@@ -180,7 +180,7 @@ export default function SettingsPage() {
         const topic = topics.find((t) => t.id === id);
         if (!topic) return;
         const allQuestions = await QuestionService.getAll();
-        const questionsWithTopic = allQuestions.filter((q) => q.topic === topic.name);
+        const questionsWithTopic = allQuestions.filter((q) => q.topic?.name === topic.name);
         const msg = questionsWithTopic.length > 0
             ? `Este tema tiene ${questionsWithTopic.length} pregunta(s) asociada(s). Al eliminarlo, las preguntas quedarán sin temática asignada. ¿Continuar?`
             : '¿Eliminar este tema?';

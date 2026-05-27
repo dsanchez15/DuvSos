@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = parseInt(userIdHeader, 10)
 
-    const sessions = await prisma.studySession.findMany({
+    const sessions = await prisma.session.findMany({
       where: { userId, status: { in: ['completed', 'abandoned'] } },
       include: { answers: true },
       orderBy: { lastActivityAt: 'desc' },

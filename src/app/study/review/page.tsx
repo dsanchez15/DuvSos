@@ -107,14 +107,13 @@ export default function ReviewPage() {
   const getFilteredQuestions = useCallback((): Question[] => {
     let qs = [...questions];
     if (config.topics !== 'all') {
-      qs = qs.filter((q) => config.topics.includes(q.topic));
+      qs = qs.filter((q) => config.topics.includes(q.topic?.name || ''));
     }
     if (config.questionType === 'direct') {
       qs = qs.filter((q) => q.type === 'direct' || q.supportsBothModes);
     } else if (config.questionType === 'multiple-choice') {
       qs = qs.filter((q) => q.type === 'multiple-choice' || q.supportsBothModes);
     } else {
-      // both - all questions with at least one mode
       qs = qs.filter((q) => q.type === 'direct' || q.type === 'multiple-choice' || q.supportsBothModes);
     }
     return qs;
