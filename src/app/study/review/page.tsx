@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { QuestionService } from '@/lib/study/question-service';
 import { TopicService } from '@/lib/study/topic-service';
-import { StudySessionService } from '@/lib/study/session-service';
-import { getStudySettings } from '@/lib/study/settings-store';
+import { SessionService } from '@/lib/study/session-service';
+import { SettingsStore } from '@/lib/study/settings-store';
 import type {
   Question,
   QuestionType,
@@ -53,25 +53,28 @@ export default function ReviewPage() {
   const [expiredSession, setExpiredSession] = useState(false);
 
   useEffect(() => {
-    setQuestions(QuestionService.getAll());
-    setTopics(TopicService.getNames());
-    const settings = getStudySettings();
-    setMaxQuestions(settings.maxQuestionsPerReview);
-    setConfig((c) => ({ ...c, questionCount: Math.min(c.questionCount, settings.maxQuestionsPerReview) }));
+    const init = async () => {
+      const qs = await QuestionService.getAll();
+      setQuestions(qs);
+      const ts = await TopicService.getAll();
+      setTopics(ts.map((t) => t.name));
+      const settings = await SettingsStore.getSettings();
+      setMaxQuestions(settings.maxQuestionsPerReview);
+      setConfig((c) => ({ ...c, questionCount: Math.min(c.questionCount, settings.maxQuestionsPerReview) }));
 
-    fetch('/api/todo-categories')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => setCategories([]));
+      fetch('/api/todo-categories')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => setCategories(Array.isArray(data) ? data : []))
+        .catch(() => setCategories([]));
 
-    StudySessionService.cleanupExpiredSessions();
-
-    // Check for active session
-    const active = StudySessionService.getActiveSession();
-    if (active) {
-      setSession(active);
-      setShowResumeDialog(true);
-    }
+      // Check for active session
+      const active = await SessionService.getActiveSession();
+      if (active) {
+        setSession(active);
+        setShowResumeDialog(true);
+      }
+    };
+    init();
   }, []);
 
   const startTimer = (seconds: number) => {
@@ -126,28 +129,28 @@ export default function ReviewPage() {
     return a;
   };
 
-  const handleStartSession = () => {
+  const handleStartSession = async () => {
     const available = getFilteredQuestions();
     const count = Math.min(config.questionCount, available.length);
     const selected = shuffleArray(available).slice(0, count);
     const questionIds = selected.map((q) => q.id);
 
-    const newSession = StudySessionService.createSession(config, questionIds);
+    const newSession = await SessionService.createSession(config, questionIds);
     setSession(newSession);
     setView('active');
-    loadNextQuestion(newSession, 0);
+    await loadNextQuestion(newSession, 0);
   };
 
-  const loadNextQuestion = (sess: StudySession, index: number) => {
+  const loadNextQuestion = async (sess: StudySession, index: number) => {
     if (index >= sess.questionIds.length) {
       finishSession(sess);
       return;
     }
-    const q = QuestionService.getById(sess.questionIds[index]);
+    const q = await QuestionService.getById(sess.questionIds[index]);
     if (!q) {
       // Skip missing questions
       sess.currentIndex = index + 1;
-      StudySessionService.saveActiveSession(sess);
+      await SessionService.saveActiveSession(sess);
       loadNextQuestion(sess, index + 1);
       return;
     }
@@ -174,7 +177,7 @@ export default function ReviewPage() {
     }
   };
 
-  const handleSubmitAnswer = (timedOut = false) => {
+  const handleSubmitAnswer = async (timedOut = false) => {
     if (!currentQuestion || !session) return;
 
     stopTimer();
@@ -208,52 +211,54 @@ export default function ReviewPage() {
       timeSpent,
     };
 
-    const updatedSession = StudySessionService.recordAnswer(session, answer);
+    const updatedSession = await SessionService.recordAnswer(session, answer);
     setSession(updatedSession);
     setIsCorrect(answer.isCorrect);
     setShowFeedback(true);
     setTimeLeft(null);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!session) return;
-    loadNextQuestion(session, session.currentIndex);
+    await loadNextQuestion(session, session.currentIndex);
   };
 
-  const finishSession = (sess: StudySession) => {
+  const finishSession = async (sess: StudySession) => {
     stopTimer();
-    const res = StudySessionService.completeSession(sess);
-    setResult(res);
-    const prev = StudySessionService.getPreviousResult(sess.config);
+    await SessionService.completeSession(sess.id);
+    const results = await SessionService.getResults();
+    setResult(results[0] || null);
+    const prev = await SessionService.getPreviousResult(sess.config);
     setPreviousResult(prev);
     setView('summary');
     setSession(null);
     setCurrentQuestion(null);
   };
 
-  const handleAbandon = () => {
+  const handleAbandon = async () => {
     if (!session) return;
     if (!confirm('¿Abandonar la sesión actual? Se guardarán los resultados parciales.')) return;
     stopTimer();
-    const res = StudySessionService.abandonSession(session);
-    setResult(res);
-    const prev = StudySessionService.getPreviousResult(session.config);
+    await SessionService.abandonSession(session.id);
+    const results = await SessionService.getResults();
+    setResult(results[0] || null);
+    const prev = await SessionService.getPreviousResult(session.config);
     setPreviousResult(prev);
     setView('summary');
     setSession(null);
     setCurrentQuestion(null);
   };
 
-  const handleResume = () => {
+  const handleResume = async () => {
     setShowResumeDialog(false);
     if (!session) return;
     setView('active');
-    loadNextQuestion(session, session.currentIndex);
+    await loadNextQuestion(session, session.currentIndex);
   };
 
-  const handleDiscardSession = () => {
+  const handleDiscardSession = async () => {
     setShowResumeDialog(false);
-    StudySessionService.discardActiveSession();
+    await SessionService.discardActiveSession();
     setSession(null);
     setExpiredSession(false);
   };

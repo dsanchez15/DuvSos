@@ -1,191 +1,88 @@
-import type {
-  StudySession,
-  StudySessionConfig,
-  SessionResult,
-  SessionAnswer,
-  SessionStatus,
-} from '@/types/study';
+import type { StudySession, StudySessionConfig, SessionResult, SessionAnswer, Question } from '@/types/study'
 
-const SESSIONS_KEY = 'aure-study-sessions';
-const RESULTS_KEY = 'aure-study-results';
-const ACTIVE_SESSION_KEY = 'aure-study-active-session';
+const API_BASE = '/api/study'
 
-const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+export const SessionService = {
+  async getActiveSession(): Promise<StudySession | null> {
+    const res = await fetch(`${API_BASE}/sessions/active`)
+    if (!res.ok) return null
+    const data = await res.json()
+    return data || null
+  },
 
-function getStoredSessions(): StudySession[] {
-  if (typeof window === 'undefined') return [];
-  const raw = localStorage.getItem(SESSIONS_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
+  async startSession(config: StudySessionConfig, questionIds: string[]): Promise<StudySession> {
+    const res = await fetch(`${API_BASE}/sessions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config, questionIds }),
+    })
+    if (!res.ok) throw new Error('Failed to start session')
+    return res.json()
+  },
 
-function saveSessions(sessions: StudySession[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
-}
+  async saveAnswer(sessionId: string, answer: SessionAnswer): Promise<void> {
+    const res = await fetch(`${API_BASE}/sessions/${sessionId}/answers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(answer),
+    })
+    if (!res.ok) throw new Error('Failed to save answer')
+  },
 
-function getStoredResults(): SessionResult[] {
-  if (typeof window === 'undefined') return [];
-  const raw = localStorage.getItem(RESULTS_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
+  async completeSession(sessionId: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/sessions/${sessionId}/complete`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'completed' }),
+    })
+    if (!res.ok) throw new Error('Failed to complete session')
+  },
 
-function saveResults(results: SessionResult[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(RESULTS_KEY, JSON.stringify(results));
-}
+  async abandonSession(sessionId: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/sessions/${sessionId}/complete`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'abandoned' }),
+    })
+    if (!res.ok) throw new Error('Failed to abandon session')
+  },
 
-export const StudySessionService = {
-  getActiveSession(): StudySession | null {
-    if (typeof window === 'undefined') return null;
-    const raw = localStorage.getItem(ACTIVE_SESSION_KEY);
-    if (!raw) return null;
-    try {
-      const session: StudySession = JSON.parse(raw);
-      const age = Date.now() - new Date(session.startedAt).getTime();
-      if (age > ONE_WEEK_MS) {
-        this.discardActiveSession();
-        return null;
-      }
-      return session;
-    } catch {
-      return null;
+  async getResults(): Promise<SessionResult[]> {
+    const res = await fetch(`${API_BASE}/sessions/results`)
+    if (!res.ok) throw new Error('Failed to fetch results')
+    return res.json()
+  },
+
+  // Compatibility methods for old API
+  async createSession(config: StudySessionConfig, questionIds: string[]): Promise<StudySession> {
+    return this.startSession(config, questionIds)
+  },
+
+  async saveActiveSession(_session: StudySession): Promise<void> {
+    // No-op in new API; session is already persisted
+  },
+
+  async recordAnswer(session: StudySession, answer: SessionAnswer): Promise<StudySession> {
+    await this.saveAnswer(session.id, answer)
+    // Re-fetch session to get updated state
+    const res = await fetch(`${API_BASE}/sessions/active`)
+    if (!res.ok) return session
+    return res.json()
+  },
+
+  async getPreviousResult(_config: StudySessionConfig): Promise<SessionResult | null> {
+    const results = await this.getResults()
+    return results[0] || null
+  },
+
+  async discardActiveSession(): Promise<void> {
+    const active = await this.getActiveSession()
+    if (active) {
+      await this.abandonSession(active.id)
     }
-  },
-
-  hasActiveSession(): boolean {
-    return this.getActiveSession() !== null;
-  },
-
-  isActiveSessionExpired(): boolean {
-    if (typeof window === 'undefined') return false;
-    const raw = localStorage.getItem(ACTIVE_SESSION_KEY);
-    if (!raw) return false;
-    try {
-      const session: StudySession = JSON.parse(raw);
-      const age = Date.now() - new Date(session.startedAt).getTime();
-      return age > ONE_WEEK_MS;
-    } catch {
-      return false;
-    }
-  },
-
-  createSession(config: StudySessionConfig, questionIds: string[]): StudySession {
-    const now = new Date().toISOString();
-    const session: StudySession = {
-      id: crypto.randomUUID(),
-      config,
-      status: 'active',
-      startedAt: now,
-      lastActivityAt: now,
-      questionIds,
-      currentIndex: 0,
-      answers: [],
-      totalTimeSpent: 0,
-    };
-    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session));
-    return session;
-  },
-
-  saveActiveSession(session: StudySession): void {
-    if (typeof window === 'undefined') return;
-    session.lastActivityAt = new Date().toISOString();
-    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session));
-  },
-
-  discardActiveSession(): void {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(ACTIVE_SESSION_KEY);
-  },
-
-  recordAnswer(session: StudySession, answer: SessionAnswer): StudySession {
-    session.answers.push(answer);
-    session.totalTimeSpent += answer.timeSpent;
-    session.currentIndex++;
-    session.lastActivityAt = new Date().toISOString();
-    this.saveActiveSession(session);
-    return session;
-  },
-
-  completeSession(session: StudySession): SessionResult {
-    session.status = 'completed';
-    const now = new Date().toISOString();
-    const result: SessionResult = {
-      id: crypto.randomUUID(),
-      sessionId: session.id,
-      config: session.config,
-      totalQuestions: session.answers.length,
-      correctCount: session.answers.filter((a) => a.isCorrect).length,
-      incorrectCount: session.answers.filter((a) => !a.isCorrect).length,
-      accuracyPercentage: session.answers.length > 0
-        ? Math.round((session.answers.filter((a) => a.isCorrect).length / session.answers.length) * 100)
-        : 0,
-      totalTimeSpent: session.totalTimeSpent,
-      completedAt: now,
-    };
-
-    // Save to history
-    const sessions = getStoredSessions();
-    sessions.push(session);
-    saveSessions(sessions);
-
-    const results = getStoredResults();
-    results.push(result);
-    saveResults(results);
-
-    this.discardActiveSession();
-    return result;
-  },
-
-  abandonSession(session: StudySession): SessionResult {
-    session.status = 'abandoned';
-    return this.completeSession(session);
-  },
-
-  getResults(): SessionResult[] {
-    return getStoredResults();
-  },
-
-  getPreviousResult(config: StudySessionConfig): SessionResult | null {
-    const results = getStoredResults();
-    const matching = results.filter((r) => {
-      const sameType = r.config.questionType === config.questionType;
-      const sameTopics =
-        config.topics === 'all'
-          ? r.config.topics === 'all'
-          : Array.isArray(r.config.topics) &&
-            Array.isArray(config.topics) &&
-            r.config.topics.length === config.topics.length &&
-            r.config.topics.every((t) => config.topics.includes(t));
-      return sameType && sameTopics;
-    });
-    if (matching.length === 0) return null;
-    return matching.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0];
   },
 
   cleanupExpiredSessions(): void {
-    if (typeof window === 'undefined') return;
-    const sessions = getStoredSessions();
-    const now = Date.now();
-    const filtered = sessions.filter((s) => {
-      const age = now - new Date(s.startedAt).getTime();
-      return age <= ONE_WEEK_MS;
-    });
-    if (filtered.length !== sessions.length) {
-      saveSessions(filtered);
-    }
-    // Also check active session
-    if (this.isActiveSessionExpired()) {
-      this.discardActiveSession();
-    }
+    // No-op in new API; sessions are managed server-side
   },
-};
+}

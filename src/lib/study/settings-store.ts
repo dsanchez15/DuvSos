@@ -1,26 +1,21 @@
-import type { StudySettings } from '@/types/study';
-import { DEFAULT_STUDY_SETTINGS } from '@/types/study';
+import type { StudySettings } from '@/types/study'
 
-const SETTINGS_KEY = 'aure-study-settings';
+const API_BASE = '/api/study'
 
-export function getStudySettings(): StudySettings {
-  if (typeof window === 'undefined') return DEFAULT_STUDY_SETTINGS;
-  const raw = localStorage.getItem(SETTINGS_KEY);
-  if (!raw) return DEFAULT_STUDY_SETTINGS;
-  try {
-    const parsed = JSON.parse(raw);
-    return {
-      showStudySection: typeof parsed.showStudySection === 'boolean' ? parsed.showStudySection : DEFAULT_STUDY_SETTINGS.showStudySection,
-      maxQuestionsPerReview: typeof parsed.maxQuestionsPerReview === 'number'
-        ? Math.max(20, Math.min(50, parsed.maxQuestionsPerReview))
-        : DEFAULT_STUDY_SETTINGS.maxQuestionsPerReview,
-    };
-  } catch {
-    return DEFAULT_STUDY_SETTINGS;
-  }
-}
+export const SettingsStore = {
+  async getSettings(): Promise<StudySettings> {
+    const res = await fetch(`${API_BASE}/settings`)
+    if (!res.ok) throw new Error('Failed to fetch settings')
+    return res.json()
+  },
 
-export function saveStudySettings(settings: StudySettings): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  async updateSettings(settings: Partial<StudySettings>): Promise<StudySettings> {
+    const res = await fetch(`${API_BASE}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings),
+    })
+    if (!res.ok) throw new Error('Failed to update settings')
+    return res.json()
+  },
 }

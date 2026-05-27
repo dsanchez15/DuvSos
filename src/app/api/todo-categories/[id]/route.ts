@@ -9,42 +9,30 @@ export async function PUT(
   try {
     const headersList = await headers()
     const userIdHeader = headersList.get('x-user-id')
-
     if (!userIdHeader) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
     const userId = parseInt(userIdHeader, 10)
     const { id: idParams } = await params
     const id = parseInt(idParams, 10)
-
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
     }
 
     const body = await request.json()
-    const { name, color, icon, description, parentId } = body
-
-    const existingCategory = await prisma.todoCategory.findFirst({
-      where: { id, userId }
-    })
-
+    const existingCategory = await prisma.category.findFirst({ where: { id, userId } })
     if (!existingCategory) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
 
     const updateData: any = {}
-    if (name !== undefined) updateData.name = name
-    if (color !== undefined) updateData.color = color
-    if (icon !== undefined) updateData.icon = icon
-    if (description !== undefined) updateData.description = description
-    if (parentId !== undefined) updateData.parentId = parentId || null
+    if (body.name !== undefined) updateData.name = body.name
+    if (body.color !== undefined) updateData.color = body.color
+    if (body.icon !== undefined) updateData.icon = body.icon
+    if (body.description !== undefined) updateData.description = body.description
+    if (body.scopes !== undefined) updateData.scopes = body.scopes
 
-    const category = await prisma.todoCategory.update({
-      where: { id },
-      data: updateData
-    })
-
+    const category = await prisma.category.update({ where: { id }, data: updateData })
     return NextResponse.json(category)
   } catch (error) {
     console.error('Error updating category:', error)
@@ -59,40 +47,25 @@ export async function DELETE(
   try {
     const headersList = await headers()
     const userIdHeader = headersList.get('x-user-id')
-
     if (!userIdHeader) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
     const userId = parseInt(userIdHeader, 10)
     const { id: idParams } = await params
     const id = parseInt(idParams, 10)
-
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
     }
 
-    // Get the default "General" category to reassign todos
-    const generalCategory = await prisma.todoCategory.findFirst({
-      where: { userId, name: 'General' }
-    })
-
-    // Reassign todos to General category before deleting
+    const generalCategory = await prisma.category.findFirst({ where: { userId, name: 'General' } })
     if (generalCategory) {
-      await prisma.todo.updateMany({
-        where: { categoryId: id },
-        data: { categoryId: generalCategory.id }
-      })
+      await prisma.todo.updateMany({ where: { categoryId: id }, data: { categoryId: generalCategory.id } })
     }
 
-    const result = await prisma.todoCategory.deleteMany({
-      where: { id, userId }
-    })
-
+    const result = await prisma.category.deleteMany({ where: { id, userId } })
     if (result.count === 0) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 })
     }
-
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting category:', error)
