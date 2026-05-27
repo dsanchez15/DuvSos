@@ -29,8 +29,22 @@ export default function Sidebar() {
   );
   const [showStudySection, setShowStudySection] = useState(true);
 
-  const toggleStudy = useCallback(() => setStudyExpanded((v) => !v), [setStudyExpanded]);
-  const togglePlan = useCallback(() => setPlanExpanded((v) => !v), [setPlanExpanded]);
+  // Auto-expand study group when navigating into /study
+  useEffect(() => {
+    if (pathname.startsWith('/study')) {
+      setStudyExpanded(true);
+    }
+  }, [pathname]);
+
+  // Auto-expand plan group when navigating into goals/progress
+  useEffect(() => {
+    if (pathname.startsWith('/goals') || pathname.startsWith('/progress')) {
+      setPlanExpanded(true);
+    }
+  }, [pathname]);
+
+  const toggleStudy = useCallback(() => setStudyExpanded((v) => !v), []);
+  const togglePlan = useCallback(() => setPlanExpanded((v) => !v), []);
 
   const toggleRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);

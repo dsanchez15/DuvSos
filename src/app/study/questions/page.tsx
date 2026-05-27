@@ -16,6 +16,7 @@ export default function QuestionsPage() {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [topics, setTopics] = useState<string[]>([]);
   const [filters, setFilters] = useState<QuestionFilter>({});
+  const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [importSummary, setImportSummary] = useState<{ imported: number; ignored: number; errors: string[] } | null>(null);
@@ -32,12 +33,15 @@ export default function QuestionsPage() {
   const [supportsBothModes, setSupportsBothModes] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const loadData = useCallback(() => {
-    setQuestions(QuestionService.filter(filters));
-    setTopics(TopicService.getNames());
+  const loadData = useCallback(async () => {
+    const qs = await QuestionService.filter(filters);
+    setQuestions(qs);
+    const ts = await TopicService.getAll();
+    setTopics(ts.map((t) => t.name));
   }, [filters]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetching
     loadData();
     fetch('/api/todo-categories')
       .then((res) => (res.ok ? res.json() : []))
@@ -63,13 +67,25 @@ export default function QuestionsPage() {
       setFormError('La pregunta es obligatoria');
       return false;
     }
-    if (!directAnswer.trim()) {
-      setFormError('La respuesta directa es obligatoria');
+    if (!categoryId) {
+      setFormError('La categoría es obligatoria');
       return false;
     }
-    if (type === 'multiple-choice') {
+    if (!topic.trim()) {
+      setFormError('La temática es obligatoria');
+      return false;
+    }
+
+    const needsDirect = type === 'direct' || supportsBothModes;
+    const needsMultiple = type === 'multiple-choice' || supportsBothModes;
+
+    if (needsDirect && !directAnswer.trim()) {
+      setFormError('La respuesta correcta es obligatoria');
+      return false;
+    }
+    if (needsMultiple) {
       if (options.some((o) => !o.trim())) {
-        setFormError('Todas las opciones de selección múltiple deben estar llenas');
+        setFormError('Todas las opciones deben estar llenas');
         return false;
       }
       if (correctOptionIndex === null) {
@@ -77,15 +93,12 @@ export default function QuestionsPage() {
         return false;
       }
     }
-    if (supportsBothModes && options.some((o) => !o.trim())) {
-      setFormError('Para activar modo dual, todas las opciones deben estar llenas');
-      return false;
-    }
+
     setFormError('');
     return true;
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -93,28 +106,32 @@ export default function QuestionsPage() {
       question: questionText.trim(),
       categoryId: categoryId === '' ? null : categoryId,
       topic: topic.trim(),
-      type,
+      type: supportsBothModes ? 'multiple-choice' : type,
       directAnswer: directAnswer.trim(),
       options: type === 'multiple-choice' || supportsBothModes ? options.map((o) => o.trim()) : ['', '', '', ''],
       correctOptionIndex: type === 'multiple-choice' || supportsBothModes ? correctOptionIndex : null,
       supportsBothModes,
     };
 
-    if (editingId) {
-      QuestionService.update(editingId, data);
-    } else {
-      QuestionService.create(data);
+    try {
+      if (editingId) {
+        await QuestionService.update(editingId, data);
+      } else {
+        await QuestionService.create(data);
+      }
+      resetForm();
+      setShowForm(false);
+      loadData();
+    } catch {
+      setFormError('Error al guardar la pregunta');
     }
-    resetForm();
-    setShowForm(false);
-    loadData();
   };
 
   const handleEdit = (q: Question) => {
     setEditingId(q.id);
     setQuestionText(q.question);
     setCategoryId(q.categoryId ?? '');
-    setTopic(q.topic);
+    setTopic(q.topic?.name || '');
     setType(q.type);
     setDirectAnswer(q.directAnswer);
     setOptions(q.options.length ? q.options : ['', '', '', '']);
@@ -124,9 +141,9 @@ export default function QuestionsPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta pregunta?')) return;
-    QuestionService.delete(id);
+    await QuestionService.delete(id);
     loadData();
   };
 
@@ -134,7 +151,7 @@ export default function QuestionsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     const text = await file.text();
-    const summary = QuestionService.importFromJSON(text, categories);
+    const summary = await QuestionService.importFromJSON(text, categories);
     setImportSummary(summary);
     setShowImportModal(true);
     loadData();
@@ -153,16 +170,31 @@ export default function QuestionsPage() {
 
         {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-3 items-end">
-          <div className="flex-1 min-w-[200px]">
-            <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Buscar</label>
-            <input
-              type="text"
-              placeholder="Buscar pregunta..."
-              value={filters.searchText || ''}
-              onChange={(e) => setFilters((f) => ({ ...f, searchText: e.target.value || null }))}
-              className="w-full px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
-            />
+          <div className="flex-1 min-w-[200px] flex gap-2">
+            <div className="flex-1">
+              <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Buscar</label>
+              <input
+                type="text"
+                placeholder="Buscar pregunta..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setFilters((f) => ({ ...f, searchText: searchQuery.trim() || null }));
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-[8px] border text-sm"
+                style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+              />
+            </div>
+            <button
+              onClick={() => setFilters((f) => ({ ...f, searchText: searchQuery.trim() || null }))}
+              className="w-9 h-9 flex items-center justify-center text-sm border rounded-[8px] hover:bg-primary/5 self-end shrink-0"
+              style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+              title="Buscar"
+            >
+              <span className="material-symbols-outlined text-base">search</span>
+            </button>
           </div>
           <div>
             <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Categoría</label>
@@ -195,34 +227,19 @@ export default function QuestionsPage() {
           <div>
             <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Tipo</label>
             <select
-              value={filters.type ?? ''}
-              onChange={(e) => setFilters((f) => ({ ...f, type: (e.target.value as QuestionType) || null }))}
+              value={filters.mode ?? ''}
+              onChange={(e) => setFilters((f) => ({ ...f, mode: (e.target.value as 'direct' | 'multiple-choice' | 'dual') || null }))}
               className="px-3 py-2 rounded-[8px] border text-sm"
               style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
             >
               <option value="">Todos</option>
               <option value="direct">Directa</option>
               <option value="multiple-choice">Selección múltiple</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-medium block mb-1" style={{ color: 'var(--color-text-muted)' }}>Dual</label>
-            <select
-              value={filters.supportsBothModes === true ? 'yes' : filters.supportsBothModes === false ? 'no' : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                setFilters((f) => ({ ...f, supportsBothModes: val === 'yes' ? true : val === 'no' ? false : null }));
-              }}
-              className="px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
-            >
-              <option value="">Todos</option>
-              <option value="yes">Sí</option>
-              <option value="no">No</option>
+              <option value="dual">Dual</option>
             </select>
           </div>
           <button
-            onClick={() => setFilters({})}
+            onClick={() => { setFilters({}); setSearchQuery(''); }}
             className="px-3 py-2 text-sm border rounded-[8px] hover:bg-primary/5"
             style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
           >
@@ -263,7 +280,7 @@ export default function QuestionsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm mb-1 truncate">{q.question}</p>
                   <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary">{q.topic}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary">{q.topic?.name || ''}</span>
                     {q.categoryId !== null && (
                       <span className="px-2 py-0.5 rounded-full" style={{ background: 'var(--color-bg-surface-hover)', color: 'var(--color-text-secondary)' }}>
                         {categories.find((c) => c.id === q.categoryId)?.name ?? 'General'}
@@ -293,46 +310,52 @@ export default function QuestionsPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--color-bg-overlay)' }} onClick={() => setShowForm(false)}>
-            <div className="w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-lg)' }} onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
+            <div className="w-full max-w-xl rounded-2xl p-6 max-h-[90vh] overflow-y-auto" style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-lg)' }} onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold">{editingId ? 'Editar Pregunta' : 'Nueva Pregunta'}</h3>
-                <button onClick={() => setShowForm(false)} className="p-1" style={{ color: 'var(--color-text-muted)' }}>
+                <button onClick={() => setShowForm(false)} className="p-1 hover:opacity-70 transition-opacity" style={{ color: 'var(--color-text-muted)' }}>
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
-              <form onSubmit={handleSave} className="space-y-4">
+
+              <form onSubmit={handleSave} className="space-y-5">
+                {/* PREGUNTA */}
                 <div>
-                  <label className="text-sm font-medium block mb-1" style={{ color: 'var(--color-text-secondary)' }}>Pregunta</label>
+                  <label className="text-[11px] font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--color-text-muted)' }}>Pregunta</label>
                   <textarea
                     value={questionText}
                     onChange={(e) => setQuestionText(e.target.value)}
-                    rows={2}
-                    className="w-full px-3 py-2 rounded-[8px] border text-sm"
-                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+                    placeholder="Escribe el enunciado de la pregunta aquí..."
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-[8px] border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                   />
                 </div>
+
+                {/* CATEGORÍA + TEMÁTICA */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium block mb-1" style={{ color: 'var(--color-text-secondary)' }}>Categoría</label>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--color-text-muted)' }}>Categoría</label>
                     <select
                       value={categoryId}
                       onChange={(e) => setCategoryId(e.target.value === '' ? '' : parseInt(e.target.value))}
-                      className="w-full px-3 py-2 rounded-[8px] border text-sm"
-                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+                      className="w-full px-3 py-2.5 rounded-[8px] border text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: categoryId ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}
                     >
-                      <option value="">Sin categoría</option>
+                      <option value="">Seleccionar...</option>
                       {categories.map((c) => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium block mb-1" style={{ color: 'var(--color-text-secondary)' }}>Temática</label>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--color-text-muted)' }}>Temática</label>
                     <select
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
-                      className="w-full px-3 py-2 rounded-[8px] border text-sm"
-                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+                      className="w-full px-3 py-2.5 rounded-[8px] border text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: topic ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}
                     >
                       <option value="">Seleccionar...</option>
                       {topics.map((t) => (
@@ -341,51 +364,75 @@ export default function QuestionsPage() {
                     </select>
                   </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium block mb-1" style={{ color: 'var(--color-text-secondary)' }}>Respuesta directa</label>
-                  <input
-                    type="text"
-                    value={directAnswer}
-                    onChange={(e) => setDirectAnswer(e.target.value)}
-                    className="w-full px-3 py-2 rounded-[8px] border text-sm"
-                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium block mb-2" style={{ color: 'var(--color-text-secondary)' }}>Tipo de respuesta</label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setType('direct')}
-                      className={`flex-1 px-3 py-2 rounded-[8px] border text-sm transition-all ${type === 'direct' ? 'border-primary bg-primary/10 text-primary' : ''}`}
-                      style={type !== 'direct' ? { borderColor: 'var(--color-border)' } : undefined}
-                    >
-                      Directa
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setType('multiple-choice')}
-                      className={`flex-1 px-3 py-2 rounded-[8px] border text-sm transition-all ${type === 'multiple-choice' ? 'border-primary bg-primary/10 text-primary' : ''}`}
-                      style={type !== 'multiple-choice' ? { borderColor: 'var(--color-border)' } : undefined}
-                    >
-                      Selección múltiple
-                    </button>
-                  </div>
-                </div>
 
-                {/* Multiple choice options */}
+                {/* TIPO DE RESPUESTA — solo visible si NO es modo dual */}
+                {!supportsBothModes && (
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--color-text-muted)' }}>Tipo de respuesta</label>
+                    <div className="flex gap-2 p-1 rounded-[8px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setType('direct')}
+                        className={`flex-1 px-3 py-2 rounded-[6px] text-sm font-medium transition-all ${
+                          type === 'direct'
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'hover:bg-white/5'
+                        }`}
+                        style={type !== 'direct' ? { color: 'var(--color-text-muted)' } : undefined}
+                      >
+                        Respuesta Directa
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setType('multiple-choice')}
+                        className={`flex-1 px-3 py-2 rounded-[6px] text-sm font-medium transition-all ${
+                          type === 'multiple-choice'
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'hover:bg-white/5'
+                        }`}
+                        style={type !== 'multiple-choice' ? { color: 'var(--color-text-muted)' } : undefined}
+                      >
+                        Selección Múltiple
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* RESPUESTA CORRECTA — Directa */}
+                {(type === 'direct' || supportsBothModes) && (
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--color-text-muted)' }}>Respuesta correcta</label>
+                    <input
+                      type="text"
+                      value={directAnswer}
+                      onChange={(e) => setDirectAnswer(e.target.value)}
+                      placeholder="Introduce la respuesta exacta"
+                      className="w-full px-4 py-2.5 rounded-[8px] border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
+                    />
+                  </div>
+                )}
+
+                {/* RESPUESTA — Selección múltiple */}
                 {(type === 'multiple-choice' || supportsBothModes) && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Opciones</label>
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--color-text-muted)' }}>Opciones</label>
                     {options.map((opt, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="correctOption"
-                          checked={correctOptionIndex === i}
-                          onChange={() => setCorrectOptionIndex(i)}
-                          className="accent-primary"
-                        />
+                      <div key={i} className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setCorrectOptionIndex(i)}
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                            correctOptionIndex === i
+                              ? 'border-primary'
+                              : ''
+                          }`}
+                          style={correctOptionIndex !== i ? { borderColor: 'var(--color-border-strong)' } : undefined}
+                        >
+                          {correctOptionIndex === i && (
+                            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+                          )}
+                        </button>
                         <input
                           type="text"
                           value={opt}
@@ -394,48 +441,53 @@ export default function QuestionsPage() {
                             next[i] = e.target.value;
                             setOptions(next);
                           }}
-                          placeholder={`Opción ${i + 1}`}
-                          className="flex-1 px-3 py-2 rounded-[8px] border text-sm"
-                          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}
+                          placeholder={`Opción ${String.fromCharCode(65 + i)}`}
+                          className="flex-1 px-4 py-2.5 rounded-[8px] border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
                         />
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Supports both modes toggle */}
-                <div className="flex items-center justify-between p-3 rounded-[8px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
-                  <div>
-                    <h4 className="text-sm font-medium">Modo dual</h4>
-                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Permite usar esta pregunta tanto en modo directo como selección múltiple</p>
+                {/* MODO DUAL */}
+                <div
+                  className="flex items-center justify-between p-4 rounded-[8px] border cursor-pointer transition-all hover:opacity-90"
+                  style={{
+                    background: supportsBothModes ? 'color-mix(in srgb, var(--color-primary) 8%, transparent)' : 'var(--color-bg-surface-hover)',
+                    borderColor: supportsBothModes ? 'color-mix(in srgb, var(--color-primary) 30%, transparent)' : 'var(--color-border)',
+                  }}
+                  onClick={() => setSupportsBothModes(!supportsBothModes)}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-lg" style={{ color: supportsBothModes ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>offline_bolt</span>
+                    <div>
+                      <h4 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>Modo dual</h4>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Activa ambos tipos de respuesta simultáneamente</p>
+                    </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={supportsBothModes}
-                      onChange={(e) => setSupportsBothModes(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 settings-toggle-track peer-focus:outline-none peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary rounded-full"></div>
-                  </label>
+                  <div className={`w-11 h-6 rounded-full relative transition-colors ${supportsBothModes ? 'bg-primary' : ''}`} style={!supportsBothModes ? { background: 'var(--color-border-strong)' } : undefined}>
+                    <div className={`absolute top-[2px] w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${supportsBothModes ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
+                  </div>
                 </div>
 
                 {formError && (
-                  <p className="text-sm text-red-500">{formError}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-danger)' }}>{formError}</p>
                 )}
 
-                <div className="flex gap-2 pt-2">
+                {/* Footer buttons */}
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="flex-1 px-4 py-2 border rounded-[8px] text-sm"
-                    style={{ borderColor: 'var(--color-border)' }}
+                    className="flex-1 px-4 py-2.5 rounded-[8px] text-sm font-medium transition-all hover:opacity-80"
+                    style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-primary text-white rounded-[8px] text-sm font-medium hover:bg-primary/90"
+                    className="flex-1 px-4 py-2.5 bg-primary text-white rounded-[8px] text-sm font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
                   >
                     {editingId ? 'Guardar cambios' : 'Crear pregunta'}
                   </button>

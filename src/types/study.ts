@@ -1,10 +1,21 @@
 export type QuestionType = 'multiple-choice' | 'direct';
 
+export interface Topic {
+  id: string;
+  name: string;
+  normalizedName: string;
+  createdAt: string;
+}
+
+// Alias para compatibilidad
+export type StudyTopic = Topic;
+
 export interface Question {
   id: string;
   question: string;
   categoryId: number | null;
-  topic: string;
+  topicId: string;
+  topic?: Topic;
   type: QuestionType;
   directAnswer: string;
   options: string[];
@@ -17,27 +28,22 @@ export interface Question {
 export interface QuestionFilter {
   categoryId?: number | null;
   topic?: string | null;
-  type?: QuestionType | null;
-  supportsBothModes?: boolean | null;
+  mode?: 'direct' | 'multiple-choice' | 'dual' | null;
   searchText?: string | null;
-}
-
-export interface StudyTopic {
-  id: string;
-  name: string;
-  normalizedName: string;
-  createdAt: string;
 }
 
 export type SessionStatus = 'active' | 'completed' | 'abandoned' | 'expired';
 
-export interface StudySessionConfig {
+export interface SessionConfig {
   questionCount: number;
   timeLimit: number | null; // in seconds, null = no limit
   timeLimitMode: 'per-question' | 'total' | null;
   topics: string[] | 'all';
   questionType: QuestionType | 'both';
 }
+
+// Alias para compatibilidad
+export type StudySessionConfig = SessionConfig;
 
 export interface SessionAnswer {
   questionId: string;
@@ -49,9 +55,9 @@ export interface SessionAnswer {
   timeSpent: number; // in seconds
 }
 
-export interface StudySession {
+export interface Session {
   id: string;
-  config: StudySessionConfig;
+  config: SessionConfig;
   status: SessionStatus;
   startedAt: string;
   lastActivityAt: string;
@@ -61,10 +67,13 @@ export interface StudySession {
   totalTimeSpent: number; // in seconds
 }
 
+// Alias para compatibilidad
+export type StudySession = Session;
+
 export interface SessionResult {
   id: string;
   sessionId: string;
-  config: StudySessionConfig;
+  config: SessionConfig;
   totalQuestions: number;
   correctCount: number;
   incorrectCount: number;
@@ -79,12 +88,15 @@ export interface ImportSummary {
   errors: string[];
 }
 
-export interface StudySettings {
+export interface StudySetting {
   showStudySection: boolean;
   maxQuestionsPerReview: number;
 }
 
-export const DEFAULT_STUDY_SETTINGS: StudySettings = {
+// Alias para compatibilidad
+export type StudySettings = StudySetting;
+
+export const DEFAULT_STUDY_SETTINGS: StudySetting = {
   showStudySection: true,
   maxQuestionsPerReview: 20,
 };

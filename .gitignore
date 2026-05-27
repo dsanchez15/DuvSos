@@ -55,6 +55,7 @@ next-env.d.ts
 /.kilocode/
 /.kiro/
 /.opencode/
+/.openspec/
 /windsurf/
 /.costrict/
 /.roo/

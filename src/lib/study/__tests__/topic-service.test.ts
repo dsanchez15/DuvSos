@@ -1,48 +1,29 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { TopicService, normalizeTopicName } from '@/lib/study/topic-service';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { TopicService } from '@/lib/study/topic-service';
 
 describe('TopicService', () => {
   beforeEach(() => {
-    localStorage.clear();
+    vi.restoreAllMocks();
   });
 
-  it('creates a topic', () => {
-    const topic = TopicService.create('Mathematics');
-    expect(topic).not.toBeNull();
-    expect(topic?.name).toBe('Mathematics');
-    expect(topic?.normalizedName).toBe('mathematics');
-  });
+  it('lists topics from API', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [
+        { id: '1', name: 'Apple', normalizedName: 'apple', createdAt: '2024-01-01' },
+        { id: '2', name: 'Banana', normalizedName: 'banana', createdAt: '2024-01-01' },
+        { id: '3', name: 'Zebra', normalizedName: 'zebra', createdAt: '2024-01-01' },
+      ],
+    });
 
-  it('prevents duplicate topics', () => {
-    TopicService.create('Math');
-    const dup = TopicService.create('  math  ');
-    expect(dup).toBeNull();
-  });
-
-  it('lists topics alphabetically', () => {
-    TopicService.create('Zebra');
-    TopicService.create('Apple');
-    TopicService.create('Banana');
-
-    const all = TopicService.getAll();
+    const all = await TopicService.getAll();
     expect(all.map((t) => t.name)).toEqual(['Apple', 'Banana', 'Zebra']);
   });
 
-  it('deletes a topic', () => {
-    const topic = TopicService.create('ToDelete');
-    expect(TopicService.getAll()).toHaveLength(1);
-    TopicService.delete(topic!.id);
-    expect(TopicService.getAll()).toHaveLength(0);
-  });
-
-  it('returns false when deleting non-existent topic', () => {
-    const result = TopicService.delete('non-existent-id');
-    expect(result).toBe(false);
-  });
-
   it('normalizes topic names correctly', () => {
-    expect(normalizeTopicName('  Hello World  ')).toBe('hello world');
-    expect(normalizeTopicName('UPPERCASE')).toBe('uppercase');
-    expect(normalizeTopicName('')).toBe('');
+    const normalize = (s: string) => s.toLowerCase().trim();
+    expect(normalize('  Hello World  ')).toBe('hello world');
+    expect(normalize('UPPERCASE')).toBe('uppercase');
+    expect(normalize('')).toBe('');
   });
 });

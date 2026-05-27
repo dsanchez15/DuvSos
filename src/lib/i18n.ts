@@ -708,6 +708,11 @@ export const translations = {
     settings: {
       title: 'Settings',
       subtitle: 'Manage your preferences',
+      tabs: {
+        general: 'General',
+        vistas: 'Views',
+        admin: 'Administration',
+      },
       accountProfile: 'Account & Profile',
       fullName: 'Full Name',
       emailAddress: 'Email Address',
@@ -1469,6 +1474,11 @@ const es: Translations = {
   settings: {
     title: 'Configuración',
     subtitle: 'Gestiona tus preferencias',
+    tabs: {
+      general: 'General',
+      vistas: 'Vistas',
+      admin: 'Administración',
+    },
     accountProfile: 'Cuenta y Perfil',
     fullName: 'Nombre completo',
     emailAddress: 'Correo electrónico',
