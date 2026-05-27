@@ -5,7 +5,7 @@ import SettingCard from '@/components/SettingCard';
 import AppLayout from '@/components/AppLayout';
 import Toast from '@/components/Toast';
 import { useAppTranslation } from '@/components/LanguageProvider';
-import { getStudySettings, saveStudySettings } from '@/lib/study/settings-store';
+import { SettingsStore } from '@/lib/study/settings-store';
 import { TopicService } from '@/lib/study/topic-service';
 import { QuestionService } from '@/lib/study/question-service';
 import type { StudySettings, StudyTopic } from '@/types/study';
@@ -58,7 +58,7 @@ export default function SettingsPage() {
     const [showCategoryForm, setShowCategoryForm] = useState(false);
 
     // ─── Vistas Tab State ───
-    const [studySettings, setStudySettings] = useState<StudySettings>(getStudySettings());
+    const [studySettings, setStudySettings] = useState<StudySettings>({ showStudySection: true, maxQuestionsPerReview: 20 });
 
     // ─── Admin Tab State ───
     const [topics, setTopics] = useState<StudyTopic[]>([]);
@@ -92,6 +92,7 @@ export default function SettingsPage() {
 
         fetchCategories();
         loadTopics();
+        loadStudySettings();
     }, []);
 
     const fetchCategories = async () => {
@@ -106,8 +107,18 @@ export default function SettingsPage() {
         }
     };
 
-    const loadTopics = () => {
-        setTopics(TopicService.getAll());
+    const loadTopics = async () => {
+        const topics = await TopicService.getAll();
+        setTopics(topics);
+    };
+
+    const loadStudySettings = async () => {
+        try {
+            const settings = await SettingsStore.getSettings();
+            setStudySettings(settings);
+        } catch (err) {
+            console.error('Failed to load study settings', err);
+        }
     };
 
     // ─── Actions ───
@@ -115,7 +126,7 @@ export default function SettingsPage() {
         e.preventDefault();
         if (!newCategoryName.trim()) return;
         try {
-            const res = await fetch('/api/todo-categories', {
+            const res = await fetch('/api/categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -147,29 +158,40 @@ export default function SettingsPage() {
         }
     };
 
-    const handleCreateTopic = (e: React.FormEvent) => {
+    const handleCreateTopic = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newTopicName.trim()) return;
-        const result = TopicService.create(newTopicName.trim());
-        if (result) {
-            setNewTopicName('');
-            setShowTopicForm(false);
-            loadTopics();
-            setToast({ message: 'Tema creado exitosamente', type: 'success' });
-        } else {
-            setToast({ message: 'El tema ya existe', type: 'error' });
+        try {
+            const result = await TopicService.create(newTopicName.trim());
+            if (result) {
+                setNewTopicName('');
+                setShowTopicForm(false);
+                loadTopics();
+                setToast({ message: 'Tema creado exitosamente', type: 'success' });
+            } else {
+                setToast({ message: 'El tema ya existe', type: 'error' });
+            }
+        } catch (err) {
+            setToast({ message: 'Error al crear el tema', type: 'error' });
         }
     };
 
-    const handleDeleteTopic = (id: string) => {
-        const questionsWithTopic = QuestionService.getAll().filter((q) => q.topic === topics.find((t) => t.id === id)?.name);
+    const handleDeleteTopic = async (id: string) => {
+        const topic = topics.find((t) => t.id === id);
+        if (!topic) return;
+        const allQuestions = await QuestionService.getAll();
+        const questionsWithTopic = allQuestions.filter((q) => q.topic?.name === topic.name);
         const msg = questionsWithTopic.length > 0
             ? `Este tema tiene ${questionsWithTopic.length} pregunta(s) asociada(s). Al eliminarlo, las preguntas quedarán sin temática asignada. ¿Continuar?`
             : '¿Eliminar este tema?';
         if (!confirm(msg)) return;
-        TopicService.delete(id);
-        loadTopics();
-        setToast({ message: 'Tema eliminado', type: 'success' });
+        try {
+            await TopicService.delete(id);
+            loadTopics();
+            setToast({ message: 'Tema eliminado', type: 'success' });
+        } catch (err) {
+            setToast({ message: 'Error al eliminar el tema', type: 'error' });
+        }
     };
 
     const applyTheme = (t: 'light' | 'dark' | 'system') => {
@@ -200,7 +222,7 @@ export default function SettingsPage() {
             localStorage.setItem('app-visual-theme', 'classic');
             localStorage.setItem('app-language', selectedLang);
             localStorage.setItem('dashboard-card-limit', cardLimit.toString());
-            saveStudySettings(studySettings);
+            await SettingsStore.updateSettings(studySettings);
 
             if (user) {
                 const response = await fetch('/api/auth/me', {
@@ -371,53 +393,6 @@ export default function SettingsPage() {
                                     </div>
                                 </SettingCard>
 
-                                {/* Todo Categories */}
-                                <SettingCard>
-                                    <div className="flex items-center gap-2 mb-6">
-                                        <span className="material-symbols-outlined text-primary">label</span>
-                                        <h2 className="text-lg font-semibold">{t('settings.todoCategories')}</h2>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {categories.length === 0 ? (
-                                            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('settings.noCategories')}</p>
-                                        ) : (
-                                            <div className="flex flex-wrap gap-2">
-                                                {categories.map((cat) => (
-                                                    <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
-                                                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                                                        <span className="text-sm font-medium">{cat.name}</span>
-                                                        {cat.name !== 'General' && (
-                                                            <button onClick={() => handleDeleteCategory(cat.id)} className="settings-cat-delete-btn" style={{ color: 'var(--color-text-muted)' }}>
-                                                                <span className="material-symbols-outlined text-sm">close</span>
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {showCategoryForm ? (
-                                            <form onSubmit={handleCreateCategory} className="space-y-3 p-4 rounded-[8px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
-                                                <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder={t('settings.categoryNamePlaceholder')}
-                                                    className="w-full px-4 py-2 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }} autoFocus />
-                                                <div className="flex gap-2">
-                                                    {CATEGORY_COLORS.map((c) => (
-                                                        <button key={c.value} type="button" onClick={() => setNewCategoryColor(c.value)}
-                                                            className={`w-8 h-8 rounded-full border-2 transition-all ${newCategoryColor === c.value ? 'scale-110' : 'border-transparent'}`}
-                                                            style={{ backgroundColor: c.value, ...(newCategoryColor === c.value ? { borderColor: 'var(--color-text-primary)' } : {}) }} title={c.name} />
-                                                    ))}
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <button type="button" onClick={() => { setShowCategoryForm(false); setNewCategoryName(''); }}
-                                                        className="px-4 py-2 settings-cancel-btn text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('common.cancel')}</button>
-                                                    <button type="submit" disabled={!newCategoryName.trim()} className="px-4 py-2 bg-primary text-white rounded-[8px] text-sm hover:bg-primary/90 disabled:opacity-50">{t('common.create')}</button>
-                                                </div>
-                                            </form>
-                                        ) : (
-                                            <button onClick={() => setShowCategoryForm(true)} className="px-4 py-2 border border-primary/30 text-primary rounded-[8px] hover:bg-primary/5 text-sm font-medium transition-colors">{t('settings.newCategory')}</button>
-                                        )}
-                                    </div>
-                                </SettingCard>
-
                                 {/* Notification Preferences */}
                                 <SettingCard>
                                     <div className="flex items-center gap-2 mb-6">
@@ -482,6 +457,21 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
                                 </SettingCard>
+
+                                {/* Danger Zone */}
+                                <SettingCard>
+                                    <div className="flex items-center gap-2 mb-4 text-red-500">
+                                        <span className="material-symbols-outlined">report_problem</span>
+                                        <h2 className="text-lg font-semibold">{t('settings.dangerZone')}</h2>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{t('settings.resetAllData')}</h3>
+                                            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.resetAllDataDesc')}</p>
+                                        </div>
+                                        <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-[8px] font-medium transition-all">{t('settings.resetAccount')}</button>
+                                    </div>
+                                </SettingCard>
                             </>
                         )}
 
@@ -505,10 +495,10 @@ export default function SettingsPage() {
                                                     type="checkbox"
                                                     className="sr-only peer"
                                                     checked={studySettings.showStudySection}
-                                                    onChange={(e) => {
+                                                    onChange={async (e) => {
                                                         const updated = { ...studySettings, showStudySection: e.target.checked };
                                                         setStudySettings(updated);
-                                                        saveStudySettings(updated);
+                                                        await SettingsStore.updateSettings(updated);
                                                         setIsDirty(true);
                                                     }}
                                                 />
@@ -612,23 +602,56 @@ export default function SettingsPage() {
                                         )}
                                     </div>
                                 </SettingCard>
+
+                                {/* Categories Management */}
+                                <SettingCard>
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <span className="material-symbols-outlined text-primary">label</span>
+                                        <h2 className="text-lg font-semibold">{t('settings.todoCategories')}</h2>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {categories.length === 0 ? (
+                                            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('settings.noCategories')}</p>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-2">
+                                                {categories.map((cat) => (
+                                                    <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }}>
+                                                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                        <span className="text-sm font-medium">{cat.name}</span>
+                                                        {cat.name !== 'General' && (
+                                                            <button onClick={() => handleDeleteCategory(cat.id)} className="settings-cat-delete-btn" style={{ color: 'var(--color-text-muted)' }}>
+                                                                <span className="material-symbols-outlined text-sm">close</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {showCategoryForm ? (
+                                            <form onSubmit={handleCreateCategory} className="space-y-3 p-4 rounded-[8px]" style={{ background: 'var(--color-bg-surface-hover)' }}>
+                                                <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder={t('settings.categoryNamePlaceholder')}
+                                                    className="w-full px-4 py-2 rounded-[8px] border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-surface)' }} autoFocus />
+                                                <div className="flex gap-2">
+                                                    {CATEGORY_COLORS.map((c) => (
+                                                        <button key={c.value} type="button" onClick={() => setNewCategoryColor(c.value)}
+                                                            className={`w-8 h-8 rounded-full border-2 transition-all ${newCategoryColor === c.value ? 'scale-110' : 'border-transparent'}`}
+                                                            style={{ backgroundColor: c.value, ...(newCategoryColor === c.value ? { borderColor: 'var(--color-text-primary)' } : {}) }} title={c.name} />
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button type="button" onClick={() => { setShowCategoryForm(false); setNewCategoryName(''); }}
+                                                        className="px-4 py-2 settings-cancel-btn text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('common.cancel')}</button>
+                                                    <button type="submit" disabled={!newCategoryName.trim()} className="px-4 py-2 bg-primary text-white rounded-[8px] text-sm hover:bg-primary/90 disabled:opacity-50">{t('common.create')}</button>
+                                                </div>
+                                            </form>
+                                        ) : (
+                                            <button onClick={() => setShowCategoryForm(true)} className="px-4 py-2 border border-primary/30 text-primary rounded-[8px] hover:bg-primary/5 text-sm font-medium transition-colors">{t('settings.newCategory')}</button>
+                                        )}
+                                    </div>
+                                </SettingCard>
                             </>
                         )}
 
-                        {/* Danger Zone (always visible at bottom) */}
-                        <SettingCard>
-                            <div className="flex items-center gap-2 mb-4 text-red-500">
-                                <span className="material-symbols-outlined">report_problem</span>
-                                <h2 className="text-lg font-semibold">{t('settings.dangerZone')}</h2>
-                            </div>
-                            <div className="flex items-center justify-between gap-4">
-                                <div>
-                                    <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{t('settings.resetAllData')}</h3>
-                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('settings.resetAllDataDesc')}</p>
-                                </div>
-                                <button className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-[8px] font-medium transition-all">{t('settings.resetAccount')}</button>
-                            </div>
-                        </SettingCard>
                     </div>
                 </div>
 

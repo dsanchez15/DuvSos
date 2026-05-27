@@ -63,9 +63,7 @@ model User {
 
   habits              Habit[]
   todos               Todo[]
-  todoCategories      TodoCategory[]
   checklists          Checklist[]
-  checklistCategories ChecklistCategory[]
   reminders           Reminder[]
   categories          Category[]
   objectives          Objective[]
@@ -76,17 +74,26 @@ model User {
   phases              Phase[]
   dailyProgress       DailyProgress[]
   weeklyCheckIns      WeeklyCheckIn[]
+  questions           Question[]
+  topics              Topic[]
+  sessions            Session[]
+  studySetting        StudySetting?
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String
-  color     String   @default("#3b82f6")
-  icon      String   @default("folder")
-  createdAt DateTime @default(now())
-  userId    Int?
-  user      User?    @relation(fields: [userId], references: [id])
-  habits    Habit[]
+  id          Int      @id @default(autoincrement())
+  name        String
+  color       String   @default("#3b82f6")
+  icon        String   @default("folder")
+  description String?
+  scopes      String[] @default(["habit", "checklist", "todo", "study"])
+  createdAt   DateTime @default(now())
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+  habits      Habit[]
+  checklists  Checklist[]
+  todos       Todo[]
+  questions      Question[]
 
   @@index([userId])
 }
@@ -188,19 +195,6 @@ model Objective {
 
 // ─── Existing Models (unchanged) ─────────────────────────────────────────
 
-model ChecklistCategory {
-  id         Int         @id @default(autoincrement())
-  name       String
-  color      String      @default("#3b82f6")
-  icon       String      @default("folder")
-  createdAt  DateTime    @default(now())
-  userId     Int?
-  user       User?       @relation(fields: [userId], references: [id])
-  checklists Checklist[]
-
-  @@index([userId])
-}
-
 model Checklist {
   id          Int                @id @default(autoincrement())
   title       String
@@ -219,7 +213,7 @@ model Checklist {
   userId      Int?
   user        User?              @relation(fields: [userId], references: [id])
   categoryId  Int?
-  category    ChecklistCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   items       ChecklistItem[]
 
   @@index([userId])
@@ -266,30 +260,12 @@ model Todo {
   parent       Todo?     @relation("SubTasks", fields: [parentId], references: [id], onDelete: Cascade)
   subTasks     Todo[]    @relation("SubTasks")
   categoryId   Int?
-  category     TodoCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([userId, completed, position])
   @@index([parentId])
   @@index([categoryId])
-}
-
-model TodoCategory {
-  id          Int       @id @default(autoincrement())
-  name        String
-  color       String    @default("#3b82f6")
-  icon        String    @default("folder")
-  description String?
-  parentId    Int?
-  parent      TodoCategory? @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children    TodoCategory[] @relation("CategoryTree")
-  createdAt   DateTime  @default(now())
-  userId      Int?
-  user        User?     @relation(fields: [userId], references: [id])
-  todos       Todo[]
-
-  @@index([userId])
-  @@index([parentId])
 }
 
 model Reminder {
@@ -535,5 +511,85 @@ model WeeklyCheckIn {
   createdAt DateTime @default(now())
 
   @@unique([userId, weekStartDate])
+  @@index([userId])
+}
+
+// ─── Study / Spaced Repetition Models ──────────────────────────────────────
+
+model Question {
+  id                String      @id @default(cuid())
+  question          String
+  categoryId        Int?
+  category          Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  topicId           String
+  topic             Topic       @relation(fields: [topicId], references: [id], onDelete: Restrict)
+  type              String      @default("direct")
+  directAnswer      String
+  options           String[]
+  correctOptionIndex Int?
+  supportsBothModes Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  userId            Int
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, topicId])
+  @@index([categoryId])
+  @@index([type])
+}
+
+model Topic {
+  id            String   @id @default(cuid())
+  name          String
+  normalizedName String
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  questions     Question[]
+
+  @@index([userId])
+  @@unique([userId, normalizedName])
+}
+
+model Session {
+  id             String          @id @default(cuid())
+  userId         Int
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  config         Json
+  status         String          @default("active")
+  startedAt      DateTime        @default(now())
+  lastActivityAt DateTime        @updatedAt
+  questionIds    String[]
+  currentIndex   Int             @default(0)
+  totalTimeSpent Int             @default(0)
+  answers        SessionAnswer[]
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+model SessionAnswer {
+  id             String       @id @default(cuid())
+  sessionId      String
+  session        Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId     String
+  questionText   String
+  userAnswer     String
+  correctAnswer  String
+  isCorrect      Boolean
+  modeUsed       String       @default("direct")
+  timeSpent      Int
+
+  @@index([sessionId])
+}
+
+model StudySetting {
+  id                  String   @id @default(cuid())
+  userId              Int      @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  showStudySection    Boolean  @default(true)
+  maxQuestionsPerReview Int    @default(20)
+
   @@index([userId])
 }
