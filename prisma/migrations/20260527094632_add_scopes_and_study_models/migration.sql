@@ -1,8 +1,6 @@
 -- Migration: add_scopes_and_study_models
 -- Description: Add scopes to Category, migrate ChecklistCategory/TodoCategory data, add study models
 
-BEGIN;
-
 -- 1. Add new columns to Category
 ALTER TABLE "Category" ADD COLUMN IF NOT EXISTS "description" TEXT;
 ALTER TABLE "Category" ADD COLUMN IF NOT EXISTS "scopes" TEXT[] DEFAULT ARRAY['habit', 'checklist', 'todo', 'study'];
@@ -33,9 +31,11 @@ SELECT
 FROM "TodoCategory"
 ON CONFLICT DO NOTHING;
 
--- 4. Update Checklist foreign keys to point to Category
--- First, create a mapping from ChecklistCategory.id to Category.id
--- Then update Checklist.categoryId
+-- 4. Drop old foreign key constraints before updating references
+ALTER TABLE "Checklist" DROP CONSTRAINT IF EXISTS "Checklist_categoryId_fkey";
+ALTER TABLE "Todo" DROP CONSTRAINT IF EXISTS "Todo_categoryId_fkey";
+
+-- 5. Update Checklist foreign keys to point to Category
 WITH mapping AS (
     SELECT 
         cc.id as old_id,
@@ -48,7 +48,7 @@ SET "categoryId" = m.new_id
 FROM mapping m
 WHERE ch."categoryId" = m.old_id;
 
--- 5. Update Todo foreign keys to point to Category
+-- 6. Update Todo foreign keys to point to Category
 WITH mapping AS (
     SELECT 
         tc.id as old_id,
@@ -60,6 +60,10 @@ UPDATE "Todo" t
 SET "categoryId" = m.new_id
 FROM mapping m
 WHERE t."categoryId" = m.old_id;
+
+-- 7. Add new foreign key constraints pointing to Category
+ALTER TABLE "Checklist" ADD CONSTRAINT "Checklist_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Todo" ADD CONSTRAINT "Todo_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- 6. Create StudyQuestion table
 CREATE TABLE "StudyQuestion" (
@@ -140,5 +144,3 @@ CREATE UNIQUE INDEX "StudySettings_userId_key" ON "StudySettings"("userId");
 -- 11. Drop old category tables (after data migration)
 DROP TABLE IF EXISTS "ChecklistCategory" CASCADE;
 DROP TABLE IF EXISTS "TodoCategory" CASCADE;
-
-COMMIT;
