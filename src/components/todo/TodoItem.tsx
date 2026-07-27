@@ -1,46 +1,12 @@
 'use client'
 
 import { useState, memo } from 'react'
-import { formatEffort } from '@/lib/todo-utils'
-
-interface Category {
-  id: number
-  name: string
-  color: string
-  icon: string
-}
-
-interface SubTask {
-  id: number
-  title: string
-  completed: boolean
-  position: number
-}
-
-interface Todo {
-  id: number
-  title: string
-  description?: string
-  completed: boolean
-  priority: string
-  dueDate?: string
-  dueTime?: string
-  effortMinutes: number
-  position: number
-  createdAt: string
-  updatedAt: string
-  parentId?: number
-  categoryId?: number
-  category?: Category
-  subTasks?: SubTask[]
-  progress?: number
-  subTasksCount?: number
-  completedSubTasksCount?: number
-}
+import { Button, Input } from '@/components/ui'
+import type { Todo } from '@/types/todo'
 
 interface TodoItemProps {
   todo: Todo
-  selectedTodo: Todo | null
+  isSelected: boolean
   onToggle: (id: number, completed: boolean) => void
   onDelete: (id: number) => void
   onEdit: (todo: Todo) => void
@@ -50,7 +16,7 @@ interface TodoItemProps {
 
 function TodoItem({
   todo,
-  selectedTodo,
+  isSelected,
   onToggle,
   onDelete,
   onEdit,
@@ -73,21 +39,21 @@ function TodoItem({
   return (
     <div className="space-y-2">
       <div
-        className={`todo-item-card flex items-start gap-3 p-4 rounded-[8px] transition-all ${
+        className={`todo-item-card group todo-item-hover flex items-start gap-3 rounded-[8px] border-2 p-4 transition-all ${
           todo.completed ? 'todo-item-card-completed' : ''
-        } border-2 group todo-item-hover`}
+        }`}
         style={{
           background: todo.completed ? 'var(--color-bg-surface-hover)' : 'var(--color-bg-surface)',
-          borderColor: selectedTodo?.id === todo.id ? 'var(--color-primary)' : 'var(--color-border)',
+          borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
         }}
       >
         {/* Checkbox */}
         <button
           onClick={() => onToggle(todo.id, !todo.completed)}
-          className={`todo-checkbox flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-0.5 ${
-            todo.completed
-              ? 'todo-checkbox-checked'
-              : 'todo-checkbox-unchecked'
+          role="checkbox"
+          aria-checked={todo.completed}
+          className={`todo-checkbox mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+            todo.completed ? 'todo-checkbox-checked' : 'todo-checkbox-unchecked'
           }`}
           style={{
             background: todo.completed ? 'var(--color-success)' : 'transparent',
@@ -95,28 +61,26 @@ function TodoItem({
           }}
         >
           {todo.completed && (
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
           )}
         </button>
 
         {/* Main content area */}
-        <div 
-          className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-start gap-2 cursor-pointer"
+        <div
+          className="flex min-w-0 flex-1 cursor-pointer flex-col gap-2 sm:flex-row sm:items-start"
           onClick={() => onSelect(todo)}
         >
-          {/* Left: Title + Description */}
-          <div className="flex-1 min-w-0 space-y-1">
-            {/* Title row */}
+          <div className="min-w-0 flex-1 space-y-1">
             <span
               onDoubleClick={(e) => {
                 e.stopPropagation()
                 onEdit(todo)
               }}
-              className={`text-base font-medium break-words ${
+              className={`block break-words text-base font-medium ${
                 todo.completed ? 'line-through' : ''
-              } block`}
+              }`}
               style={{
                 color: todo.completed ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
               }}
@@ -124,28 +88,23 @@ function TodoItem({
               {todo.title}
             </span>
 
-            {/* Description */}
             {todo.description && (
-              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                {todo.description}
-              </p>
+              <p className="text-sm text-text-secondary">{todo.description}</p>
             )}
 
-            {/* Subtasks toggle */}
             {(todo.subTasksCount || 0) > 0 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   setShowSubtasks(!showSubtasks)
                 }}
-                className="todo-subtask-toggle flex items-center gap-1 px-2 py-0.5 rounded-full transition-colors mt-1"
-                style={{ color: 'var(--color-text-secondary)', background: 'var(--color-bg-surface-hover)' }}
+                className="todo-subtask-toggle mt-1 flex items-center gap-1 rounded-full bg-bg-surface-hover px-2 py-0.5 text-text-secondary transition-colors"
               >
                 <span className={`material-symbols-outlined text-sm transition-transform ${showSubtasks ? 'rotate-180' : ''}`}>
                   expand_more
                 </span>
                 <span className="text-xs font-medium">Subtasks</span>
-                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                <span className="text-xs text-text-muted">
                   {todo.completedSubTasksCount}/{todo.subTasksCount}
                 </span>
               </button>
@@ -154,28 +113,25 @@ function TodoItem({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        <div className="flex flex-shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={() => setShowAddSubtask(!showAddSubtask)}
-            className="todo-action-btn todo-action-btn-info p-2 rounded-[8px] transition-colors"
+            className="todo-action-btn todo-action-btn-info rounded-[8px] p-2 text-text-muted transition-colors"
             title="Add subtask"
-            style={{ color: 'var(--color-text-muted)' }}
           >
             <span className="material-symbols-outlined text-lg">add_task</span>
           </button>
           <button
             onClick={() => onEdit(todo)}
-            className="todo-action-btn todo-action-btn-primary p-2 rounded-[8px] transition-colors"
+            className="todo-action-btn todo-action-btn-primary rounded-[8px] p-2 text-text-muted transition-colors"
             title="Edit"
-            style={{ color: 'var(--color-text-muted)' }}
           >
             <span className="material-symbols-outlined text-lg">edit</span>
           </button>
           <button
             onClick={() => onDelete(todo.id)}
-            className="todo-action-btn todo-action-btn-danger p-2 rounded-[8px] transition-colors"
+            className="todo-action-btn todo-action-btn-danger rounded-[8px] p-2 text-text-muted transition-colors"
             title="Delete"
-            style={{ color: 'var(--color-text-muted)' }}
           >
             <span className="material-symbols-outlined text-lg">delete</span>
           </button>
@@ -186,30 +142,26 @@ function TodoItem({
       {showAddSubtask && (
         <div className="ml-8">
           <form onSubmit={handleAddSubtask} className="flex gap-2">
-            <input
-              type="text"
+            <Input
+              fieldSize="sm"
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
               placeholder="Subtask title..."
-              className="rf-input flex-1 px-3 py-2 rounded-[8px] border text-sm"
-              style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)', color: 'var(--color-text-primary)' }}
               autoFocus
             />
-            <button
-              type="submit"
-              disabled={!newSubtaskTitle.trim()}
-              className="btn-neon px-3 py-2 bg-primary text-white rounded-[8px] text-sm hover:bg-primary/90 disabled:opacity-50"
-            >
+            <Button type="submit" size="sm" disabled={!newSubtaskTitle.trim()}>
               Add
-            </button>
-            <button
-              type="button"
-              onClick={() => { setShowAddSubtask(false); setNewSubtaskTitle('') }}
-              className="btn-outline px-3 py-2 text-sm"
-              style={{ color: 'var(--color-text-muted)' }}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowAddSubtask(false)
+                setNewSubtaskTitle('')
+              }}
             >
               Cancel
-            </button>
+            </Button>
           </form>
         </div>
       )}
@@ -220,17 +172,15 @@ function TodoItem({
           {todo.subTasks.map((subtask) => (
             <div
               key={subtask.id}
-              className={`subtask-card group flex items-center gap-3 p-3 rounded-[8px] ${
+              className={`subtask-card group flex items-center gap-3 rounded-[8px] border border-border bg-bg-surface-hover p-3 ${
                 subtask.completed ? 'subtask-card-completed' : ''
-              } border`}
-              style={{
-                background: 'var(--color-bg-surface-hover)',
-                borderColor: 'var(--color-border)',
-              }}
+              }`}
             >
               <button
                 onClick={() => onToggle(subtask.id, !subtask.completed)}
-                className={`subtask-checkbox flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                role="checkbox"
+                aria-checked={subtask.completed}
+                className={`subtask-checkbox flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                   subtask.completed ? 'subtask-checkbox-checked' : 'subtask-checkbox-unchecked'
                 }`}
                 style={{
@@ -239,7 +189,7 @@ function TodoItem({
                 }}
               >
                 {subtask.completed && (
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
@@ -252,9 +202,8 @@ function TodoItem({
               </span>
               <button
                 onClick={() => onDelete(subtask.id)}
-                className="todo-action-btn-danger p-1 rounded transition-colors opacity-0 group-hover:opacity-100"
+                className="todo-action-btn-danger rounded p-1 text-text-muted opacity-0 transition-colors group-hover:opacity-100"
                 title="Delete subtask"
-                style={{ color: 'var(--color-text-muted)' }}
               >
                 <span className="material-symbols-outlined text-sm">delete</span>
               </button>

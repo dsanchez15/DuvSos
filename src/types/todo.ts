@@ -19,7 +19,7 @@ export interface Todo {
   title: string
   description?: string
   completed: boolean
-  priority: Priority
+  priority: string
   dueDate?: string
   dueTime?: string
   effortMinutes: number

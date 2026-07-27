@@ -1,4 +1,4 @@
-import { SelectHTMLAttributes, useId } from 'react'
+import { SelectHTMLAttributes, forwardRef, useId } from 'react'
 import { FieldWrapper, type FieldSize } from './Input'
 
 const baseSelectClasses =
@@ -15,11 +15,19 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   fieldSize?: FieldSize
 }
 
-export function Select({ label, error, fieldSize = 'md', className = '', id, children, ...props }: SelectProps) {
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  { label, error, fieldSize = 'md', className = '', id, children, ...props },
+  ref
+) {
   const autoId = useId()
   const selectId = id ?? autoId
   const field = (
-    <select id={selectId} className={`${baseSelectClasses} ${sizeClasses[fieldSize]} ${className}`} {...props}>
+    <select
+      ref={ref}
+      id={selectId}
+      className={`${baseSelectClasses} ${sizeClasses[fieldSize]} ${className}`}
+      {...props}
+    >
       {children}
     </select>
   )
@@ -29,6 +37,6 @@ export function Select({ label, error, fieldSize = 'md', className = '', id, chi
       {field}
     </FieldWrapper>
   )
-}
+})
 
 export default Select

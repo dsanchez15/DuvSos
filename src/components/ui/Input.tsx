@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, useId } from 'react'
+import { InputHTMLAttributes, forwardRef, useId } from 'react'
 
 const baseFieldClasses =
   'w-full rounded-[8px] border border-border bg-bg-input text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-strong transition-colors disabled:opacity-50'
@@ -37,11 +37,19 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fieldSize?: FieldSize
 }
 
-export function Input({ label, error, fieldSize = 'md', className = '', id, ...props }: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { label, error, fieldSize = 'md', className = '', id, ...props },
+  ref
+) {
   const autoId = useId()
   const inputId = id ?? autoId
   const field = (
-    <input id={inputId} className={`${baseFieldClasses} ${sizeClasses[fieldSize]} ${className}`} {...props} />
+    <input
+      ref={ref}
+      id={inputId}
+      className={`${baseFieldClasses} ${sizeClasses[fieldSize]} ${className}`}
+      {...props}
+    />
   )
   if (!label && !error) return field
   return (
@@ -49,6 +57,6 @@ export function Input({ label, error, fieldSize = 'md', className = '', id, ...p
       {field}
     </FieldWrapper>
   )
-}
+})
 
 export default Input
