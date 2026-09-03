@@ -12,6 +12,13 @@ interface Milestone {
   items?: { itemModule: string; itemId: number }[]
 }
 
+interface Suggestion {
+  id: number
+  module: string
+  title: string
+  reason: string
+}
+
 export default function MilestonesPage() {
   const [milestones, setMilestones] = useState<Milestone[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,7 +29,7 @@ export default function MilestonesPage() {
   const [date, setDate] = useState('')
   const [color, setColor] = useState('#f59e0b')
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null)
-  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
 
   const colors = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4']
 

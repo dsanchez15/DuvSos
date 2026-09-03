@@ -61,7 +61,7 @@ export function useStudySession(t: TranslateFn) {
   const [showResumeDialog, setShowResumeDialog] = useState(false)
 
   const tRef = useRef(t)
-  tRef.current = t
+  useEffect(() => { tRef.current = t }, [t])
 
   useEffect(() => {
     const init = async () => {
@@ -84,7 +84,7 @@ export function useStudySession(t: TranslateFn) {
       }
     }
     init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   const startTimer = useCallback((seconds: number) => {
@@ -138,6 +138,8 @@ export function useStudySession(t: TranslateFn) {
     [stopTimer]
   )
 
+  const loadNextQuestionRef = useRef<((sess: StudySession, index: number) => Promise<void>) | undefined>(undefined)
+
   const loadNextQuestion = useCallback(
     async (sess: StudySession, index: number): Promise<void> => {
       if (index >= sess.questionIds.length) {
@@ -149,7 +151,8 @@ export function useStudySession(t: TranslateFn) {
         // Skip missing questions
         sess.currentIndex = index + 1
         await SessionService.saveActiveSession(sess)
-        return loadNextQuestion(sess, index + 1)
+        await loadNextQuestionRef.current?.(sess, index + 1)
+        return
       }
 
       // Determine mode
@@ -175,6 +178,10 @@ export function useStudySession(t: TranslateFn) {
     },
     [config, finishSession, startTimer]
   )
+
+  useEffect(() => {
+    loadNextQuestionRef.current = loadNextQuestion
+  }, [loadNextQuestion])
 
   const startSession = useCallback(async () => {
     const available = getFilteredQuestions()

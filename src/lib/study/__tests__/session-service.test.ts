@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SessionService } from '@/lib/study/session-service';
-import type { StudySessionConfig } from '@/types/study';
+import type { StudySessionConfig, StudySession } from '@/types/study';
 
 describe('SessionService', () => {
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('SessionService', () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => mockSession });
 
     const updated = await SessionService.recordAnswer(
-      { id: 'sess1' } as any,
+      { id: 'sess1' } as StudySession,
       { questionId: 'q1', questionText: 'Q1', userAnswer: 'A1', correctAnswer: 'A1', isCorrect: true, modeUsed: 'direct', timeSpent: 5 }
     );
 

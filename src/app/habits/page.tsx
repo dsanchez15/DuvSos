@@ -48,7 +48,7 @@ export default function HabitsPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchHabits();

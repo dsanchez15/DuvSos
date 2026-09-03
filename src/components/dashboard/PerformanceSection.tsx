@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Card } from '@/components/ui'
 import { useAppTranslation } from '@/components/LanguageProvider'
 import type { PerformanceStats } from '@/types/dashboard'
@@ -31,9 +32,9 @@ export default function PerformanceSection({ stats }: PerformanceSectionProps) {
         <h3 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">
           {t('dashboard.performancePlan')}
         </h3>
-        <a href="/goals" className="rounded-lg px-2 py-1 text-xs text-text-muted hover:bg-primary/10">
+        <Link href="/goals" className="rounded-lg px-2 py-1 text-xs text-text-muted hover:bg-primary/10">
           {t('dashboard.viewAll')}
-        </a>
+        </Link>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {cards.map((card) => (

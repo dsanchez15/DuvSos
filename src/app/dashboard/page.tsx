@@ -4,6 +4,7 @@ import { useState } from 'react'
 import AppLayout from '@/components/AppLayout'
 import { useAppTranslation } from '@/components/LanguageProvider'
 import { useDashboardData } from '@/hooks/useDashboardData'
+import { useFeatureFlags } from '@/hooks/useFeatureFlags'
 import DashboardHeader from '@/components/dashboard/DashboardHeader'
 import HabitGrid from '@/components/dashboard/HabitGrid'
 import PerformanceSection from '@/components/dashboard/PerformanceSection'
@@ -16,6 +17,7 @@ import UpcomingReminders from '@/components/dashboard/UpcomingReminders'
 
 export default function DashboardPage() {
   const { t } = useAppTranslation()
+  const { flags } = useFeatureFlags()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
@@ -37,7 +39,7 @@ export default function DashboardPage() {
     markTodoDone,
     markChecklistItemDone,
     markReminderDone,
-  } = useDashboardData(year, month)
+  } = useDashboardData({ year, month, flags })
 
   const goToday = () => {
     const now = new Date()
@@ -97,21 +99,24 @@ export default function DashboardPage() {
               </div>
             )}
 
-            <div>
-              <HabitGrid habits={habits} onMarkDone={markHabitDone} />
-              <WeeklyCompliance metrics={metrics} />
-            </div>
+            {flags.habits && (
+              <div>
+                <HabitGrid habits={habits} onMarkDone={markHabitDone} />
+                <WeeklyCompliance metrics={metrics} />
+              </div>
+            )}
 
-            <PerformanceSection stats={performanceStats} />
+            {flags.goals && <PerformanceSection stats={performanceStats} />}
 
             <TaskLists
               checklists={checklists}
               todos={todos}
+              showChecklists={flags.checklists}
               onMarkChecklistItemDone={markChecklistItemDone}
               onMarkTodoDone={markTodoDone}
             />
 
-            <QuickRegisterForm onRegistered={fetchPerformanceStats} />
+            {flags.checkin && <QuickRegisterForm onRegistered={fetchPerformanceStats} />}
 
             <DashboardCalendar
               year={year}
@@ -126,7 +131,9 @@ export default function DashboardPage() {
           {/* ═══ RIGHT SIDEBAR ═══ */}
           <aside className="w-full space-y-6 lg:w-80">
             <Scorecard metrics={metrics} />
-            <UpcomingReminders reminders={upcomingReminders} onMarkDone={markReminderDone} />
+            {flags.reminders && (
+              <UpcomingReminders reminders={upcomingReminders} onMarkDone={markReminderDone} />
+            )}
           </aside>
         </div>
       </div>

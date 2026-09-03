@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
 import { Spinner } from '@/components/ui'
@@ -60,9 +61,9 @@ export default function GoalDetailPage() {
       <AppLayout>
         <div className="py-12 text-center">
           <p className="mb-2 text-lg text-text-primary">{t('goals.notFound')}</p>
-          <a href="/goals" className="text-primary hover:underline">
+          <Link href="/goals" className="text-primary hover:underline">
             {t('common.back')}
-          </a>
+          </Link>
         </div>
       </AppLayout>
     )
@@ -88,9 +89,9 @@ export default function GoalDetailPage() {
 
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/goals" className="rounded-[8px] p-2 text-text-muted hover:bg-primary/10">
+            <Link href="/goals" className="rounded-[8px] p-2 text-text-muted hover:bg-primary/10">
               ←
-            </a>
+            </Link>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">
                 {isEditing ? t('goals.actions.editGoal') : goal.title}

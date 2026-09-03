@@ -7,6 +7,7 @@ import type { DashboardChecklistItem, DashboardTodo } from '@/types/dashboard'
 interface TaskListsProps {
   checklists: DashboardChecklistItem[]
   todos: DashboardTodo[]
+  showChecklists?: boolean
   onMarkChecklistItemDone: (checklistId: number, itemId: number) => void
   onMarkTodoDone: (id: number) => void
 }
@@ -22,16 +23,23 @@ function DoneButton({ onClick, label }: { onClick: () => void; label: string }) 
   )
 }
 
-export default function TaskLists({ checklists, todos, onMarkChecklistItemDone, onMarkTodoDone }: TaskListsProps) {
+export default function TaskLists({
+  checklists,
+  todos,
+  showChecklists = true,
+  onMarkChecklistItemDone,
+  onMarkTodoDone,
+}: TaskListsProps) {
   const { t } = useAppTranslation()
 
   return (
     <section>
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-text-secondary">
-        {t('dashboard.checklistsAndTodos')}
+        {showChecklists ? t('dashboard.checklistsAndTodos') : t('dashboard.todos')}
       </h3>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className={`grid grid-cols-1 gap-4 ${showChecklists ? 'lg:grid-cols-2' : ''}`}>
         {/* Checklists */}
+        {showChecklists && (
         <Card className="dashboard-card">
           <div className="mb-3 flex items-center justify-between">
             <h4 className="card-title flex items-center gap-2 font-semibold text-text-primary">
@@ -58,6 +66,7 @@ export default function TaskLists({ checklists, todos, onMarkChecklistItemDone, 
             ))}
           </div>
         </Card>
+        )}
 
         {/* ToDos */}
         <Card className="dashboard-card">

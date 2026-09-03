@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { apiClient, ApiError } from '@/lib/api-client'
 import { recalcTodoParent } from '@/lib/todo-utils'
 import type { Todo, TodoCategory, TodoMetrics, GroupedTodos } from '@/types/todo'
@@ -49,14 +49,15 @@ export function useTodos(t: TranslateFn) {
 
   // Refs keep async callbacks stable while reading fresh state
   const todosRef = useRef(todos)
-  todosRef.current = todos
   const groupedRef = useRef(groupedTodos)
-  groupedRef.current = groupedTodos
   const selectedRef = useRef(selectedTodo)
-  selectedRef.current = selectedTodo
   const tRef = useRef(t)
-  tRef.current = t
   const queryRef = useRef<TodoQuery | null>(null)
+
+  useEffect(() => { todosRef.current = todos }, [todos])
+  useEffect(() => { groupedRef.current = groupedTodos }, [groupedTodos])
+  useEffect(() => { selectedRef.current = selectedTodo }, [selectedTodo])
+  useEffect(() => { tRef.current = t }, [t])
 
   const refreshMetrics = useCallback(async () => {
     try {

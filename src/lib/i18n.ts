@@ -755,6 +755,16 @@ export const translations = {
       showStudySectionDesc: 'Enable or disable the Study section in the sidebar',
       maxQuestionsPerReview: 'Max questions per review',
       maxQuestionsPerReviewDesc: 'Upper limit of questions in a review session',
+      featureFlags: 'Features',
+      features: {
+        habits: { title: 'Habits', description: 'Show the Habits section and dashboard widgets' },
+        goals: { title: 'Goals', description: 'Show the Goals section and performance planning' },
+        checklists: { title: 'Checklists', description: 'Show the Checklists section on the dashboard' },
+        reminders: { title: 'Reminders', description: 'Show upcoming reminders on the dashboard' },
+        progress: { title: 'Progress', description: 'Show the Progress section and tracking' },
+        checkin: { title: 'Check-in', description: 'Show the daily check-in form on the dashboard' },
+        study: { title: 'Study', description: 'Show the Study section and spaced repetition' },
+      },
       studyTopics: 'Study Topics',
       noTopics: 'No topics created yet',
       topicNamePlaceholder: 'Topic name',
@@ -1628,12 +1638,22 @@ const es: Translations = {
     unsavedChanges: 'Tienes cambios sin guardar',
     discard: 'Descartar',
     saveChanges: 'Guardar cambios',
-    studySection: 'Estudio',
-    showStudySection: 'Mostrar sección de Estudio',
-    showStudySectionDesc: 'Activa o desactiva la sección de Estudio en el sidebar',
-    maxQuestionsPerReview: 'Máximo de preguntas por repaso',
-    maxQuestionsPerReviewDesc: 'Límite superior de preguntas en una sesión de repaso',
-    studyTopics: 'Temas de Estudio',
+      studySection: 'Estudio',
+      showStudySection: 'Mostrar sección de Estudio',
+      showStudySectionDesc: 'Activa o desactiva la sección de Estudio en el sidebar',
+      maxQuestionsPerReview: 'Máximo de preguntas por repaso',
+      maxQuestionsPerReviewDesc: 'Límite superior de preguntas en una sesión de repaso',
+      featureFlags: 'Funcionalidades',
+      features: {
+        habits: { title: 'Hábitos', description: 'Muestra la sección de Hábitos y sus widgets en el panel' },
+        goals: { title: 'Metas', description: 'Muestra la sección de Metas y la planificación' },
+        checklists: { title: 'Listas de verificación', description: 'Muestra las listas de verificación en el panel' },
+        reminders: { title: 'Recordatorios', description: 'Muestra los recordatorios próximos en el panel' },
+        progress: { title: 'Progreso', description: 'Muestra la sección de Progreso y seguimiento' },
+        checkin: { title: 'Check-in', description: 'Muestra el formulario de check-in diario en el panel' },
+        study: { title: 'Estudio', description: 'Muestra la sección de Estudio y repetición espaciada' },
+      },
+      studyTopics: 'Temas de Estudio',
     noTopics: 'No hay temas creados aún',
     topicNamePlaceholder: 'Nombre del tema',
     newTopic: 'Nuevo Tema',
@@ -1746,7 +1766,7 @@ const es: Translations = {
   },
 };
 
-const allTranslations: Record<string, any> = { en: translations.en, es };
+const allTranslations: Record<string, Record<string, unknown>> = { en: translations.en, es };
 
 let currentLanguage: Language = 'en';
 
@@ -1794,11 +1814,11 @@ export function getServerLanguage(): Language {
 
 export function t(key: string, vars?: Record<string, string | number>): string {
   const keys = key.split('.');
-  let value: any = allTranslations[currentLanguage] || allTranslations['en'];
+  let value: unknown = allTranslations[currentLanguage] || allTranslations['en'];
 
   for (const k of keys) {
-    if (value && typeof value === 'object' && k in value) {
-      value = value[k];
+    if (value && typeof value === 'object' && k in (value as Record<string, unknown>)) {
+      value = (value as Record<string, unknown>)[k];
     } else {
       return key;
     }

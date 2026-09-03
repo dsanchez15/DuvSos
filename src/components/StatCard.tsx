@@ -5,10 +5,9 @@ interface StatCardProps {
   value: string | number
   sublabel?: string
   icon?: React.ReactNode
-  trend?: 'up' | 'down' | 'neutral'
 }
 
-export default function StatCard({ label, value, sublabel, icon, trend }: StatCardProps) {
+export default function StatCard({ label, value, sublabel, icon }: StatCardProps) {
   return (
     <div className="rounded-xl p-4 text-center" style={{ background: 'var(--color-bg-input)' }}>
       <div className="flex items-center justify-center mb-2">

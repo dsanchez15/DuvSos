@@ -1,15 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import AppLayout from '@/components/AppLayout'
 import { Phase } from '@/types/goal'
 import { useAppTranslation } from '@/components/LanguageProvider'
 
-type Language = 'en' | 'es';
-
 export default function NewGoalPage() {
-  const { t, language } = useAppTranslation()
+  const { t } = useAppTranslation()
   const router = useRouter()
   const [phases, setPhases] = useState<Phase[]>([])
   const [form, setForm] = useState({
@@ -25,7 +24,6 @@ export default function NewGoalPage() {
   const [milestoneErrors, setMilestoneErrors] = useState<Record<number, string>>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [lang] = useState<Language>(language as Language)
 
   useEffect(() => {
     fetch('/api/phases').then(res => res.ok && res.json()).then(data => {
@@ -97,8 +95,8 @@ export default function NewGoalPage() {
       }
 
       router.push('/goals')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -304,13 +302,13 @@ export default function NewGoalPage() {
           </div>
 
           <div className="flex gap-3">
-            <a
+            <Link
               href="/goals"
               className="flex-1 px-4 py-2 rounded-[8px] border font-medium text-center"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
               {t('common.cancel')}
-            </a>
+            </Link>
             <button
               type="submit"
               disabled={loading}

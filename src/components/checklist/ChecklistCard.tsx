@@ -36,9 +36,10 @@ export default function ChecklistCard({
   const status = getStatus(c)
 
   const itemsList = Array.isArray(c.items) ? c.items : []
-  const metrics = (c as any).metrics as
-    | { totalItems: number; completedItems: number; completionPercentage: number; totalEffort: number }
-    | undefined
+  const checklistWithMetrics = c as Checklist & {
+    metrics?: { totalItems: number; completedItems: number; completionPercentage: number; totalEffort: number }
+  }
+  const metrics = checklistWithMetrics.metrics
 
   return (
     <div

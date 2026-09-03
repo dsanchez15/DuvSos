@@ -1,7 +1,6 @@
 'use client'
 
 import SettingCard from '@/components/SettingCard'
-import { Toggle } from '@/components/ui'
 import { useAppTranslation } from '@/components/LanguageProvider'
 import type { StudySettings } from '@/types/study'
 
@@ -20,18 +19,6 @@ export default function StudySectionCard({ settings, onChange }: StudySectionCar
         <h2 className="text-lg font-semibold">{t('settings.studySection')}</h2>
       </div>
       <div className="space-y-6">
-        <div className="settings-row-hover flex items-center justify-between rounded-[8px] p-3 transition-colors">
-          <div>
-            <h3 className="font-medium">{t('settings.showStudySection')}</h3>
-            <p className="text-xs text-text-muted">{t('settings.showStudySectionDesc')}</p>
-          </div>
-          <Toggle
-            checked={settings.showStudySection}
-            onChange={(checked) => onChange({ ...settings, showStudySection: checked }, true)}
-            ariaLabel={t('settings.showStudySection')}
-          />
-        </div>
-
         <div className="settings-row-hover flex items-center justify-between rounded-[8px] p-3 transition-colors">
           <div>
             <h3 className="font-medium">{t('settings.maxQuestionsPerReview')}</h3>

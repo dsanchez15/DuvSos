@@ -47,7 +47,7 @@ export async function getSession() {
             algorithms: ['HS256'],
         })
         return payload
-    } catch (error) {
+    } catch {
         return null
     }
 }
@@ -77,6 +77,7 @@ export async function getCurrentUser() {
                 visualTheme: true,
                 checklistAlertDays: true,
                 language: true,
+                featureFlags: true,
             },
         })
         if (!user) console.warn('getCurrentUser: User not found in DB for id:', userId)

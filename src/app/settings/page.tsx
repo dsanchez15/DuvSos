@@ -12,6 +12,7 @@ import type { StudySettings, StudyTopic } from '@/types/study';
 import SettingsTabs, { type SettingsTabKey } from '@/components/settings/SettingsTabs';
 import AccountProfileCard, { type SettingsUser } from '@/components/settings/AccountProfileCard';
 import DashboardConfigCard from '@/components/settings/DashboardConfigCard';
+import FeatureFlagsCard from '@/components/settings/FeatureFlagsCard';
 import NotificationsCard from '@/components/settings/NotificationsCard';
 import ThemeAppearanceCard from '@/components/settings/ThemeAppearanceCard';
 import DangerZoneCard from '@/components/settings/DangerZoneCard';
@@ -19,6 +20,7 @@ import StudySectionCard from '@/components/settings/StudySectionCard';
 import TopicsManagerCard from '@/components/settings/TopicsManagerCard';
 import CategoriesManagerCard, { type SettingsCategory } from '@/components/settings/CategoriesManagerCard';
 import SettingsFooter from '@/components/settings/SettingsFooter';
+import { useFeatureFlags, type FeatureFlag } from '@/hooks/useFeatureFlags';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -48,7 +50,11 @@ export default function SettingsPage() {
 
     const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
     const [selectedLang, setSelectedLang] = useState<'en' | 'es'>(getInitialLanguage);
-    const [cardLimit, setCardLimit] = useState(4);
+    const [cardLimit, setCardLimit] = useState(() => {
+        if (typeof window === 'undefined') return 4;
+        const savedLimit = window.localStorage.getItem('dashboard-card-limit');
+        return savedLimit ? parseInt(savedLimit, 10) : 4;
+    });
     const [checklistAlertDays, setChecklistAlertDays] = useState(3);
     const [isDirty, setIsDirty] = useState(false);
     const [user, setUser] = useState<SettingsUser | null>(null);
@@ -57,11 +63,21 @@ export default function SettingsPage() {
     const [categories, setCategories] = useState<SettingsCategory[]>([]);
     const [studySettings, setStudySettings] = useState<StudySettings>({ showStudySection: true, maxQuestionsPerReview: 20 });
     const [topics, setTopics] = useState<StudyTopic[]>([]);
+    const { flags: featureFlags, setFlag: setFeatureFlag } = useFeatureFlags();
+
+    const fetchCategories = async () => {
+        return apiClient.get<SettingsCategory[]>('/api/todo-categories');
+    };
+
+    const loadTopics = async () => {
+        return TopicService.getAll();
+    };
+
+    const loadStudySettings = async () => {
+        return SettingsStore.getSettings();
+    };
 
     useEffect(() => {
-        const savedLimit = localStorage.getItem('dashboard-card-limit');
-        if (savedLimit) setCardLimit(parseInt(savedLimit));
-
         apiClient.get<{ user: SettingsUser & { theme?: string; checklistAlertDays?: number; language?: string } }>('/api/auth/me')
             .then((data) => {
                 if (data?.user) {
@@ -88,30 +104,10 @@ export default function SettingsPage() {
                 }
             });
 
-        fetchCategories();
-        loadTopics();
-        loadStudySettings();
+        fetchCategories().then(setCategories).catch((err) => console.error('Failed to fetch categories', err));
+        loadTopics().then(setTopics).catch((err) => console.error('Failed to fetch topics', err));
+        loadStudySettings().then(setStudySettings).catch((err) => console.error('Failed to load study settings', err));
     }, []);
-
-    const fetchCategories = async () => {
-        try {
-            setCategories(await apiClient.get<SettingsCategory[]>('/api/todo-categories'));
-        } catch (err) {
-            console.error('Failed to fetch categories', err);
-        }
-    };
-
-    const loadTopics = async () => {
-        setTopics(await TopicService.getAll());
-    };
-
-    const loadStudySettings = async () => {
-        try {
-            setStudySettings(await SettingsStore.getSettings());
-        } catch (err) {
-            console.error('Failed to load study settings', err);
-        }
-    };
 
     // ─── Actions ───
 
@@ -196,6 +192,11 @@ export default function SettingsPage() {
         setIsDirty(true);
     };
 
+    const handleFeatureFlagChange = async (key: FeatureFlag, value: boolean) => {
+        await setFeatureFlag(key, value);
+        setIsDirty(true);
+    };
+
     const handleUserChange = (updated: SettingsUser) => {
         setUser(updated);
         setIsDirty(true);
@@ -275,7 +276,10 @@ export default function SettingsPage() {
                         )}
 
                         {activeTab === 'vistas' && (
-                            <StudySectionCard settings={studySettings} onChange={handleStudySettingsChange} />
+                            <>
+                                <FeatureFlagsCard flags={featureFlags} onChange={handleFeatureFlagChange} />
+                                <StudySectionCard settings={studySettings} onChange={handleStudySettingsChange} />
+                            </>
                         )}
 
                         {activeTab === 'admin' && (
