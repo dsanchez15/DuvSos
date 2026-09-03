@@ -9,7 +9,7 @@ import { useAppTranslation } from '@/components/LanguageProvider'
 export default function CheckInPage() {
   const { t, language } = useAppTranslation()
   const [checkins, setCheckins] = useState<WeeklyCheckIn[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   const fetchCheckins = useCallback(async () => {
     try {
@@ -24,13 +24,19 @@ export default function CheckInPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     fetchCheckins()
   }, [fetchCheckins])
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: {
+    weekStartDate: string
+    fatigueLevel: number
+    completedHours: number | null
+    deviations: string
+    adjustmentNotes: string
+  }) => {
     const res = await fetch('/api/checkin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

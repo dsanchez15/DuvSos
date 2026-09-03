@@ -94,3 +94,30 @@ export function calculateProgress(subTasks: { completed: boolean }[]): number {
   const completed = subTasks.filter((st) => st.completed).length
   return Math.round((completed / subTasks.length) * 100)
 }
+
+/**
+ * Recalculate a parent todo's progress and subtask counters.
+ * Returns a new todo object with updated progress, subTasksCount and
+ * completedSubTasksCount derived from its subTasks.
+ */
+export function recalcTodoParent<T extends {
+  completed: boolean
+  subTasks?: { id: number; title: string; completed: boolean; position: number }[]
+  progress?: number
+  subTasksCount?: number
+  completedSubTasksCount?: number
+}>(parent: T): T {
+  const subs = parent.subTasks || []
+  const completedSubtasks = subs.filter((s) => s.completed).length
+  const totalSubtasks = subs.length
+  const progress = totalSubtasks > 0
+    ? Math.round((completedSubtasks / totalSubtasks) * 100)
+    : (parent.completed ? 100 : 0)
+  return {
+    ...parent,
+    subTasks: subs,
+    progress,
+    subTasksCount: totalSubtasks,
+    completedSubTasksCount: completedSubtasks,
+  }
+}

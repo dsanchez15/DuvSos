@@ -1,23 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import AppLayout from '@/components/AppLayout'
 import { Phase } from '@/types/goal'
 import { useAppTranslation } from '@/components/LanguageProvider'
 
 export default function PhasesPage() {
   const { t, language } = useAppTranslation()
-  const router = useRouter()
   const [phases, setPhases] = useState<Phase[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ number: '', title: '', description: '', startDate: '', endDate: '' })
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    fetchPhases()
-  }, [])
 
   const fetchPhases = async () => {
     try {
@@ -32,6 +27,10 @@ export default function PhasesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchPhases()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,9 +77,9 @@ export default function PhasesPage() {
       <div className="space-y-6">
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <a href="/goals" className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
+            <Link href="/goals" className="p-2 rounded-[8px] hover:bg-primary/10" style={{ color: 'var(--color-text-muted)' }}>
               ←
-            </a>
+            </Link>
             <div>
               <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 {t('phases.title')}

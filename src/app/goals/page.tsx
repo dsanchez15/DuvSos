@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import AppLayout from '@/components/AppLayout'
 import GoalCard from '@/components/GoalCard'
 import { Goal } from '@/types/goal'
@@ -35,7 +36,7 @@ export default function GoalsPage() {
     } finally {
       setLoading(false)
     }
-  }, [showInactive, categoryFilter])
+  }, [showInactive, categoryFilter, t])
 
   useEffect(() => {
     fetchGoals()
@@ -69,19 +70,19 @@ export default function GoalsPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <a
+            <Link
               href="/goals/phases"
               className="px-4 py-2 border rounded-[8px] font-medium hover:bg-primary/5 transition-colors"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
             >
               {t('goals.phases')}
-            </a>
-            <a
+            </Link>
+            <Link
               href="/goals/new"
               className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors"
             >
               + {t('goals.newGoal')}
-            </a>
+            </Link>
           </div>
         </header>
 
@@ -124,12 +125,12 @@ export default function GoalsPage() {
             <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
               {showInactive ? t('goals.noGoals') : t('goals.createFirst')}
             </p>
-            <a
+            <Link
               href="/goals/new"
               className="px-4 py-2 bg-primary text-white rounded-[8px] font-medium hover:bg-primary/90 transition-colors inline-block"
             >
               {t('goals.newGoal')}
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

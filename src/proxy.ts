@@ -21,7 +21,7 @@ export async function proxy(request: NextRequest) {
             if (!isNaN(userIdFromJwt) && userIdFromJwt > 0) {
                 userId = userIdFromJwt
             }
-        } catch (error) {
+        } catch {
             // Invalid token
         }
     }

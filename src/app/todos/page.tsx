@@ -1,7 +1,7 @@
 'use client';
 
 import AppLayout from '@/components/AppLayout';
-import TodoList from '@/components/TodoList';
+import TodoList from '@/components/todo/TodoList';
 
 export default function TodosPage() {
     return (

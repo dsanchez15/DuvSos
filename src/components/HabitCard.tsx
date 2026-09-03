@@ -17,7 +17,7 @@ interface HabitCardProps {
 
 export default function HabitCard({
   habit,
-  onUpdate,
+  onUpdate: _onUpdate,
   onDelete,
   onToggleCompletion,
   onStateChange,

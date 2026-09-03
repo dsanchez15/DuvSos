@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/AppLayout'
-import ChecklistList from '@/components/ChecklistList'
+import ChecklistList, { type SortOption } from '@/components/checklist/ChecklistList'
 import ChecklistForm from '@/components/ChecklistForm'
 import CategoryManager from '@/components/CategoryManager'
 import Toast from '@/components/Toast'
 import { useAppTranslation } from '@/components/LanguageProvider'
 import { Checklist, ChecklistCategory, ChecklistFilter, ChecklistFormData, ChecklistItem, Priority, ChecklistTab } from '@/types/checklist'
-import { SortOption } from '@/components/ChecklistList'
 
 export default function ChecklistsPage() {
   const { t } = useAppTranslation()

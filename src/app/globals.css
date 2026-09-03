@@ -13,15 +13,27 @@
     --color-background: var(--color-bg-base);
     --color-foreground: var(--color-text-primary);
     --color-primary: var(--color-primary);
+    --color-primary-hover: var(--color-primary-hover);
+    --color-primary-light: var(--color-primary-light);
+    --color-success: var(--color-success);
+    --color-warning: var(--color-warning);
+    --color-danger: var(--color-danger);
+    --color-info: var(--color-info);
     --color-background-light: var(--color-bg-surface);
     --color-background-dark: var(--color-bg-base);
     --color-sidebar-bg: var(--color-sidebar-bg);
+    --color-sidebar-border: var(--color-sidebar-border);
     --color-bg-surface: var(--color-bg-surface);
     --color-bg-surface-hover: var(--color-bg-surface-hover);
+    --color-bg-input: var(--color-bg-input);
+    --color-bg-overlay: var(--color-bg-overlay);
     --color-text-primary: var(--color-text-primary);
     --color-text-secondary: var(--color-text-secondary);
     --color-text-muted: var(--color-text-muted);
+    --color-text-inverse: var(--color-text-inverse);
     --color-border: var(--color-border);
+    --color-border-hover: var(--color-border-hover);
+    --color-border-strong: var(--color-border-strong);
     --font-sans: var(--font-body);
     --font-mono: var(--font-geist-mono);
     /* Aure palette */
@@ -150,6 +162,11 @@ body {
     transform: translateY(-1px);
 }
 
+/* Preserve selected border color even when hovered */
+.todo-item-hover.todo-card-selected:hover {
+    border-color: var(--color-primary);
+}
+
 .todo-checkbox-unchecked:hover {
     border-color: var(--color-success) !important;
 }
@@ -195,6 +212,122 @@ body {
 
 .todo-advanced-toggle:hover {
     background: var(--color-bg-surface-hover);
+}
+
+/* ─── Todo utility classes ─── */
+.todo-card-surface {
+    @apply rounded-[8px] p-4 border-2;
+    background: var(--color-bg-surface);
+    border-color: var(--color-border);
+}
+
+.todo-card-surface-hover {
+    @apply rounded-[8px] p-4;
+    background: var(--color-bg-surface-hover);
+}
+
+.todo-card-selected {
+    border-color: var(--color-primary);
+}
+
+.todo-input {
+    @apply px-4 py-3 rounded-[8px] border focus:outline-none focus:ring-2 focus:ring-primary;
+    border-color: var(--color-border);
+    background: var(--color-bg-input);
+    color: var(--color-text-primary);
+}
+
+.todo-input-sm {
+    @apply px-3 py-2 rounded-[8px] border text-sm;
+    border-color: var(--color-border);
+    background: var(--color-bg-input);
+    color: var(--color-text-primary);
+}
+
+.todo-label {
+    @apply block text-sm font-medium mb-1;
+    color: var(--color-text-secondary);
+}
+
+.todo-heading {
+    @apply text-2xl font-bold;
+    color: var(--color-text-primary);
+}
+
+.todo-text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.todo-text-muted {
+    color: var(--color-text-muted);
+}
+
+.todo-text-primary {
+    color: var(--color-text-primary);
+}
+
+.todo-bg-surface {
+    background: var(--color-bg-surface);
+}
+
+.todo-bg-surface-hover {
+    background: var(--color-bg-surface-hover);
+}
+
+.todo-border {
+    border-color: var(--color-border);
+}
+
+.todo-btn-primary {
+    @apply px-6 py-3 rounded-[8px] font-medium transition-colors;
+    background: var(--color-primary);
+    color: white;
+}
+.todo-btn-primary:hover {
+    background: var(--color-primary-hover);
+}
+.todo-btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
+.todo-btn-sm {
+    @apply px-3 py-2 rounded-[8px] text-sm;
+    background: var(--color-primary);
+    color: white;
+}
+.todo-btn-sm:hover {
+    background: var(--color-primary-hover);
+}
+.todo-btn-sm:disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
+.todo-error-banner {
+    @apply flex items-center gap-3 p-4 border rounded-[8px];
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+    border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
+    color: var(--color-danger);
+}
+
+.todo-stat-box {
+    @apply rounded-[8px] p-3;
+    background: var(--color-bg-surface-hover);
+}
+
+.todo-stat-label {
+    @apply text-xs mb-1;
+    color: var(--color-text-muted);
+}
+
+.todo-stat-value {
+    @apply text-xl font-bold;
+    color: var(--color-text-primary);
+}
+
+.todo-section-card {
+    @apply rounded-[8px] p-5 border;
+    background: var(--color-bg-surface);
+    border-color: var(--color-border);
 }
 
 /* Checklist component token-based hover states */
