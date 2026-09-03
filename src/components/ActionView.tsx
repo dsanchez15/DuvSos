@@ -1,15 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Habit, HabitWithMetrics } from '@/types/habit'
 import { calculateStreak, calculateCompletionRate, getPeriodLabel, getPeriodRangeText, getTodayDateString, isCompletedOnDate, getLevelName } from '@/lib/habit-utils'
 import UserProgressionBadge from './UserProgressionBadge'
 import EnergySelector from './EnergySelector'
 import { useAppTranslation } from '@/components/LanguageProvider'
 
+interface ToggleCompletionResult {
+  xp?: {
+    newXP: number
+    newLevel: number
+    leveledUp: boolean
+    milestone: string | null
+  }
+}
+
 interface ActionViewProps {
   habits: Habit[]
-  onToggleCompletion: (id: number, date: string, completed: boolean) => Promise<any>
+  onToggleCompletion: (id: number, date: string, completed: boolean) => Promise<ToggleCompletionResult | undefined>
   loading?: boolean
 }
 

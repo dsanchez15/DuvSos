@@ -4,15 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppTranslation } from '@/components/LanguageProvider'
 
-type Language = 'en' | 'es';
-
 export default function LoginPage() {
-    const { t, language } = useAppTranslation()
+    const { t } = useAppTranslation()
     const router = useRouter()
     const [isLogin, setIsLogin] = useState(true)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const [lang] = useState<Language>(language as Language)
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -40,8 +37,8 @@ export default function LoginPage() {
 
             router.refresh()
             router.push('/dashboard')
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : t('login.error'))
         } finally {
             setLoading(false)
         }

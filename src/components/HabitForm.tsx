@@ -56,7 +56,7 @@ export default function HabitForm({ onSubmit, onCancel, initialData, categories 
     } else {
       setCycleError('')
     }
-  }, [isPermanent, startDate, endDate])
+  }, [isPermanent, startDate, endDate, t])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

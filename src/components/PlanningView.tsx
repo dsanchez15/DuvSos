@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import HabitCard from './HabitCard'
 import HabitForm from './HabitForm'
 import { useAppTranslation } from '@/components/LanguageProvider'

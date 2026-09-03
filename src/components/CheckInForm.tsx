@@ -44,8 +44,8 @@ export default function CheckInForm({ onSubmit, initialData }: CheckInFormProps)
     setError(null)
     try {
       await onSubmit(form)
-    } catch (err: any) {
-      setError(err.message || t('progress.saveError'))
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('progress.saveError'))
     } finally {
       setLoading(false)
     }

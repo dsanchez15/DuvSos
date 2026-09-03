@@ -1,6 +1,6 @@
 export type Priority = 'low' | 'normal' | 'high'
 
-export interface Category {
+export interface TodoCategory {
   id: number
   name: string
   color: string
@@ -19,7 +19,7 @@ export interface Todo {
   title: string
   description?: string
   completed: boolean
-  priority: Priority
+  priority: string
   dueDate?: string
   dueTime?: string
   effortMinutes: number
@@ -28,7 +28,7 @@ export interface Todo {
   updatedAt: string
   parentId?: number
   categoryId?: number
-  category?: Category
+  category?: TodoCategory
   subTasks?: SubTask[]
   progress?: number
   subTasksCount?: number

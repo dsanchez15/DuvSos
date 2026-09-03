@@ -423,3 +423,74 @@ export function computeBlockerPayload(
 
   return updates
 }
+
+/**
+ * Find the closest valid drop target to the given tree index.
+ * Returns null when there are no valid targets.
+ */
+export function findClosestValidTarget(treeIdx: number, targets: number[]): number | null {
+  if (targets.length === 0) return null
+  let closest = targets[0]
+  let minDist = Math.abs(targets[0] - treeIdx)
+  for (const t of targets) {
+    const dist = Math.min(Math.abs(t - treeIdx), Math.abs(t - (treeIdx + 1)))
+    if (dist < minDist) {
+      minDist = dist
+      closest = t
+    }
+  }
+  return closest
+}
+
+/**
+ * Determine the new parentId based on where the item is being dropped.
+ * Parents always stay at top level; children join the parent group of
+ * the drop position.
+ */
+export function determineNewParentId(
+  orderedTree: ChecklistItem[],
+  dropIdx: number,
+  draggedItem: ChecklistItem
+): number | null {
+  const isParent = draggedItem.parentId == null
+  if (isParent) return null
+
+  if (dropIdx === 0) {
+    const firstParent = orderedTree.find((i) => i.parentId == null)
+    return firstParent?.id ?? null
+  }
+
+  const itemBefore = orderedTree[dropIdx - 1]
+  if (!itemBefore) return null
+
+  if (itemBefore.parentId == null) {
+    return itemBefore.id
+  }
+  return itemBefore.parentId
+}
+
+/**
+ * Compute the drop index within the target group. For parent moves it is
+ * the flat tree position; for child moves, the position among the target
+ * parent's children.
+ */
+export function computeDropIndex(
+  orderedTree: ChecklistItem[],
+  dropIdx: number,
+  newParentId: number | null,
+  draggedItem: ChecklistItem
+): number {
+  const isParent = draggedItem.parentId == null
+  if (isParent) return dropIdx
+
+  const targetChildren = orderedTree.filter(
+    (i) => i.parentId === newParentId && i.id !== draggedItem.id
+  )
+
+  let childPosition = 0
+  for (const child of targetChildren) {
+    const childIdx = orderedTree.findIndex((i) => i.id === child.id)
+    if (childIdx < dropIdx) childPosition++
+  }
+  return childPosition
+}

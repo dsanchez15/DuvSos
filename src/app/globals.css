@@ -15,6 +15,10 @@
     --color-primary: var(--color-primary);
     --color-primary-hover: var(--color-primary-hover);
     --color-primary-light: var(--color-primary-light);
+    --color-success: var(--color-success);
+    --color-warning: var(--color-warning);
+    --color-danger: var(--color-danger);
+    --color-info: var(--color-info);
     --color-background-light: var(--color-bg-surface);
     --color-background-dark: var(--color-bg-base);
     --color-sidebar-bg: var(--color-sidebar-bg);
@@ -30,10 +34,6 @@
     --color-border: var(--color-border);
     --color-border-hover: var(--color-border-hover);
     --color-border-strong: var(--color-border-strong);
-    --color-success: var(--color-success);
-    --color-warning: var(--color-warning);
-    --color-danger: var(--color-danger);
-    --color-info: var(--color-info);
     --font-sans: var(--font-body);
     --font-mono: var(--font-geist-mono);
     /* Aure palette */

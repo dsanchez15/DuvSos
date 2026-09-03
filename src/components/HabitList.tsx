@@ -26,7 +26,7 @@ export default function HabitList() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     fetchHabits()

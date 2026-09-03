@@ -50,10 +50,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [collapsed, setCollapsed] = useState<boolean>(false);
     const [mobileOverlayOpen, setMobileOverlayOpen] = useState<boolean>(false);
-    const [mounted, setMounted] = useState(false);
-
     useEffect(() => {
-        setMounted(true);
         const mobile = getIsMobile();
         setIsMobile(mobile);
 

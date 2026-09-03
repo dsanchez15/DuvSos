@@ -52,8 +52,8 @@ export default function DayTracker({ onSubmit, initialData }: DayTrackerProps) {
     try {
       await onSubmit(form)
       setForm(f => ({ ...f, plannedTime: null, actualTime: null, notes: '' }))
-    } catch (err: any) {
-      setError(err.message || t('progress.saveError'))
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('progress.saveError'))
     } finally {
       setLoading(false)
     }

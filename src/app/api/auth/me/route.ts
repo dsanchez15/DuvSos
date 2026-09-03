@@ -22,7 +22,7 @@ export async function PATCH(request: Request) {
 
     try {
         const body = await request.json();
-        const { name, email, tagline, theme, visualTheme, checklistAlertDays, language } = body;
+        const { name, email, tagline, theme, visualTheme, checklistAlertDays, language, featureFlags } = body;
         console.log('PATCH /api/auth/me request:', { name, email, tagline });
 
         // Simple validation
@@ -45,6 +45,7 @@ export async function PATCH(request: Request) {
                 visualTheme: visualTheme !== undefined ? visualTheme : user.visualTheme,
                 checklistAlertDays: checklistAlertDays !== undefined ? checklistAlertDays : user.checklistAlertDays,
                 language: language !== undefined ? language : user.language,
+                featureFlags: featureFlags !== undefined ? featureFlags : user.featureFlags,
             },
         });
         console.log('User updated successfully:', updatedUser.id);

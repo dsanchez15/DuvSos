@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/components/SidebarContext";
 import { useAppTranslation } from "@/components/LanguageProvider";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { useSidebarData } from "@/hooks/useSidebarData";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import SidebarItem from "@/components/SidebarItem";
 import SidebarGroup from "@/components/SidebarGroup";
 import SidebarLogo from "@/components/SidebarLogo";
@@ -18,6 +19,7 @@ export default function Sidebar() {
   const { isExpanded, isMobileOverlayOpen, toggle, closeMobileOverlay } =
     useSidebar();
   const { user, expiringCount } = useSidebarData();
+  const { flags } = useFeatureFlags();
 
   const [planExpanded, setPlanExpanded] = useLocalStorageState(
     "sidebar-plan-expanded",
@@ -27,46 +29,27 @@ export default function Sidebar() {
     "sidebar-study-expanded",
     false,
   );
-  const [showStudySection, setShowStudySection] = useState(true);
 
   // Auto-expand study group when navigating into /study
   useEffect(() => {
     if (pathname.startsWith('/study')) {
       setStudyExpanded(true);
     }
-  }, [pathname]);
+  }, [pathname, setStudyExpanded]);
 
   // Auto-expand plan group when navigating into goals/progress
   useEffect(() => {
     if (pathname.startsWith('/goals') || pathname.startsWith('/progress')) {
       setPlanExpanded(true);
     }
-  }, [pathname]);
+  }, [pathname, setPlanExpanded]);
 
-  const toggleStudy = useCallback(() => setStudyExpanded((v) => !v), []);
-  const togglePlan = useCallback(() => setPlanExpanded((v) => !v), []);
+  const toggleStudy = useCallback(() => setStudyExpanded((v) => !v), [setStudyExpanded]);
+  const togglePlan = useCallback(() => setPlanExpanded((v) => !v), [setPlanExpanded]);
 
   const toggleRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
-
-  // Listen for study settings changes (cross-tab + same-tab via storage)
-  useEffect(() => {
-    const readStudyVisibility = () => {
-      try {
-        const raw = localStorage.getItem("aure-study-settings");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          setShowStudySection(Boolean(parsed.showStudySection));
-        }
-      } catch {
-        /* ignore */
-      }
-    };
-    readStudyVisibility();
-    window.addEventListener("storage", readStudyVisibility);
-    return () => window.removeEventListener("storage", readStudyVisibility);
-  }, []);
 
   // Use the custom focus trap hook
   useFocusTrap(sidebarRef, isMobileOverlayOpen, toggleRef);
@@ -163,30 +146,36 @@ export default function Sidebar() {
             isExpanded={isExpanded}
             isActive={pathname === "/todos"}
           />
-          <SidebarItem
-            href="/checklists"
-            icon="fact_check"
-            label={t("sidebar.checklists")}
-            isExpanded={isExpanded}
-            isActive={pathname === "/checklists"}
-            badge={checklistsBadge}
-          />
-          <SidebarItem
-            href="/reminders"
-            icon="notifications_active"
-            label={t("sidebar.reminders")}
-            isExpanded={isExpanded}
-            isActive={pathname === "/reminders"}
-          />
-          <SidebarItem
-            href="/habits"
-            icon="routine"
-            label={t("sidebar.habits")}
-            isExpanded={isExpanded}
-            isActive={pathname === "/habits"}
-          />
+          {flags.checklists && (
+            <SidebarItem
+              href="/checklists"
+              icon="fact_check"
+              label={t("sidebar.checklists")}
+              isExpanded={isExpanded}
+              isActive={pathname === "/checklists"}
+              badge={checklistsBadge}
+            />
+          )}
+          {flags.reminders && (
+            <SidebarItem
+              href="/reminders"
+              icon="notifications_active"
+              label={t("sidebar.reminders")}
+              isExpanded={isExpanded}
+              isActive={pathname === "/reminders"}
+            />
+          )}
+          {flags.habits && (
+            <SidebarItem
+              href="/habits"
+              icon="routine"
+              label={t("sidebar.habits")}
+              isExpanded={isExpanded}
+              isActive={pathname === "/habits"}
+            />
+          )}
 
-          {showStudySection && (
+          {flags.study && (
             <SidebarGroup
               icon="school"
               label="Estudio"
@@ -202,25 +191,29 @@ export default function Sidebar() {
             />
           )}
 
-          <SidebarGroup
-            icon="track_changes"
-            label={t("sidebar.plan")}
-            isExpanded={isExpanded}
-            groupExpanded={planExpanded}
-            onToggle={togglePlan}
-            isActive={
-              pathname.startsWith("/goals") || pathname.startsWith("/progress")
-            }
-            pathname={pathname}
-            items={[
-              { href: "/goals", icon: "flag", label: t("sidebar.goals") },
-              {
-                href: "/progress",
-                icon: "trending_up",
-                label: t("sidebar.progressAndCheckIn"),
-              },
-            ]}
-          />
+          {(flags.goals || flags.progress) && (
+            <SidebarGroup
+              icon="track_changes"
+              label={t("sidebar.plan")}
+              isExpanded={isExpanded}
+              groupExpanded={planExpanded}
+              onToggle={togglePlan}
+              isActive={
+                pathname.startsWith("/goals") || pathname.startsWith("/progress")
+              }
+              pathname={pathname}
+              items={[
+                ...(flags.goals ? [{ href: "/goals", icon: "flag", label: t("sidebar.goals") }] : []),
+                ...(flags.progress
+                  ? [{
+                      href: "/progress",
+                      icon: "trending_up",
+                      label: t("sidebar.progressAndCheckIn"),
+                    }]
+                  : []),
+              ]}
+            />
+          )}
         </nav>
 
         {/* User Profile */}
